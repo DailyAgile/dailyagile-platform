@@ -8,8 +8,8 @@ i18n
   .use(initReactI18next)
   .use(resourcesToBackend((language: string) => import(`./locales/${language}.json`)))
   .init({
-    lng: defaultLocale,
-    fallbackLng: defaultLocale,
+    lng: 'en-US',
+    fallbackLng: 'en-US',
     supportedLngs: supportedLocales.map((l) => l.code),
     interpolation: {
       escapeValue: false,

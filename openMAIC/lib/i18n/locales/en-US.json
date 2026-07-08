@@ -7,7 +7,7 @@
   },
   "home": {
     "slogan": "Accelerate Business Agility",
-    "greetingWithName": "Welcome to DailyAgile, {{name}}"
+    "greetingWithName": "Welcome to DailyAgile"
   },
   "toolbar": {
     "pdfParser": "Parser",

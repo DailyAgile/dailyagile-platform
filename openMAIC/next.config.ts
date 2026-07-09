@@ -1,9 +1,6 @@
 import type { NextConfig } from 'next';
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
-
 const nextConfig: NextConfig = {
-  basePath,
   output: process.env.VERCEL ? undefined : 'standalone',
   transpilePackages: ['mathml2omml', 'pptxgenjs', '@openmaic/importer'],
   // These agent packages do a runtime `import(specifier)` with a computed

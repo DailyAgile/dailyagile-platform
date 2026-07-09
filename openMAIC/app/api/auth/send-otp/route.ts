@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const rateLimit = checkOTPRateLimit(normalizedEmail);
   if (rateLimit.limited) {
     return apiError(
-      'RATE_LIMIT',
+      'RATE_LIMITED',
       429,
       `Please wait ${rateLimit.secondsUntilRetry} seconds before requesting another code`
     );

@@ -17,24 +17,24 @@ export default function HomePage() {
             />
           </div>
           <nav className="flex items-center gap-6">
-            <a href="#features" className="text-teal-600 hover:text-orange-600 text-sm font-medium">
+            <a href="#features" className="text-cyan-600 hover:text-orange-600 text-sm font-medium">
               Why Us
             </a>
-            <a href="#pricing" className="text-teal-600 hover:text-orange-600 text-sm font-medium">
+            <a href="#pricing" className="text-cyan-600 hover:text-orange-600 text-sm font-medium">
               Pricing
             </a>
-            <a href="#reviews" className="text-teal-600 hover:text-orange-600 text-sm font-medium">
+            <a href="#reviews" className="text-cyan-600 hover:text-orange-600 text-sm font-medium">
               Reviews
             </a>
             <a
               href="#pricing"
-              className="bg-gradient-to-r from-teal-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold hover:shadow-lg transition"
+              className="bg-gradient-to-r from-cyan-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold hover:shadow-lg transition"
             >
               Get Started
             </a>
             <Link
               href="/classroom"
-              className="bg-navy-700 text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-navy-800 transition"
+              className="bg-slate-900 text-white px-4 py-2 rounded-full text-sm font-bold hover:bg-slate-800 transition"
             >
               🧪 Test Platform
             </Link>
@@ -45,10 +45,10 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-block bg-gradient-to-r from-teal-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
+          <div className="inline-block bg-gradient-to-r from-cyan-600 to-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
             ✨ Trusted by 800+ Professionals
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-navy-700 mb-6" style={{ fontFamily: 'Cambria, serif' }}>
+          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6" style={{ fontFamily: 'Cambria, serif' }}>
             Accelerate Business Agility
           </h1>
           <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
@@ -63,7 +63,7 @@ export default function HomePage() {
             </a>
             <a
               href="#reviews"
-              className="border-2 border-navy-700 text-navy-700 px-8 py-3 rounded-3xl font-bold hover:bg-navy-700 hover:text-white transition"
+              className="border-2 border-slate-900 text-slate-900 px-8 py-3 rounded-3xl font-bold hover:bg-slate-900 hover:text-white transition"
             >
               See What Others Say
             </a>
@@ -94,7 +94,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-3 gap-8 mb-12">
             <div className="text-center">
-              <div className="text-4xl font-bold text-teal-600 mb-2">800+</div>
+              <div className="text-4xl font-bold text-cyan-600 mb-2">800+</div>
               <p className="text-gray-700">Professionals Trained</p>
             </div>
             <div className="text-center">
@@ -102,13 +102,13 @@ export default function HomePage() {
               <p className="text-gray-700">5-Star Rating</p>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-teal-600 mb-2">100%</div>
+              <div className="text-4xl font-bold text-cyan-600 mb-2">100%</div>
               <p className="text-gray-700">Learn at Your Pace</p>
             </div>
           </div>
 
           {/* Student Avatars */}
-          <h2 className="text-2xl font-bold text-navy-700 text-center mb-8" style={{ fontFamily: 'Cambria, serif' }}>
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-8" style={{ fontFamily: 'Cambria, serif' }}>
             Meet Our Certified Professionals
           </h2>
           <div className="grid grid-cols-12 gap-3 mb-12 justify-items-center">
@@ -124,32 +124,32 @@ export default function HomePage() {
           </div>
 
           {/* Testimonials */}
-          <h2 className="text-2xl font-bold text-navy-700 text-center mb-8" style={{ fontFamily: 'Cambria, serif' }}>
+          <h2 className="text-2xl font-bold text-slate-900 text-center mb-8" style={{ fontFamily: 'Cambria, serif' }}>
             What Students Are Saying
           </h2>
           <div className="grid grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-lg border-t-4 border-teal-600">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-lg border-t-4 border-cyan-600">
               <div className="text-orange-600 mb-2">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-700 italic mb-4">
                 "Applied the prompt engineering techniques in our sprint planning. Team productivity jumped 40% in two weeks. Game-changer."
               </p>
-              <p className="font-bold text-navy-700">Sarah Chen</p>
+              <p className="font-bold text-slate-900">Sarah Chen</p>
               <p className="text-sm text-gray-600">Product Manager, TechCorp</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-lg border-t-4 border-teal-600">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-lg border-t-4 border-cyan-600">
               <div className="text-orange-600 mb-2">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-700 italic mb-4">
                 "Built a RAG pipeline using what I learned. Now the entire data team uses it. Best investment in my professional development."
               </p>
-              <p className="font-bold text-navy-700">Marcus Johnson</p>
+              <p className="font-bold text-slate-900">Marcus Johnson</p>
               <p className="text-sm text-gray-600">Senior Engineer, DataFlow Inc</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-lg border-t-4 border-teal-600">
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-lg border-t-4 border-cyan-600">
               <div className="text-orange-600 mb-2">⭐⭐⭐⭐⭐</div>
               <p className="text-gray-700 italic mb-4">
                 "My manager noticed the change immediately. Got promoted within 3 months. The Agile + AI combo is exactly what leadership needed."
               </p>
-              <p className="font-bold text-navy-700">Jennifer Park</p>
+              <p className="font-bold text-slate-900">Jennifer Park</p>
               <p className="text-sm text-gray-600">Scrum Master, CloudFirst</p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function HomePage() {
       {/* Features */}
       <section id="features" className="bg-gradient-to-b from-blue-50 to-white px-4 py-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-navy-700 text-center mb-4" style={{ fontFamily: 'Cambria, serif' }}>
+          <h2 className="text-4xl font-bold text-slate-900 text-center mb-4" style={{ fontFamily: 'Cambria, serif' }}>
             Why Choose DailyAgile?
           </h2>
           <p className="text-center text-gray-700 mb-12 max-w-2xl mx-auto">
@@ -175,9 +175,9 @@ export default function HomePage() {
               { icon: '⏱️', title: 'Learn at Your Pace', desc: 'Lifetime access. Your schedule, your speed.' },
               { icon: '💼', title: 'Proven Results', desc: '800+ professionals transformed their careers.' },
             ].map((feature, i) => (
-              <div key={i} className="bg-white p-6 rounded-lg border border-gray-200 hover:border-teal-600 hover:shadow-lg transition text-center">
+              <div key={i} className="bg-white p-6 rounded-lg border border-gray-200 hover:border-cyan-600 hover:shadow-lg transition text-center">
                 <div className="text-3xl mb-3">{feature.icon}</div>
-                <h3 className="font-bold text-navy-700 mb-2">{feature.title}</h3>
+                <h3 className="font-bold text-slate-900 mb-2">{feature.title}</h3>
                 <p className="text-sm text-gray-700">{feature.desc}</p>
               </div>
             ))}
@@ -188,7 +188,7 @@ export default function HomePage() {
       {/* Pricing */}
       <section id="pricing" className="bg-white px-4 py-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-navy-700 text-center mb-4" style={{ fontFamily: 'Cambria, serif' }}>
+          <h2 className="text-4xl font-bold text-slate-900 text-center mb-4" style={{ fontFamily: 'Cambria, serif' }}>
             Simple, Transparent Pricing
           </h2>
           <p className="text-center text-gray-700 mb-12">
@@ -214,9 +214,9 @@ export default function HomePage() {
                     ⭐ POPULAR
                   </div>
                 )}
-                <h3 className="font-bold text-navy-700 mb-1">{card.title}</h3>
+                <h3 className="font-bold text-slate-900 mb-1">{card.title}</h3>
                 <p className="text-sm text-gray-700 mb-3">{card.subtitle}</p>
-                <div className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-orange-600 bg-clip-text text-transparent mb-1">
+                <div className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-orange-600 bg-clip-text text-transparent mb-1">
                   {card.price}
                 </div>
                 <p className="text-sm text-gray-700 mb-4">{card.modules}</p>
@@ -236,7 +236,7 @@ export default function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-gradient-to-r from-navy-700 via-teal-600 to-teal-500 text-white px-4 py-16">
+      <section className="bg-gradient-to-r from-slate-900 via-cyan-600 to-teal-500 text-white px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4" style={{ fontFamily: 'Cambria, serif' }}>
             Ready to Accelerate Your Career?
@@ -254,7 +254,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-navy-700 to-navy-800 text-white px-4 py-8">
+      <footer className="bg-gradient-to-r from-slate-900 to-slate-800 text-white px-4 py-8">
         <div className="max-w-6xl mx-auto text-center text-sm">
           <div className="flex justify-center gap-6 mb-4">
             <a href="#pricing" className="text-teal-400 hover:text-orange-400">Pricing</a>

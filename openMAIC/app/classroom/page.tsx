@@ -508,7 +508,7 @@ function HomePage() {
       >
         {/* ── Logo ── */}
         <motion.img
-          src="/assets/dailyagile_logo.png"
+          src="assets/dailyagile_logo.png"
           alt="DailyAgile"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

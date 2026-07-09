@@ -33,7 +33,7 @@ export default function HomePage() {
           }}
         >
           <div>
-            <img src="/assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '48px', width: 'auto' }} />
+            <img src="assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '48px', width: 'auto' }} />
           </div>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
             <a href="#features" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
@@ -135,10 +135,10 @@ export default function HomePage() {
           {/* Hero Images */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '3rem' }}>
             <div style={{ borderRadius: '0.75rem', overflow: 'hidden', height: '256px', backgroundColor: '#e5e7eb' }}>
-              <img src="/assets/hero-professionals.png" alt="Professionals Learning" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src="assets/hero-professionals.png" alt="Professionals Learning" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <div style={{ borderRadius: '0.75rem', overflow: 'hidden', height: '256px', backgroundColor: '#e5e7eb' }}>
-              <img src="/assets/hero-robots.png" alt="AI Robots Teaching" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src="assets/hero-robots.png" alt="AI Robots Teaching" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           </div>
         </div>

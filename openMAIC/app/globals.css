@@ -2,8 +2,8 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-/* Tailwind v4 source scanning - include all app files and components */
-@source "./**/*.{tsx,ts,jsx,js}";
+/* Tailwind v4 source scanning - scan current and parent directories */
+@source "../**/*.{tsx,ts,jsx,js}";
 @source '../node_modules/streamdown/dist/*.js';
 @source '../node_modules/@streamdown/code/dist/*.js';
 @source "../node_modules/@openmaic/renderer/dist/**/*.{js,cjs}";
@@ -48,27 +48,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-navy: {
-    700: #1E3A5F;
-    800: #1a2f4d;
-  };
-  --color-teal: {
-    600: #0891B2;
-  };
-  --color-orange: {
-    600: #EA580C;
-  };
-  --color-blue: {
-    50: #f0f9ff;
-  };
-  --color-cyan: {
-    50: #ecfdf5;
-  };
-  --color-gray: {
-    200: #e5e7eb;
-    600: #4b5563;
-    700: #374151;
-  };
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

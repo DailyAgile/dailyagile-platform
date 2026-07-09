@@ -180,7 +180,7 @@ export default function HomePage() {
                   backgroundColor: '#e5e7eb',
                 }}
               >
-                <img src={`/assets/student-${i}.png`} alt={`Student ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src={`assets/student-${i}.png`} alt={`Student ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
           </div>

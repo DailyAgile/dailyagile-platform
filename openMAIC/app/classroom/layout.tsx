@@ -1,9 +1,14 @@
-import { AccessCodeGuard } from '@/components/access-code-guard';
+import { ClassroomGuard } from '@/components/auth/classroom-guard';
+
+export const metadata = {
+  title: 'Classroom | DailyAgile',
+  description: 'Interactive AI-powered classroom',
+};
 
 export default function ClassroomLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <AccessCodeGuard>{children}</AccessCodeGuard>;
+  return <ClassroomGuard>{children}</ClassroomGuard>;
 }

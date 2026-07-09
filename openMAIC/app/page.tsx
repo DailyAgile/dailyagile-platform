@@ -60,7 +60,7 @@ export default function HomePage() {
               Get Started
             </a>
             <Link
-              href="/classroom"
+              href="/auth/login"
               style={{
                 backgroundColor: primaryColor,
                 color: 'white',

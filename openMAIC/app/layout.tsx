@@ -32,6 +32,9 @@ export default function RootLayout({
 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        {basePath && <base href={basePath + '/'} />}
+      </head>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
         suppressHydrationWarning

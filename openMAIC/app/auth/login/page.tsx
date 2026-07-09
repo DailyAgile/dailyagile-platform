@@ -73,7 +73,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block mb-6">
             <img
-              src="/academy/assets/dailyagile_logo.png"
+              src="/assets/dailyagile_logo.png"
               alt="DailyAgile"
               className="h-12 w-auto"
             />

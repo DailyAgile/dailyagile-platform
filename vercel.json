@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd openMAIC && pnpm install && pnpm build",
+  "outputDirectory": "openMAIC/.next",
+  "framework": "nextjs",
+  "rootDirectory": "openMAIC"
+}

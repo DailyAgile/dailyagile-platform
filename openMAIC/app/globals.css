@@ -2,14 +2,16 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-/* Tailwind v4 source scanning - scan current and parent directories */
-@source "../**/*.{tsx,ts,jsx,js}";
+/* Tailwind v4 source scanning */
+@source './**/*.tsx';
+@source './**/*.ts';
+@source './**/*.jsx';
+@source './**/*.js';
+@source '../components/**/*.tsx';
+@source '../lib/**/*.tsx';
 @source '../node_modules/streamdown/dist/*.js';
 @source '../node_modules/@streamdown/code/dist/*.js';
 @source "../node_modules/@openmaic/renderer/dist/**/*.{js,cjs}";
-/* slide-renderer-demo is gitignored (local sandbox), which makes Tailwind v4's
-   auto source detection skip it. Re-include it explicitly so the demo's
-   Tailwind classes (e.g. bg-violet-600) still get generated. */
 @source "./slide-renderer-demo/**/*.{tsx,ts,jsx,js}";
 
 @custom-variant dark (&:is(.dark *));

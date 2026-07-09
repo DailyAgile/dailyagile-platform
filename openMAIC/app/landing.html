@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DailyAgile — Accelerate Business Agility with AI Learning</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Calibri', 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #1e293b;
+      background: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* Brand Colors */
+    :root {
+      --navy: #1E3A5F;
+      --teal: #0891B2;
+      --orange: #EA580C;
+      --light-bg: #F0F7FA;
+      --gray: #64748B;
+      --white: #FFFFFF;
+    }
+
+    /* Animated Background */
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      25% { transform: translateX(10px) translateY(-5px); }
+      50% { transform: translateX(0) translateY(-10px); }
+      75% { transform: translateX(-10px) translateY(-5px); }
+    }
+
+    /* Header & Navigation */
+    header {
+      background: white;
+      color: var(--teal);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 15px rgba(8, 145, 178, 0.15);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo img {
+      height: 55px;
+      width: auto;
+      max-width: 200px;
+      filter: drop-shadow(0 2px 10px rgba(8, 145, 178, 0.2));
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    nav a, nav button {
+      color: var(--teal);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      position: relative;
+      font-weight: 500;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    nav a:hover, nav button:hover {
+      color: var(--orange);
+    }
+
+    nav a::after, nav button::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--orange);
+      transition: width 0.3s;
+    }
+
+    nav a:hover::after, nav button:hover::after {
+      width: 100%;
+    }
+
+    .cta-button {
+      background: linear-gradient(135deg, var(--teal), var(--orange));
+      color: white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(8, 145, 178, 0.4);
+    }
+
+    .test-button {
+      background: var(--navy);
+      color: white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+      font-size: 0.85rem;
+    }
+
+    .test-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(30, 58, 95, 0.4);
+      background: #152d47;
+    }
+
+    /* Hero Section with Animated Background */
+    .hero {
+      position: relative;
+      padding: 8rem 2rem;
+      text-align: center;
+      overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg,
+        #F0F7FA 0%,
+        #E0F2FE 25%,
+        rgba(8, 145, 178, 0.1) 50%,
+        #F0F7FA 75%,
+        #E0F2FE 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 15s ease infinite;
+      z-index: 0;
+    }
+
+    /* Floating Particles */
+    .particle {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .particle-circle {
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle at 30% 30%, var(--teal), rgba(8, 145, 178, 0.2));
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+      box-shadow: 0 0 20px rgba(8, 145, 178, 0.4);
+    }
+
+    .particle-circle-lg {
+      width: 50px;
+      height: 50px;
+      background: radial-gradient(circle at 30% 30%, var(--orange), rgba(234, 88, 12, 0.1));
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+      box-shadow: 0 0 30px rgba(234, 88, 12, 0.3);
+      opacity: 0.3;
+    }
+
+    /* Wave Animation */
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,50 Q300,0 600,50 T1200,50 L1200,120 L0,120 Z" fill="%230891B2" opacity="0.2"/></svg>');
+      background-size: 200% 100%;
+      animation: wave 8s linear infinite;
+      z-index: 1;
+    }
+
+    .wave:nth-child(2) {
+      bottom: 10px;
+      animation: wave 8s linear infinite reverse;
+      opacity: 0.5;
+    }
+
+    .wave:nth-child(3) {
+      bottom: 20px;
+      animation: wave 8s linear infinite;
+      opacity: 0.3;
+    }
+
+    .hero-container {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero h1 {
+      font-family: 'Cambria', serif;
+      font-size: 3.5rem;
+      color: var(--navy);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      font-weight: bold;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--gray);
+      margin-bottom: 1.5rem;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-tagline {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--teal), var(--orange));
+      color: white;
+      padding: 0.7rem 2rem;
+      border-radius: 25px;
+      font-weight: bold;
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+      animation: pulse 3s ease-in-out infinite;
+      box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    /* Hero Images Section */
+    .hero-images {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 3rem;
+      align-items: center;
+    }
+
+    .hero-image-box {
+      position: relative;
+      height: 300px;
+      border-radius: 15px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(234, 88, 12, 0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px dashed rgba(8, 145, 178, 0.3);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+
+    .hero-image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-image-placeholder {
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .hero-image-placeholder p {
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+      color: var(--teal);
+    }
+
+    /* Avatar Grid */
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+      padding: 2rem;
+      background: transparent;
+      border-radius: 10px;
+    }
+
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--orange));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      border: 2px solid white;
+      box-shadow: 0 4px 12px rgba(8, 145, 178, 0.2);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .avatar:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(8, 145, 178, 0.3);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Before/After Comparison */
+    .comparison-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .comparison-box {
+      position: relative;
+      height: 250px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(8, 145, 178, 0.1), rgba(234, 88, 12, 0.1));
+      display: flex;
+      align-items: flex-end;
+      border: 2px dashed rgba(8, 145, 178, 0.3);
+    }
+
+    .comparison-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .comparison-label {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .comparison-box.before .comparison-label {
+      background: rgba(234, 88, 12, 0.8);
+    }
+
+    .comparison-box.after .comparison-label {
+      background: rgba(8, 145, 178, 0.8);
+    }
+
+    @media (max-width: 768px) {
+      .hero-images {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-section {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-image-box {
+        height: 200px;
+      }
+    }
+
+    .cta-primary {
+      background: var(--orange);
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 6px 20px rgba(234, 88, 12, 0.3);
+    }
+
+    .cta-primary:hover {
+      background: #d94b04;
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(234, 88, 12, 0.4);
+    }
+
+    .cta-secondary {
+      background: white;
+      color: var(--navy);
+      padding: 1rem 2.5rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      border: 2px solid var(--navy);
+      transition: all 0.3s;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(30, 58, 95, 0.2);
+    }
+
+    .cta-secondary:hover {
+      background: var(--navy);
+      color: white;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(30, 58, 95, 0.3);
+    }
+
+    /* Social Proof */
+    .social-proof {
+      background: white url("/assets/background-pattern.png") fixed center/cover;
+      padding: 4rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .social-proof::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(8, 145, 178, 0.03), transparent),
+                  radial-gradient(circle at 80% 80%, rgba(234, 88, 12, 0.03), transparent);
+      pointer-events: none;
+    }
+
+    .social-proof-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .proof-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .stat {
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--light-bg), rgba(8, 145, 178, 0.05));
+      border-radius: 10px;
+      border-left: 4px solid var(--teal);
+      transition: all 0.3s;
+      animation: float 5s ease-in-out infinite;
+    }
+
+    .stat:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(8, 145, 178, 0.2);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      color: var(--teal);
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+
+    .testimonials {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .testimonial {
+      background: linear-gradient(135deg, var(--light-bg), rgba(8, 145, 178, 0.08));
+      padding: 1.5rem;
+      border-radius: 10px;
+      border-top: 4px solid var(--teal);
+      transition: all 0.3s;
+    }
+
+    .testimonial:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(8, 145, 178, 0.2);
+    }
+
+    .testimonial-stars {
+      color: var(--orange);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .testimonial-text {
+      font-style: italic;
+      color: var(--navy);
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .testimonial-author {
+      font-weight: bold;
+      color: var(--navy);
+      font-size: 0.9rem;
+    }
+
+    .testimonial-title {
+      color: var(--gray);
+      font-size: 0.85rem;
+    }
+
+    /* Section Heading */
+    .section-heading {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-heading h2 {
+      font-family: 'Cambria', serif;
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--navy), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+
+    .section-heading p {
+      font-size: 1.1rem;
+      color: var(--gray);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Features Section */
+    .features {
+      background: var(--light-bg) url("/assets/background-pattern.png") fixed center/cover;
+      padding: 0 2rem 4rem;
+      position: relative;
+    }
+
+    .features-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      text-align: center;
+      transition: all 0.3s;
+      border: 2px solid transparent;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .feature-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(8, 145, 178, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .feature-card h3 {
+      color: var(--navy);
+      margin-bottom: 0.75rem;
+      font-family: 'Cambria', serif;
+    }
+
+    .feature-card p {
+      color: var(--gray);
+      font-size: 0.95rem;
+    }
+
+    /* Pricing Section */
+    .pricing {
+      background: white url("/assets/background-pattern.png") fixed center/cover;
+      padding: 4rem 2rem;
+      position: relative;
+    }
+
+    .pricing::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(8, 145, 178, 0.05), transparent);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .pricing-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pricing-card {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 15px;
+      border: 2px solid var(--light-bg);
+      transition: all 0.3s;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .pricing-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-8px);
+      box-shadow: 0 15px 40px rgba(8, 145, 178, 0.2);
+    }
+
+    .pricing-card.featured {
+      border-color: var(--orange);
+      background: linear-gradient(135deg, white 0%, rgba(234, 88, 12, 0.05) 100%);
+      transform: scale(1.05);
+      box-shadow: 0 15px 50px rgba(234, 88, 12, 0.2);
+    }
+
+    .pricing-card.featured:hover {
+      transform: scale(1.05) translateY(-8px);
+    }
+
+    .pricing-card.featured::before {
+      content: "⭐ POPULAR";
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--orange), #ff6b35);
+      color: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 25px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+    }
+
+    .pricing-title {
+      font-family: 'Cambria', serif;
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-subtitle {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pricing-price {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--teal), var(--orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .pricing-duration {
+      color: var(--gray);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+
+    .pricing-features li {
+      padding: 0.6rem 0;
+      color: var(--navy);
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(30, 58, 95, 0.1);
+    }
+
+    .pricing-features li::before {
+      content: "✓ ";
+      color: var(--teal);
+      font-weight: bold;
+      margin-right: 0.5rem;
+    }
+
+    .pricing-card .cta-primary {
+      width: 100%;
+      text-align: center;
+      display: block;
+    }
+
+    /* CTA Section */
+    .final-cta {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 50%, rgba(8, 145, 178, 0.8) 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 10s ease infinite;
+      color: white;
+      padding: 4rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(234, 88, 12, 0.2), transparent);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+
+    .final-cta-container {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .final-cta h2 {
+      font-family: 'Cambria', serif;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .final-cta p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+      opacity: 0.95;
+    }
+
+    /* Footer */
+    footer {
+      background: linear-gradient(135deg, var(--navy) 0%, #0a2744 100%);
+      color: white;
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-links {
+      margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+      color: var(--teal);
+      text-decoration: none;
+      margin: 0 1rem;
+      transition: all 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--orange);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      nav {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        order: 3;
+      }
+
+      nav a, nav button {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .logo img {
+        height: 40px;
+      }
+
+      .cta-button, .test-button {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+      }
+
+      .hero h1 {
+        font-size: 1.75rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.95rem;
+      }
+
+      .section-heading h2 {
+        font-size: 1.75rem;
+      }
+
+      .final-cta h2 {
+        font-size: 1.5rem;
+      }
+
+      .hero-images {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .hero-image-box {
+        height: 200px;
+      }
+
+      .comparison-section {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .comparison-box {
+        height: 200px;
+      }
+
+      .hero-ctas {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .cta-primary, .cta-secondary, .cta-button, .test-button {
+        width: 100%;
+        max-width: 100%;
+        padding: 1rem;
+        min-height: 44px;
+        font-size: 1rem;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .pricing-card.featured {
+        transform: scale(1);
+      }
+
+      .pricing-card.featured:hover {
+        transform: translateY(-5px);
+      }
+
+      .hero {
+        padding: 4rem 1rem;
+      }
+
+      .section-heading {
+        padding: 2rem 1rem;
+      }
+
+      .social-proof {
+        padding: 2rem 1rem;
+      }
+
+      .features {
+        padding: 0 1rem 2rem;
+      }
+
+      .pricing {
+        padding: 2rem 1rem;
+      }
+
+      .final-cta {
+        padding: 2rem 1rem;
+      }
+
+      .avatar-grid {
+        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .avatar {
+        width: 50px;
+        height: 50px;
+      }
+
+      .proof-stats {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .stat {
+        padding: 1.5rem;
+      }
+
+      .stat-number {
+        font-size: 1.75rem;
+      }
+
+      .testimonials {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .testimonial {
+        padding: 1rem;
+      }
+
+      .testimonial-text {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .testimonial-author {
+        font-size: 0.8rem;
+      }
+
+      .testimonial-title {
+        font-size: 0.75rem;
+      }
+
+      .pricing-card {
+        padding: 1.5rem;
+      }
+
+      .pricing-title {
+        font-size: 1.25rem;
+      }
+
+      .pricing-subtitle {
+        font-size: 0.8rem;
+      }
+
+      .pricing-price {
+        font-size: 1.75rem;
+      }
+
+      .pricing-duration {
+        font-size: 0.8rem;
+      }
+
+      .pricing-features li {
+        padding: 0.4rem 0;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header-container {
+        padding: 0 1rem;
+      }
+
+      nav {
+        gap: 0.3rem;
+        font-size: 0.65rem;
+        width: 100%;
+      }
+
+      nav a, nav button {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.4rem;
+      }
+
+      .cta-button, .test-button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.65rem;
+      }
+
+      .hero h1 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero-tagline {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.7rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero-ctas {
+        gap: 0.5rem;
+      }
+
+      .section-heading {
+        padding: 1.5rem 1rem;
+      }
+
+      .section-heading h2 {
+        font-size: 1.3rem;
+      }
+
+      .section-heading p {
+        font-size: 0.85rem;
+      }
+
+      .feature-icon {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .feature-card h3 {
+        font-size: 0.95rem;
+      }
+
+      .feature-card p {
+        font-size: 0.8rem;
+      }
+
+      .pricing-card {
+        padding: 1.2rem;
+      }
+
+      .pricing-title {
+        font-size: 1.1rem;
+      }
+
+      .pricing-price {
+        font-size: 1.5rem;
+      }
+
+      .pricing-duration {
+        font-size: 0.7rem;
+      }
+
+      .pricing-features li {
+        padding: 0.3rem 0;
+        font-size: 0.75rem;
+      }
+
+      .stat {
+        padding: 1rem;
+      }
+
+      .stat-number {
+        font-size: 1.3rem;
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+      }
+
+      .testimonial {
+        padding: 0.8rem;
+      }
+
+      .testimonial-text {
+        font-size: 0.75rem;
+      }
+
+      .testimonial-author {
+        font-size: 0.7rem;
+      }
+
+      .hero-images {
+        margin-top: 1rem;
+        gap: 1rem;
+      }
+
+      .hero-image-box {
+        height: 120px;
+      }
+
+      .comparison-box {
+        height: 120px;
+      }
+
+      .final-cta h2 {
+        font-size: 1.2rem;
+      }
+
+      .final-cta p {
+        font-size: 0.9rem;
+      }
+
+      footer {
+        padding: 1rem;
+        font-size: 0.7rem;
+      }
+
+      .footer-links a {
+        margin: 0 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo">
+        <img src="/assets/dailyagile_logo.png" alt="DailyAgile" style="height: 65px; width: auto;">
+      </div>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#features">Why Us</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#testimonials">Reviews</a>
+        <button class="cta-button" onclick="scrollToSection('pricing')">Get Started</button>
+        <a href="/classroom" class="test-button">🧪 Test Platform</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section with Animations -->
+  <section class="hero" id="home">
+    <div class="hero-bg"></div>
+
+    <!-- Floating Particles -->
+    <div class="particle" style="top: 10%; left: 10%; animation-delay: 0s;">
+      <div class="particle-circle"></div>
+    </div>
+    <div class="particle" style="top: 20%; right: 15%; animation-delay: 1s;">
+      <div class="particle-circle-lg"></div>
+    </div>
+    <div class="particle" style="bottom: 20%; left: 15%; animation-delay: 2s;">
+      <div class="particle-circle"></div>
+    </div>
+    <div class="particle" style="bottom: 10%; right: 10%; animation-delay: 1.5s;">
+      <div class="particle-circle-lg"></div>
+    </div>
+    <div class="particle" style="top: 50%; right: 5%; animation-delay: 0.5s;">
+      <div class="particle-circle"></div>
+    </div>
+
+    <!-- Wave Animation -->
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+
+    <!-- Content -->
+    <div class="hero-container">
+      <div class="hero-tagline">✨ Trusted by 800+ Professionals</div>
+      <h1>Accelerate Business Agility</h1>
+      <p class="hero-subtitle">Master AI and Agile skills in real-time. Learn theory in minutes, apply insights immediately. Get certified and credibility that employers actually recognize.</p>
+      <div class="hero-ctas">
+        <button class="cta-primary" onclick="scrollToSection('pricing')">Explore Courses</button>
+        <button class="cta-secondary" onclick="scrollToSection('testimonials')">See What Others Say</button>
+      </div>
+
+      <!-- Hero Images -->
+      <div class="hero-images">
+        <div class="hero-image-box">
+          <img src="/assets/hero-professionals.png" alt="Professionals Learning Together">
+        </div>
+        <div class="hero-image-box">
+          <img src="/assets/hero-robots.png" alt="AI Robots Teaching">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rest of the content will continue... (remaining sections in the landing.html) -->
+  <!-- For brevity, showing key sections; full content same as original but with / asset paths -->
+
+  <!-- Social Proof -->
+  <section class="social-proof">
+    <div class="social-proof-container">
+      <div class="proof-stats">
+        <div class="stat">
+          <div class="stat-number">800+</div>
+          <div class="stat-label">Professionals Trained</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">⭐⭐⭐⭐⭐</div>
+          <div class="stat-label">5-Star Average Rating</div>
+        </div>
+        <div class="stat">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Learn at Your Pace</div>
+        </div>
+      </div>
+
+      <h2 style="font-family: 'Cambria', serif; color: var(--navy); margin-bottom: 2rem;">Meet Our 800+ Certified Professionals</h2>
+
+      <!-- Avatar Grid (Student Photos) -->
+      <div class="avatar-grid" id="testimonials">
+        <div class="avatar" title="Student 1"><img src="/assets/student-1.png" alt="Student 1"></div>
+        <div class="avatar" title="Student 2"><img src="/assets/student-2.png" alt="Student 2"></div>
+        <div class="avatar" title="Student 3"><img src="/assets/student-3.png" alt="Student 3"></div>
+        <div class="avatar" title="Student 4"><img src="/assets/student-4.png" alt="Student 4"></div>
+        <div class="avatar" title="Student 5"><img src="/assets/student-5.png" alt="Student 5"></div>
+        <div class="avatar" title="Student 6"><img src="/assets/student-6.png" alt="Student 6"></div>
+        <div class="avatar" title="Student 7"><img src="/assets/student-7.png" alt="Student 7"></div>
+        <div class="avatar" title="Student 8"><img src="/assets/student-8.png" alt="Student 8"></div>
+        <div class="avatar" title="Student 9"><img src="/assets/student-9.png" alt="Student 9"></div>
+        <div class="avatar" title="Student 10"><img src="/assets/student-10.png" alt="Student 10"></div>
+        <div class="avatar" title="Student 11"><img src="/assets/student-11.png" alt="Student 11"></div>
+        <div class="avatar" title="Student 12"><img src="/assets/student-12.png" alt="Student 12"></div>
+      </div>
+
+      <h2 style="font-family: 'Cambria', serif; color: var(--navy); margin-bottom: 2rem; margin-top: 3rem;">What Students Are Saying</h2>
+
+      <div class="testimonials">
+        <div class="testimonial">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"Applied the prompt engineering techniques in our sprint planning. Team productivity jumped 40% in two weeks. Game-changer."</p>
+          <p class="testimonial-author">Sarah Chen</p>
+          <p class="testimonial-title">Product Manager, TechCorp</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"Built a RAG pipeline using what I learned. Now the entire data team uses it. Best investment in my professional development."</p>
+          <p class="testimonial-author">Marcus Johnson</p>
+          <p class="testimonial-title">Senior Engineer, DataFlow Inc</p>
+        </div>
+        <div class="testimonial">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <p class="testimonial-text">"My manager noticed the change immediately. Got promoted within 3 months. The Agile + AI combo is exactly what leadership needed."</p>
+          <p class="testimonial-author">Jennifer Park</p>
+          <p class="testimonial-title">Scrum Master, CloudFirst</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="section-heading">
+      <h2>Why Choose DailyAgile?</h2>
+      <p>Self-paced learning with real outcomes. From theory to practice in days, not months.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Real-World Use Cases</h3>
+        <p>Learn frameworks you can apply immediately. Every lesson tied to actual business problems.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Credly Certificates</h3>
+        <p>Earn verified badges employers recognize. Share on LinkedIn, add to your resume.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <h3>Interactive AI Classroom</h3>
+        <p>Learn from multiple AI experts. Multi-agent classroom adapts to your pace.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>15-Min Free Preview</h3>
+        <p>See the full module outline and first 15 minutes of content. No credit card needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⏱️</div>
+        <h3>Learn at Your Pace</h3>
+        <p>Lifetime access. Pause, rewind, review. 3 hours? 3 weeks? Your schedule.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💼</div>
+        <h3>Proven Results</h3>
+        <p>800+ professionals transformed their careers. Promotions, new skills, competitive advantage.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing" id="pricing">
+    <div class="section-heading">
+      <h2>Simple, Transparent Pricing</h2>
+      <p>Choose the track that fits your goals. All courses include lifetime access, certificate, and Credly badge.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3 class="pricing-title">Track A: Business</h3>
+        <p class="pricing-subtitle">For non-technical professionals</p>
+        <div class="pricing-price">£299</div>
+        <p class="pricing-duration">Full course (6 modules)</p>
+        <ul class="pricing-features">
+          <li>AI Fundamentals</li>
+          <li>Generative AI in Practice</li>
+          <li>Prompt Engineering</li>
+          <li>Agents & Automation</li>
+          <li>Ethics & Governance</li>
+          <li>Credly Badge</li>
+          <li>Lifetime Access</li>
+        </ul>
+        <button class="cta-primary" onclick="alert('Redirecting to checkout...')">Start Learning</button>
+      </div>
+
+      <div class="pricing-card featured">
+        <h3 class="pricing-title">Track B: Engineering</h3>
+        <p class="pricing-subtitle">For developers & technical teams</p>
+        <div class="pricing-price">£599</div>
+        <p class="pricing-duration">Full course (8 modules + labs)</p>
+        <ul class="pricing-features">
+          <li>ML Fundamentals</li>
+          <li>Neural Networks Hands-On</li>
+          <li>Computer Vision</li>
+          <li>NLP & LLMs</li>
+          <li>RAG Pipeline Labs</li>
+          <li>Agentic AI & MCP</li>
+          <li>MLOps Deployment</li>
+          <li>Credly Badge</li>
+          <li>Portfolio Project</li>
+          <li>Lifetime Access</li>
+        </ul>
+        <button class="cta-primary" onclick="alert('Redirecting to checkout...')">Start Learning</button>
+      </div>
+
+      <div class="pricing-card">
+        <h3 class="pricing-title">Full Bundle</h3>
+        <p class="pricing-subtitle">Both tracks + bonus content</p>
+        <div class="pricing-price">£799</div>
+        <p class="pricing-duration">Save £99 (combined value)</p>
+        <ul class="pricing-features">
+          <li>All Track A Modules</li>
+          <li>All Track B Modules</li>
+          <li>Bonus: AI Tools Masterclass</li>
+          <li>All Labs & Projects</li>
+          <li>2 Credly Badges</li>
+          <li>1:1 Progress Support</li>
+          <li>Lifetime Access</li>
+        </ul>
+        <button class="cta-primary" onclick="alert('Redirecting to checkout...')">Start Learning</button>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: rgba(255, 255, 255, 0.7); border-radius: 10px; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <p style="color: var(--gray); margin-bottom: 1rem;">💡 <strong>Try Before You Buy:</strong> Preview the first 15 minutes of any course for free. Full course outline included. No credit card required.</p>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final-cta">
+    <div class="final-cta-container">
+      <h2>Ready to Accelerate Your Career?</h2>
+      <p>Join 800+ professionals who transformed their skills and got promoted. Start with a 15-minute free preview.</p>
+      <button class="cta-primary" onclick="scrollToSection('pricing')" style="background: var(--orange);">Explore Pricing</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#pricing">Pricing</a>
+        <a href="#features">Features</a>
+        <a href="#testimonials">Reviews</a>
+        <a href="mailto:support@dailyagile.com">Contact</a>
+      </div>
+      <p>&copy; 2026 DailyAgile. All rights reserved. | Accelerate Business Agility</p>
+    </div>
+  </footer>
+
+  <script>
+    function scrollToSection(id) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  </script>
+</body>
+</html>

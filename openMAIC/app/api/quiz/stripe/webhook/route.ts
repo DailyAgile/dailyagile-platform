@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createAdminClient } from '@/lib/server/supabase-client';
+import { getSupabaseClient } from '@/lib/server/supabase-client';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-11-20',
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: true });
       }
 
-      const supabase = createAdminClient();
+      const supabase = getSupabaseClient();
 
       // Create or update student record
       const { data: student, error: studentError } = await supabase

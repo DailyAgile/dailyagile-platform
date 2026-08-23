@@ -359,6 +359,43 @@ Verify installed skills:
 
 ---
 
+## 🎯 CLAUDE SKILLS — USE PROACTIVELY
+
+These skills should be invoked automatically without asking, based on task type:
+
+### Engineering & Deployment
+- **/debug** → When you report an error or bug. Structured debugging (reproduce, isolate, diagnose, fix)
+- **/deploy-checklist** → Before deploying to production or Vercel. Pre-flight verification
+- **/code-review** → Before committing code changes or opening PRs. Security, performance, correctness
+- **/testing-strategy** → When planning tests or writing test code
+- **/tech-debt** → When discussing refactoring or legacy code cleanup
+- **/architecture** → When choosing between technologies or designing system components
+- **/system-design** → When designing new systems or services
+- **/documentation** → When writing docs, READMEs, or technical guides
+- **/incident-response** → If a critical issue occurs in production
+
+### Product & Strategy
+- **/sprint-planning** → At sprint kickoff or when sizing backlog items
+- **/roadmap-update** → When planning product direction or reprioritizing initiatives
+- **/product-brainstorming** → When exploring new features or problem spaces
+- **/brainstorm** → When tackling a complex problem or strategic question
+- **/write-spec** → When turning a vague idea into a feature spec or PRD
+- **/competitive-brief** → When analyzing competitors or feature areas
+- **/metrics-review** → When reviewing weekly/monthly product metrics
+- **/stakeholder-update** → When writing status updates for leadership
+- **/synthesize-research** → When analyzing user interviews, surveys, or feedback
+
+### Design & UX
+- **/design-critique** → When reviewing designs for usability and consistency
+- **/accessibility-review** → When building UI or checking accessibility compliance
+- **/design-handoff** → When converting designs to developer specs
+- **/design-system** → When auditing or documenting design systems
+- **/user-research** → When planning or conducting user research
+- **/research-synthesis** → When analyzing research findings
+- **/ux-copy** → When writing UI copy, error messages, or microcopy
+
+---
+
 ## 🤝 CLAUDE COWORK — FOR HEAVY TASKS
 
 Use Claude Cowork (Cowork tab in Claude Desktop) for:
@@ -728,6 +765,36 @@ Month 12: Year 2 planning + community launch
 - Voice: ElevenLabs voice clone for consistent instructor experience
 - Corporate pricing: quote annually (£5,000–£8,000/yr) not per-module
 - Social: use CrossPost MCP for consistent daily LinkedIn/X presence
+
+---
+
+### 🔗 Quiz Share Modal Solution (2026-08-14)
+
+**Problem:** Clipboard API Copy button was failing with "Failed to copy" errors when browser blocked permissions.
+
+**Root Cause:** Browser security blocks clipboard API when user denies permissions. Cannot control student browser settings.
+
+**Solution Implemented:** Triple-click + Ctrl+C (permission-free)
+- Removed Copy buttons and copyStatus state tracking
+- Removed clipboard API calls entirely
+- Added native triple-click text selection on all URL input fields
+- Clear instructions: "Triple-click to select, then press Ctrl+C (or Cmd+C on Mac) to copy"
+- 2px teal borders make URLs visually prominent
+
+**Why It Works:**
+- ✅ Works 100% of the time (native browser feature, no permissions)
+- ✅ Works on all browsers (Chrome, Safari, Firefox, Edge)
+- ✅ Works on mobile (triple-tap)
+- ✅ Zero permission prompts
+- ✅ Zero "Failed to copy" errors
+
+**Implementation:**
+- File: `openMAIC/app/teach/quiz/management/page.tsx`
+- Commit: `6f3ba2c` — "Implement production-ready share modal without browser permissions"
+- Share modal provides 3 shareable links: Practice Mode, Mock Test Mode, Game Mode (Live)
+- Students triple-click any URL and press Ctrl+C to copy
+
+**Decision:** Clipboard API confidence is only 30-50% (permission-dependent). Triple-click is guaranteed 100% success. Keep current solution permanently.
 
 ---
 

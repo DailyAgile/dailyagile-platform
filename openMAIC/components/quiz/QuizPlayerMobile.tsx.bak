@@ -1,0 +1,235 @@
+/**
+ * Mobile-Optimized Quiz Player
+ * Adds gesture support, haptics, and mobile-specific UX
+ */
+
+'use client';
+
+import { useState, useEffect, useRef, useCallback } from 'react';
+import QuizPlayer, { QuizQuestion } from '@/components/quiz/QuizPlayer';
+import { GestureDetector, GestureConfig } from '@/lib/client/gestures';
+import { useHaptics, QuizHaptics } from '@/lib/client/haptics';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('QuizPlayerMobile');
+
+interface QuizPlayerMobileProps {
+  questions: QuizQuestion[];
+  sessionId: string;
+  onSubmitAnswer: (questionId: string, selectedAnswer: string, timeTaken: number) => Promise<void>;
+  onFinishQuiz: () => Promise<void>;
+  isLoading?: boolean;
+  enableGestures?: boolean;
+  enableHaptics?: boolean;
+  enableLandscape?: boolean;
+}
+
+export function QuizPlayerMobile({
+  questions,
+  sessionId,
+  onSubmitAnswer,
+  onFinishQuiz,
+  isLoading = false,
+  enableGestures = true,
+  enableHaptics = true,
+  enableLandscape = true,
+}: QuizPlayerMobileProps) {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
+  const quizContainerRef = useRef<HTMLDivElement>(null);
+  const haptics = useHaptics();
+
+  // Track device orientation
+  useEffect(() => {
+    const handleOrientationChange = () => {
+      const isLandscape = window.matchMedia('(orientation: landscape)').matches;
+      setOrientation(isLandscape ? 'landscape' : 'portrait');
+      log.info(`Orientation changed to ${isLandscape ? 'landscape' : 'portrait'}`);
+    };
+
+    window.addEventListener('orientationchange', handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
+
+    // Initial check
+    handleOrientationChange();
+
+    return () => {
+      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
+    };
+  }, []);
+
+  // Handle swipe navigation
+  const handleSwipeLeft = useCallback(() => {
+    if (currentQuestionIndex < questions.length - 1) {
+      log.info('Swipe left detected - next question');
+      if (enableHaptics) QuizHaptics.navigate();
+      setCurrentQuestionIndex((prev) => prev + 1);
+    }
+  }, [currentQuestionIndex, questions.length, enableHaptics]);
+
+  const handleSwipeRight = useCallback(() => {
+    if (currentQuestionIndex > 0) {
+      log.info('Swipe right detected - previous question');
+      if (enableHaptics) QuizHaptics.navigate();
+      setCurrentQuestionIndex((prev) => prev - 1);
+    }
+  }, [currentQuestionIndex, enableHaptics]);
+
+  // Initialize gesture detector
+  useEffect(() => {
+    if (!enableGestures || !quizContainerRef.current) {
+      return;
+    }
+
+    const config: GestureConfig = {
+      minSwipeDistance: 50,
+      maxSwipeAngle: 30,
+      onSwipeLeft: handleSwipeLeft,
+      onSwipeRight: handleSwipeRight,
+    };
+
+    const detector = new GestureDetector(quizContainerRef.current, config);
+
+    return () => {
+      detector.destroy();
+    };
+  }, [enableGestures, handleSwipeLeft, handleSwipeRight]);
+
+  // Disable pinch zoom for better quiz experience
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
+
+  // Prevent horizontal scroll bounce on iOS
+  useEffect(() => {
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const startX = (e as any).startX || touch.clientX;
+
+      // Allow vertical scrolling, prevent horizontal
+      if (Math.abs(touch.clientX - startX) > Math.abs(touch.clientY - (e as any).startY || 0)) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={quizContainerRef}
+      className={`w-full h-full overflow-hidden ${
+        orientation === 'landscape' ? 'landscape' : 'portrait'
+      }`}
+      style={{
+        paddingTop: 'max(env(safe-area-inset-top), 1rem)',
+        paddingLeft: 'max(env(safe-area-inset-left), 1rem)',
+        paddingRight: 'max(env(safe-area-inset-right), 1rem)',
+        paddingBottom: 'max(env(safe-area-inset-bottom), 1rem)',
+      }}
+    >
+      {/* Gesture hint for first question */}
+      {currentQuestionIndex < questions.length - 1 && !isLoading && (
+        <div className="absolute top-0 right-4 text-xs text-[#64748B] pointer-events-none md:hidden">
+          Swipe left for next
+        </div>
+      )}
+
+      {/* Main quiz player */}
+      <QuizPlayer
+        questions={questions}
+        sessionId={sessionId}
+        onSubmitAnswer={onSubmitAnswer}
+        onFinishQuiz={onFinishQuiz}
+        isLoading={isLoading}
+      />
+
+      {/* Mobile controls hint */}
+      {enableGestures && (
+        <div className="mt-4 text-center text-xs text-[#64748B] md:hidden">
+          <p>← Swipe to navigate →</p>
+        </div>
+      )}
+
+      {/* Accessibility: Screen reader support */}
+      {currentQuestionIndex < questions.length && (
+        <div className="sr-only" role="status" aria-live="polite">
+          Question {currentQuestionIndex + 1} of {questions.length}
+          {enableGestures && ', swipe left for next question, swipe right for previous'}
+        </div>
+      )}
+
+      {/* Viewport meta tags info (for debugging) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 right-4 bg-black text-white text-xs p-2 rounded opacity-50">
+          <div>Orientation: {orientation}</div>
+          <div>Question: {currentQuestionIndex + 1}/{questions.length}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Enhanced Quiz Player with all mobile optimizations
+ */
+export function QuizPlayerMobileEnhanced({
+  questions,
+  sessionId,
+  onSubmitAnswer,
+  onFinishQuiz,
+  isLoading = false,
+}: QuizPlayerMobileProps & {
+  onSubmitAnswer: (questionId: string, selectedAnswer: string, timeTaken: number) => Promise<void>;
+}) {
+  const haptics = useHaptics();
+
+  // Wrap handlers with haptic feedback
+  const handleSubmitAnswerWithHaptics = useCallback(
+    async (questionId: string, selectedAnswer: string, timeTaken: number) => {
+      if (haptics.supported) {
+        haptics.quiz.answerSelected();
+      }
+      await onSubmitAnswer(questionId, selectedAnswer, timeTaken);
+      if (haptics.supported) {
+        haptics.quiz.answerSubmitted();
+      }
+    },
+    [onSubmitAnswer, haptics]
+  );
+
+  const handleFinishQuizWithHaptics = useCallback(async () => {
+    if (haptics.supported) {
+      haptics.quiz.quizCompleted();
+    }
+    await onFinishQuiz();
+  }, [onFinishQuiz, haptics]);
+
+  return (
+    <QuizPlayerMobile
+      questions={questions}
+      sessionId={sessionId}
+      onSubmitAnswer={handleSubmitAnswerWithHaptics}
+      onFinishQuiz={handleFinishQuizWithHaptics}
+      isLoading={isLoading}
+      enableGestures={true}
+      enableHaptics={haptics.supported}
+      enableLandscape={true}
+    />
+  );
+}

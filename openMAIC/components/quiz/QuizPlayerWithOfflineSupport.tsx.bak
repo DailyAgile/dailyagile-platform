@@ -1,0 +1,200 @@
+/**
+ * Quiz Player with Offline Support
+ * Wraps QuizPlayer to add offline-first functionality
+ */
+
+'use client';
+
+import { useState, useCallback, useEffect } from 'react';
+import QuizPlayer, { QuizQuestion } from '@/components/quiz/QuizPlayer';
+import { OfflineIndicator } from '@/components/quiz/OfflineIndicator';
+import { useOfflineSync } from '@/lib/hooks/use-offline-sync';
+import {
+  saveAnswer,
+  cacheQuizData,
+  queueSubmission,
+  createSession,
+  updateSessionProgress,
+  completeSession,
+  getAllAnswers,
+  QuizSession,
+} from '@/lib/client/quiz-indexeddb';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('QuizPlayerWithOfflineSupport');
+
+interface QuizPlayerWithOfflineSupportProps {
+  questions: QuizQuestion[];
+  quizId: string;
+  studentId: string;
+  sceneId: string;
+  sessionId: string;
+  onFinish?: () => void;
+  isLoading?: boolean;
+}
+
+export function QuizPlayerWithOfflineSupport({
+  questions,
+  quizId,
+  studentId,
+  sceneId,
+  sessionId,
+  onFinish,
+  isLoading = false,
+}: QuizPlayerWithOfflineSupportProps) {
+  const { syncStatus, isInitialized, sync } = useOfflineSync();
+  const [isCaching, setIsCaching] = useState(false);
+  const [session, setSession] = useState<QuizSession | null>(null);
+  const [localSession, setLocalSession] = useState<string>(sessionId);
+
+  // Initialize quiz session and cache data on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        setIsCaching(true);
+
+        // Cache quiz data for offline use
+        await cacheQuizData(quizId, questions);
+        log.info(`Cached quiz data for offline use (${questions.length} questions)`);
+
+        // Create local session
+        const newSession = await createSession(
+          quizId,
+          studentId,
+          sceneId,
+          questions.length
+        );
+        setSession(newSession);
+        setLocalSession(newSession.id);
+      } catch (err) {
+        log.error('Failed to initialize offline support:', err);
+      } finally {
+        setIsCaching(false);
+      }
+    })();
+  }, [quizId, questions, studentId, sceneId]);
+
+  // Handle answer submission (save locally, then sync)
+  const handleSubmitAnswer = useCallback(
+    async (questionId: string, selectedAnswer: string, timeTaken: number) => {
+      try {
+        // Save answer locally
+        await saveAnswer(
+          quizId,
+          questionId,
+          localSession,
+          selectedAnswer,
+          timeTaken
+        );
+
+        // Update session progress
+        const allAnswers = await getAllAnswers(localSession);
+        await updateSessionProgress(localSession, allAnswers.length);
+
+        log.info(`Saved answer for question ${questionId}`);
+
+        // If online, try to sync immediately
+        if (!syncStatus || syncStatus.state !== 'offline') {
+          // Small delay to avoid overwhelming the server
+          setTimeout(() => {
+            sync().catch((err) => {
+              log.warn('Auto-sync after answer failed:', err);
+              // Continue - will retry later
+            });
+          }, 500);
+        } else {
+          log.debug('Offline - answer queued for sync');
+        }
+      } catch (err) {
+        log.error('Failed to save answer:', err);
+        throw err;
+      }
+    },
+    [quizId, localSession, syncStatus, sync]
+  );
+
+  // Handle quiz completion
+  const handleFinishQuiz = useCallback(async () => {
+    try {
+      log.info('Quiz finished');
+
+      // Get all answers
+      const answers = await getAllAnswers(localSession);
+      const answersMap = answers.reduce(
+        (acc, answer) => {
+          acc[answer.questionId] = answer.selectedAnswer;
+          return acc;
+        },
+        {} as Record<string, string>
+      );
+
+      // Mark session complete
+      await completeSession(localSession);
+
+      // Queue submission for sync
+      if (questions.length > 0) {
+        await queueSubmission(
+          quizId,
+          localSession,
+          studentId,
+          sceneId,
+          answersMap,
+          questions
+        );
+
+        log.info('Quiz submission queued');
+
+        // Trigger sync
+        await sync();
+      }
+
+      if (onFinish) {
+        onFinish();
+      }
+    } catch (err) {
+      log.error('Failed to finish quiz:', err);
+      throw err;
+    }
+  }, [quizId, localSession, studentId, sceneId, questions, sync, onFinish]);
+
+  if (!isInitialized || isLoading || isCaching) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 border-4 border-[#0891B2] border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-[#64748B]">
+            {isLoading ? 'Loading quiz...' : 'Preparing offline support...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full">
+      {/* Offline Indicator */}
+      <OfflineIndicator position="top" compact={true} onSyncClick={sync} />
+
+      {/* Quiz Player */}
+      <div className="pt-12 md:pt-0">
+        <QuizPlayer
+          questions={questions}
+          sessionId={localSession}
+          onSubmitAnswer={handleSubmitAnswer}
+          onFinishQuiz={handleFinishQuiz}
+          isLoading={isLoading}
+        />
+      </div>
+
+      {/* Sync Status Message */}
+      {syncStatus && syncStatus.state === 'offline' && (
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-700">
+            <strong>You're offline.</strong> Your answers are being saved locally. They will sync
+            automatically when you get back online.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

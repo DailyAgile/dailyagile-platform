@@ -18,7 +18,7 @@ export interface PaginationMetadata {
   hasMore: boolean;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse<T> extends Record<string, unknown> {
   data: T[];
   pagination: PaginationMetadata;
 }

@@ -48,6 +48,6 @@ export function apiError(
   );
 }
 
-export function apiSuccess<T extends Record<string, unknown>>(data: T, status = 200): NextResponse {
-  return NextResponse.json({ success: true, ...data }, { status });
+export function apiSuccess<T>(data: T, status = 200): NextResponse {
+  return NextResponse.json({ success: true, ...(data as Record<string, unknown>) }, { status });
 }

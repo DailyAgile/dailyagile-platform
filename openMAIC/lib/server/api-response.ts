@@ -19,6 +19,7 @@ export const API_ERROR_CODES = {
   INVALID_EMAIL: 'INVALID_EMAIL',
   INVALID_OTP: 'INVALID_OTP',
   EMAIL_SEND_FAILED: 'EMAIL_SEND_FAILED',
+  UNAUTHORIZED: 'UNAUTHORIZED',
 } as const;
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];

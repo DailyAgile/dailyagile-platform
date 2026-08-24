@@ -2,6 +2,15 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+
+/**
+ * Environment Initialization
+ * Ensures all critical environment variables are set at server startup
+ * This runs once when the server starts and logs validation results
+ * See lib/env/init.ts for details
+ */
+import '@/lib/env/init';
+
 import './globals.css';
 import '@openmaic/renderer/fonts.css';
 import 'animate.css';

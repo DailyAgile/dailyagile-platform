@@ -60,7 +60,7 @@ import { WebhookEventHandlerFactory } from '../../../../../lib/webhook/event-han
 import { CheckoutSessionCompletedHandler } from '../../../../../lib/webhook/handlers/checkout-session-handler';
 import { getCircuitBreaker } from '../../../../../lib/webhook/circuit-breaker';
 import { queueEmail } from '../../../../../lib/email/email-queue-service';
-import { escapeHtml } from '../../../../../lib/email/template-renderer';
+import { escapeHtml } from '../../../../../lib/security/html-utils';
 
 const log = createLogger('StripeWebhook');
 

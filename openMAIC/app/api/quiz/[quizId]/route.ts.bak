@@ -1,0 +1,199 @@
+/**
+ * Quiz Detail Endpoints
+ * GET /api/quiz/[quizId] — Get quiz details
+ * PATCH /api/quiz/[quizId] — Update quiz
+ */
+
+import { NextRequest } from 'next/server';
+import { requireAuth, requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { getQuizWithQuestions, getQuizForStudent, updateQuiz } from '@/lib/quiz/quiz-service';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('QuizDetailRoute');
+
+interface UpdateQuizRequest {
+  title?: string;
+  description?: string;
+  time_limit_minutes?: number;
+  attempt_limit?: number;
+  pass_threshold?: number;
+}
+
+/**
+ * GET /api/quiz/[quizId]
+ * Instructors see full details with answers; students see only question structure
+ */
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> }
+): Promise<Response> {
+  try {
+    // 🔒 AUTHENTICATION: Verify user is logged in
+    let user;
+    try {
+      user = await requireAuth(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
+    const { quizId } = params;
+
+    // 🔍 AUTHORIZATION: Check if instructor or has assignment
+    if (user.role === 'instructor' || user.role === 'admin') {
+      // Instructors can see their own quizzes
+      const quiz = await getQuizWithQuestions(quizId);
+
+      if (!quiz) {
+        return apiError('QUIZ_NOT_FOUND', 404, 'Quiz not found');
+      }
+
+      // Verify ownership
+      if (quiz.quiz.instructor_id !== user.email) {
+        log.warn(`Unauthorized quiz access attempt by ${user.email}`);
+        return apiError('FORBIDDEN', 403, 'You do not have permission to view this quiz');
+      }
+
+      log.info(`Instructor ${user.email} viewing quiz ${quizId}`);
+
+      return apiSuccess({
+        data: {
+          quiz: quiz.quiz,
+          questions: quiz.questions,
+          total_questions: quiz.questions.length,
+        },
+      });
+    } else if (user.role === 'student') {
+      // Students can only see quizzes they have assignments for
+      const supabase = getSupabaseClient();
+
+      const { data: assignment, error } = await supabase
+        .from('quiz_assignments')
+        .select('id')
+        .eq('quiz_id', quizId)
+        .single();
+
+      if (error || !assignment) {
+        log.warn(`Student ${user.email} attempted to access unassigned quiz ${quizId}`);
+        return apiError('FORBIDDEN', 403, 'You do not have access to this quiz');
+      }
+
+      // Return student-friendly version (no answers)
+      const quiz = await getQuizForStudent(quizId);
+
+      if (!quiz) {
+        return apiError('QUIZ_NOT_FOUND', 404, 'Quiz not found');
+      }
+
+      log.info(`Student ${user.email} viewing quiz ${quizId}`);
+
+      return apiSuccess({
+        data: {
+          quiz: quiz.quiz,
+          questions: quiz.questions,
+        },
+      });
+    }
+
+    return apiError('FORBIDDEN', 403, 'Invalid user role');
+  } catch (error) {
+    log.error('Error in GET /api/quiz/[quizId]:', error);
+    return apiError('INTERNAL_ERROR', 500, 'Internal server error');
+  }
+}
+
+/**
+ * PATCH /api/quiz/[quizId]
+ * Update quiz (instructor only)
+ */
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> }
+): Promise<Response> {
+  try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let instructor;
+    try {
+      instructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
+    const { quizId } = params;
+    const body = (await req.json()) as UpdateQuizRequest;
+
+    // 📥 VALIDATION
+    if (body.title !== undefined && !body.title.trim()) {
+      return apiError(
+        'VALIDATION_ERROR',
+        400,
+        'Quiz title cannot be empty'
+      );
+    }
+
+    if (body.time_limit_minutes !== undefined && body.time_limit_minutes < 1) {
+      return apiError(
+        'VALIDATION_ERROR',
+        400,
+        'Time limit must be at least 1 minute'
+      );
+    }
+
+    if (body.attempt_limit !== undefined && body.attempt_limit < 1) {
+      return apiError(
+        'VALIDATION_ERROR',
+        400,
+        'Attempt limit must be at least 1'
+      );
+    }
+
+    if (body.pass_threshold !== undefined && (body.pass_threshold < 0 || body.pass_threshold > 100)) {
+      return apiError(
+        'VALIDATION_ERROR',
+        400,
+        'Pass threshold must be between 0 and 100'
+      );
+    }
+
+    // 💾 DATABASE: Update quiz
+    log.info(`Updating quiz ${quizId} for instructor ${instructor.email}`);
+
+    const updates: any = {};
+    if (body.title !== undefined) updates.title = body.title.trim();
+    if (body.description !== undefined) updates.description = body.description?.trim();
+    if (body.time_limit_minutes !== undefined) updates.time_limit_minutes = body.time_limit_minutes;
+    if (body.attempt_limit !== undefined) updates.attempt_limit = body.attempt_limit;
+    if (body.pass_threshold !== undefined) updates.pass_threshold = body.pass_threshold;
+
+    const updated = await updateQuiz(quizId, instructor.email, updates);
+
+    if (!updated) {
+      return apiError(
+        'FORBIDDEN',
+        403,
+        'You do not have permission to update this quiz'
+      );
+    }
+
+    // ✅ SUCCESS
+    log.info(`✅ Quiz updated: ${quizId}`);
+
+    return apiSuccess({
+      data: {
+        quiz_id: updated.id,
+        title: updated.title,
+        description: updated.description,
+        time_limit_minutes: updated.time_limit_minutes,
+        attempt_limit: updated.attempt_limit,
+        pass_threshold: updated.pass_threshold,
+        updated_at: updated.updated_at,
+      },
+    });
+  } catch (error) {
+    log.error('Error in PATCH /api/quiz/[quizId]:', error);
+    return apiError('INTERNAL_ERROR', 500, 'Internal server error');
+  }
+}

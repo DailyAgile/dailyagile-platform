@@ -1,0 +1,102 @@
+/**
+ * GET /api/admin/instructors/bulk-upload/[uploadId]
+ * Check status of a bulk upload
+ * REQUIRES: Admin authentication
+ *
+ * Returns:
+ * {
+ *   success: true,
+ *   data: {
+ *     id: string,
+ *     fileName: string,
+ *     rowCount: number,
+ *     processedRowCount: number,
+ *     successfulRowCount: number,
+ *     failedRowCount: number,
+ *     status: 'pending' | 'processing' | 'completed' | 'partial' | 'failed',
+ *     errorMessage?: string,
+ *     startedAt?: string,
+ *     completedAt?: string,
+ *     created_at: string
+ *   }
+ * }
+ */
+
+import { NextRequest } from 'next/server';
+import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { createLogger } from '@/lib/logger';
+import { requireAdmin, handleAuthError } from '@/lib/server/auth-middleware';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+
+const log = createLogger('GetUploadStatus');
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ uploadId: string }> },
+): Promise<Response> {
+  try {
+    // 🔒 AUTHENTICATION: Verify admin is logged in
+    let authenticatedAdmin;
+    try {
+      authenticatedAdmin = await requireAdmin(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
+    const { uploadId } = await params;
+    const supabase = getSupabaseClient();
+
+    // Get upload record
+    const { data: upload, error: uploadError } = await supabase
+      .from('instructor_bulk_uploads')
+      .select(
+        `
+        id,
+        upload_id,
+        file_name,
+        row_count,
+        processed_row_count,
+        successful_row_count,
+        failed_row_count,
+        status,
+        error_message,
+        started_processing_at,
+        completed_at,
+        created_at
+      `,
+      )
+      .eq('id', uploadId)
+      .single();
+
+    if (uploadError || !upload) {
+      log.warn(`Admin ${authenticatedAdmin.email} attempted to access non-existent upload ${uploadId}`);
+      return apiError('NOT_FOUND', 404, 'Upload not found');
+    }
+
+    log.info(
+      `Fetched upload status ${uploadId} for admin ${authenticatedAdmin.email} - Status: ${upload.status}`,
+    );
+
+    return apiSuccess({
+      success: true,
+      data: {
+        id: upload.id,
+        uploadId: upload.upload_id,
+        fileName: upload.file_name,
+        rowCount: upload.row_count,
+        processedRowCount: upload.processed_row_count || 0,
+        successfulRowCount: upload.successful_row_count || 0,
+        failedRowCount: upload.failed_row_count || 0,
+        status: upload.status,
+        errorMessage: upload.error_message,
+        startedAt: upload.started_processing_at,
+        completedAt: upload.completed_at,
+        created_at: upload.created_at,
+      },
+    });
+  } catch (error) {
+    log.error('Error getting upload status:', error);
+    return apiError('INTERNAL_ERROR', 500, 'Failed to get upload status');
+  }
+}

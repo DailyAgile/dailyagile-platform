@@ -1,0 +1,122 @@
+/**
+ * POST /api/quiz/assignments/[assignmentId]/request-extension
+ * Request extension or new code for expired/exhausted assignment
+ * REQUIRES: Student authentication (verified)
+ *
+ * Body:
+ * {
+ *   requestType: 'extension' | 'new_code',
+ *   reason?: string
+ * }
+ *
+ * Note: studentId is extracted from JWT, not from client
+ */
+
+import { NextRequest } from 'next/server';
+import { createLogger } from '@/lib/logger';
+import { requireStudent, handleAuthError } from '@/lib/server/auth-middleware';
+import { getSupabaseClient } from '@/lib/server/supabase-client';
+import {
+  requestExtension,
+  requestNewCode,
+} from '@/lib/quiz/assignment-service';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+
+const log = createLogger('RequestExtension');
+
+interface RequestExtensionBody {
+  requestType: 'extension' | 'new_code';
+  reason?: string;
+}
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ assignmentId: string }> },
+): Promise<Response> {
+  try {
+    // 🔒 AUTHENTICATION: Verify student is logged in
+    let authenticatedStudent;
+    try {
+      authenticatedStudent = await requireStudent(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
+    const { assignmentId } = await params;
+    const body = (await req.json()) as RequestExtensionBody;
+    const { requestType, reason } = body;
+
+    if (!requestType) {
+      return apiError(
+        'MISSING_REQUIRED_FIELD',
+        400,
+        'requestType is required',
+      );
+    }
+
+    if (!['extension', 'new_code'].includes(requestType)) {
+      return apiError(
+        'INVALID_REQUEST',
+        400,
+        'requestType must be "extension" or "new_code"',
+      );
+    }
+
+    const supabase = getSupabaseClient();
+
+    // 🔒 AUTHORIZATION: Verify assignment exists and belongs to this student
+    const { data: assignment, error: assignmentError } = await supabase
+      .from('quiz_assignments')
+      .select('id, student_id, quiz_id, instructor_id')
+      .eq('id', assignmentId)
+      .single();
+
+    if (assignmentError || !assignment) {
+      log.warn(`Assignment not found: ${assignmentId}`);
+      return apiError('NOT_FOUND', 404, 'Assignment not found');
+    }
+
+    // Verify student owns this assignment
+    if (assignment.student_id !== authenticatedStudent.id) {
+      log.warn(
+        `FORBIDDEN: Student ${authenticatedStudent.id} attempted to request extension for assignment owned by ${assignment.student_id}`
+      );
+      return apiError(
+        'FORBIDDEN',
+        403,
+        'You do not have permission to request extension for this assignment'
+      );
+    }
+
+    let result;
+
+    if (requestType === 'extension') {
+      result = await requestExtension(assignmentId, authenticatedStudent.id, reason);
+    } else {
+      // For new_code request
+      result = await requestNewCode(
+        assignmentId,
+        authenticatedStudent.id,
+        reason
+      );
+    }
+
+    log.info(
+      `✅ ${requestType} request created: student ${authenticatedStudent.email} for assignment ${assignmentId}`,
+    );
+
+    return apiSuccess({
+      success: true,
+      data: {
+        requestId: result.id,
+        status: result.status,
+        requestType,
+        message: `Your ${requestType} request has been sent to your instructor. You'll be notified when they respond.`,
+      },
+    });
+  } catch (error) {
+    log.error('Error creating request:', error);
+    return apiError('INTERNAL_ERROR', 500, 'Failed to create request');
+  }
+}

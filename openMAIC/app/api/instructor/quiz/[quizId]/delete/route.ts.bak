@@ -1,0 +1,184 @@
+/**
+ * DELETE /api/instructor/quiz/[quizId]/delete
+ * Soft or hard delete a quiz
+ * REQUIRES: Instructor authentication (verified)
+ * Hard delete also requires: 2-step verification code
+ *
+ * Query params:
+ * - deleteType: 'soft' | 'hard' (default: 'soft')
+ *
+ * Body (for hard delete):
+ * {
+ *   confirmQuizName: string,      // Must match quiz title exactly
+ *   twoFACode?: string            // 2FA code from email/SMS
+ * }
+ */
+
+import { NextRequest } from 'next/server';
+import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { createLogger } from '@/lib/logger';
+import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
+import { countSnapshotsForQuiz } from '@/lib/quiz/snapshot-service';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+
+const log = createLogger('DeleteQuiz');
+
+interface DeleteQuizRequest {
+  confirmQuizName?: string;
+  twoFACode?: string;
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> },
+): Promise<Response> {
+  try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let authenticatedInstructor;
+    try {
+      authenticatedInstructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
+    const { quizId } = params;
+    const { searchParams } = new URL(req.url);
+    const deleteType = searchParams.get('deleteType') || 'soft';
+
+    if (!['soft', 'hard'].includes(deleteType)) {
+      return apiError(
+        'INVALID_REQUEST',
+        400,
+        'deleteType must be "soft" or "hard"',
+      );
+    }
+
+    const supabase = getSupabaseClient();
+
+    // 🔒 AUTHORIZATION: Verify quiz exists AND instructor owns it
+    const { data: quiz, error: quizError } = await supabase
+      .from('quizzes')
+      .select('id, title, instructor_id')
+      .eq('id', quizId)
+      .eq('instructor_id', authenticatedInstructor.email) // Only own quizzes
+      .single();
+
+    if (quizError || !quiz) {
+      log.warn(
+        `FORBIDDEN: Instructor ${authenticatedInstructor.email} attempted to delete quiz ${quizId} they don't own`
+      );
+      return apiError('FORBIDDEN', 403, 'You do not have permission to delete this quiz');
+    }
+
+    if (deleteType === 'soft') {
+      // Soft delete: mark as deleted_at and is_active = false
+      const { error } = await supabase
+        .from('quizzes')
+        .update({
+          deleted_at: new Date().toISOString(),
+          is_active: false,
+        })
+        .eq('id', quizId);
+
+      if (error) {
+        log.error('Failed to soft delete quiz:', error);
+        return apiError('INTERNAL_ERROR', 500, 'Failed to delete quiz');
+      }
+
+      log.info(`✅ Quiz soft deleted (archived): ${quiz.title} (${quizId})`);
+
+      return apiSuccess({
+        success: true,
+        data: {
+          message: `Quiz "${quiz.title}" archived successfully`,
+          quizId,
+          deleteType: 'soft',
+          canRestore: true,
+        },
+      });
+    } else {
+      // Hard delete: requires name confirmation + 2FA verification
+      const body = (await req.json()) as DeleteQuizRequest;
+      const { confirmQuizName, twoFACode } = body;
+
+      // Step 1: Require exact quiz name confirmation
+      if (!confirmQuizName) {
+        return apiError(
+          'MISSING_REQUIRED_FIELD',
+          400,
+          'confirmQuizName required for hard delete',
+        );
+      }
+
+      if (confirmQuizName !== quiz.title) {
+        log.warn(`Quiz name mismatch for hard delete: ${confirmQuizName} vs ${quiz.title}`);
+        return apiError(
+          'INVALID_REQUEST',
+          400,
+          `Quiz name mismatch. Type exactly: "${quiz.title}"`,
+        );
+      }
+
+      // Step 2: Validate 2FA verification code (required)
+      if (!twoFACode) {
+        log.info(`2FA code required for hard delete: ${quiz.title}`);
+        return apiError(
+          'FORBIDDEN',
+          403,
+          'Hard delete requires 2-step verification. Check your email/SMS for code.',
+        );
+      }
+
+      // Validate the provided 2FA code against stored code
+      const { data: validation } = await supabase
+        .rpc('validate_2fa_code', {
+          p_instructor_email: authenticatedInstructor.email,
+          p_quiz_id: quizId,
+          p_provided_code: twoFACode,
+          p_operation_type: 'hard_delete',
+        });
+
+      if (!validation || !validation[0]?.is_valid) {
+        const message = validation?.[0]?.message || '2FA code validation failed';
+        log.warn(`Invalid 2FA code for hard delete: ${authenticatedInstructor.email} on ${quiz.title}`);
+        return apiError('FORBIDDEN', 403, message);
+      }
+
+      // Get snapshot count before deletion (for audit purposes)
+      const snapshotCount = await countSnapshotsForQuiz(quizId);
+
+      // Hard delete: remove quiz and all questions
+      // Snapshots and quiz_sessions are preserved (references only)
+      const { error: deleteError } = await supabase
+        .from('quizzes')
+        .delete()
+        .eq('id', quizId);
+
+      if (deleteError) {
+        log.error('Failed to hard delete quiz:', deleteError);
+        return apiError('INTERNAL_ERROR', 500, 'Failed to permanently delete quiz');
+      }
+
+      log.info(
+        `✅ Quiz HARD DELETED: "${quiz.title}" (${quizId}) by ${authenticatedInstructor.email} - ${snapshotCount} snapshots preserved for audit`
+      );
+
+      return apiSuccess({
+        success: true,
+        data: {
+          message: `Quiz "${quiz.title}" permanently deleted. ${snapshotCount} student records preserved for audit.`,
+          quizId,
+          deleteType: 'hard',
+          canRestore: false,
+          snapshotsPreserved: snapshotCount,
+          deletedBy: authenticatedInstructor.email,
+          deletedAt: new Date().toISOString(),
+        },
+      });
+    }
+  } catch (error) {
+    log.error('Error deleting quiz:', error);
+    return apiError('INTERNAL_ERROR', 500, 'Failed to delete quiz');
+  }
+}

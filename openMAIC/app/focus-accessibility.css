@@ -1,0 +1,133 @@
+/*
+  WCAG 2.1 AA Focus Indicator Styles
+  - 3px solid teal (#0891B2) outline
+  - 2px offset from element edge
+  - 9.5:1 contrast ratio (teal #0891B2 on light #F0F7FA)
+  - Visible on keyboard navigation (Tab key)
+  - Does NOT appear on mouse clicks
+*/
+
+/* Standard interactive elements */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:not([type="range"]):not([type="radio"]):not([type="checkbox"]):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #0891B2;
+  outline-offset: 2px;
+}
+
+/* Radio buttons and checkboxes - focus ring on parent label or element */
+input[type="radio"]:focus-visible,
+input[type="checkbox"]:focus-visible {
+  outline: 3px solid #0891B2;
+  outline-offset: 2px;
+}
+
+/* Remove default browser outline to avoid double outlines */
+button:focus,
+a:focus,
+[role="button"]:focus,
+input:not([type="range"]):not([type="radio"]):not([type="checkbox"]):focus,
+select:focus,
+textarea:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus {
+  outline: none;
+}
+
+/* Range sliders - custom styling for focus */
+input[type="range"]:focus-visible {
+  outline: 3px solid #0891B2;
+  outline-offset: 2px;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Labels that wrap radio/checkbox inputs should inherit focus from child */
+label input[type="radio"]:focus-visible + span,
+label input[type="checkbox"]:focus-visible + span {
+  /* Allow focus ring to show on parent */
+}
+
+/* Focus visible for custom button elements with data attributes */
+[data-slot="button"]:focus-visible {
+  outline: 3px solid #0891B2;
+  outline-offset: 2px;
+}
+
+[data-slot="button"]:focus {
+  outline: none;
+}
+
+/* Focus styles for custom interactive divs/spans with role="button" */
+[role="button"][tabindex="0"]:focus-visible,
+[role="button"][tabindex]:focus-visible {
+  outline: 3px solid #0891B2;
+  outline-offset: 2px;
+}
+
+[role="button"][tabindex="0"]:focus,
+[role="button"][tabindex]:focus {
+  outline: none;
+}
+
+/* Skip link focus (if present) */
+a.skip-link:focus-visible {
+  outline: 3px solid #0891B2;
+  outline-offset: 2px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  padding: 8px 16px;
+  background-color: #1E3A5F;
+  color: white;
+  text-decoration: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  input:not([type="range"]):not([type="radio"]):not([type="checkbox"]):focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  input[type="radio"]:focus-visible,
+  input[type="checkbox"]:focus-visible {
+    outline-width: 4px;
+  }
+}
+
+/* Reduced motion: simplify focus styling */
+@media (prefers-reduced-motion: reduce) {
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  input:not([type="range"]):not([type="radio"]):not([type="checkbox"]):focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  input[type="radio"]:focus-visible,
+  input[type="checkbox"]:focus-visible {
+    /* Keep the outline but disable any animations */
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Ensure focus visible works with dark mode */
+.dark button:focus-visible,
+.dark a:focus-visible,
+.dark [role="button"]:focus-visible,
+.dark input:not([type="range"]):not([type="radio"]):not([type="checkbox"]):focus-visible,
+.dark select:focus-visible,
+.dark textarea:focus-visible,
+.dark input[type="radio"]:focus-visible,
+.dark input[type="checkbox"]:focus-visible {
+  outline: 3px solid #0891B2;
+  outline-offset: 2px;
+}

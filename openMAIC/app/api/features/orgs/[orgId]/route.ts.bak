@@ -1,0 +1,35 @@
+/**
+ * Get all enabled features for an organization
+ * GET /api/features/orgs/[orgId]
+ */
+
+import { NextRequest } from 'next/server';
+import { getOrgFeatures } from '@/lib/server/feature-flags';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('OrgFeaturesAPI');
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ orgId: string }> }
+) {
+  try {
+    const { orgId } = params;
+
+    // Validate org ID
+    if (!orgId || typeof orgId !== 'string') {
+      return apiError('INVALID_REQUEST', 400, 'Invalid org ID');
+    }
+
+    const features = await getOrgFeatures(orgId);
+
+    log.debug(`Org "${orgId}" has ${features.length} enabled features`);
+
+    return apiSuccess({ orgId, features });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    log.error(`Error fetching org features for "${params.orgId}":`, error);
+    return apiError('INTERNAL_ERROR', 500, message);
+  }
+}

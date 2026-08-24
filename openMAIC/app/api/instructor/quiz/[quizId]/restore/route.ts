@@ -1,0 +1,79 @@
+/**
+ * PATCH /api/instructor/quiz/[quizId]/restore
+ * Restore a soft-deleted (archived) quiz
+ * REQUIRES: Instructor authentication (verified)
+ */
+
+import { NextRequest } from 'next/server';
+import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { createLogger } from '@/lib/logger';
+import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+
+const log = createLogger('RestoreQuiz');
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ quizId: string }> },
+): Promise<Response> {
+  try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let authenticatedInstructor;
+    try {
+      authenticatedInstructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
+    const { quizId } = await params;
+    const supabase = getSupabaseClient();
+
+    // 🔒 AUTHORIZATION: Verify quiz exists AND instructor owns it
+    const { data: quiz, error: quizError } = await supabase
+      .from('quizzes')
+      .select('id, title, deleted_at, instructor_id')
+      .eq('id', quizId)
+      .eq('instructor_id', authenticatedInstructor.id) // Only own quizzes
+      .single();
+
+    if (quizError || !quiz) {
+      log.warn(
+        `FORBIDDEN: Instructor ${authenticatedInstructor.email} attempted to restore quiz ${quizId} they don't own`
+      );
+      return apiError('FORBIDDEN', 403, 'You do not have permission to restore this quiz');
+    }
+
+    // Check if it's actually deleted
+    if (!quiz.deleted_at) {
+      return apiError('INVALID_REQUEST', 400, 'Quiz is not archived');
+    }
+
+    // Restore: clear deleted_at and set is_active = true
+    const { error } = await supabase
+      .from('quizzes')
+      .update({
+        deleted_at: null,
+        is_active: true,
+      })
+      .eq('id', quizId);
+
+    if (error) {
+      log.error('Failed to restore quiz:', error);
+      return apiError('INTERNAL_ERROR', 500, 'Failed to restore quiz');
+    }
+
+    log.info(`✅ Quiz restored: ${quiz.title} (${quizId})`);
+
+    return apiSuccess({
+      success: true,
+      data: {
+        message: `Quiz "${quiz.title}" restored successfully`,
+        quizId,
+      },
+    });
+  } catch (error) {
+    log.error('Error restoring quiz:', error);
+    return apiError('INTERNAL_ERROR', 500, 'Failed to restore quiz');
+  }
+}

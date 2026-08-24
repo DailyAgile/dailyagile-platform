@@ -1,0 +1,170 @@
+/**
+ * PATCH /api/instructor/requests/[requestId]
+ * Approve or deny an extension/new-code request
+ *
+ * Body:
+ * {
+ *   action: 'approve' | 'deny',
+ *   instructorId: string,
+ *   newExpiryDate?: string (required for extension approval),
+ *   reason?: string (reason for denial)
+ * }
+ */
+
+import { NextRequest } from 'next/server';
+import { createLogger } from '@/lib/logger';
+import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
+import {
+  approveExtension,
+  denyExtension,
+  createAssignment,
+} from '@/lib/quiz/assignment-service';
+import { createSnapshot } from '@/lib/quiz/snapshot-service';
+import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+
+const log = createLogger('ApproveRequest');
+
+interface ApproveRequestBody {
+  action: 'approve' | 'deny';
+  newExpiryDate?: string;
+  reason?: string;
+  instructorId?: string;
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ requestId: string }> },
+): Promise<Response> {
+  try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let authenticatedInstructor;
+    try {
+      authenticatedInstructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
+    const { requestId } = params;
+    const body = (await req.json()) as ApproveRequestBody;
+    const { action, newExpiryDate, reason } = body;
+
+    if (!action) {
+      return apiError(
+        'MISSING_REQUIRED_FIELD',
+        400,
+        'action is required',
+      );
+    }
+
+    if (!['approve', 'deny'].includes(action)) {
+      return apiError('INVALID_REQUEST', 400, 'action must be "approve" or "deny"');
+    }
+
+    const supabase = getSupabaseClient();
+
+    // 🔒 AUTHORIZATION: Get request and verify instructor owns the assignment
+    const { data: request, error: requestError } = await supabase
+      .from('assignment_extension_requests')
+      .select(
+        `
+        *,
+        quiz_assignments!inner(
+          id,
+          instructor_id,
+          quiz_id
+        )
+      `
+      )
+      .eq('id', requestId)
+      .eq('quiz_assignments.instructor_id', authenticatedInstructor.email) // Only own assignments
+      .single();
+
+    if (requestError || !request) {
+      log.warn(
+        `FORBIDDEN: Instructor ${authenticatedInstructor.email} attempted to manage request ${requestId} they don't own`
+      );
+      return apiError(
+        'FORBIDDEN',
+        403,
+        'You do not have permission to manage this request'
+      );
+    }
+
+    let result;
+
+    if (action === 'approve') {
+      if (request.request_type === 'extension') {
+        if (!newExpiryDate) {
+          return apiError(
+            'MISSING_REQUIRED_FIELD',
+            400,
+            'newExpiryDate required for extension approval',
+          );
+        }
+
+        result = await approveExtension(requestId, newExpiryDate, authenticatedInstructor.email);
+        log.info(`✅ Extension approved: ${requestId} with new expiry ${newExpiryDate}`);
+      } else {
+        // For new_code request, create new assignment
+        const { data: originalAssignment } = await supabase
+          .from('quiz_assignments')
+          .select('quiz_id')
+          .eq('id', request.assignment_id)
+          .single();
+
+        if (!originalAssignment) {
+          return apiError('NOT_FOUND', 404, 'Original assignment not found');
+        }
+
+        // Create new assignment with same quiz
+        const newAssignment = await createAssignment(
+          originalAssignment.quiz_id,
+          authenticatedInstructor.email,
+          new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 2 weeks default
+          request.student_id,
+        );
+
+        // Create snapshot for new assignment
+        try {
+          await createSnapshot(originalAssignment.quiz_id, newAssignment.id);
+        } catch (error) {
+          log.warn('Failed to create snapshot for new assignment:', error);
+        }
+
+        // Update request with new assignment
+        const { data: updatedRequest } = await supabase
+          .from('assignment_extension_requests')
+          .update({
+            status: 'approved',
+            approved_by: authenticatedInstructor.email,
+            approved_at: new Date().toISOString(),
+            new_assignment_id: newAssignment.id,
+          })
+          .eq('id', requestId)
+          .select()
+          .single();
+
+        result = updatedRequest;
+        log.info(`✅ New code approved: ${requestId} with code ${newAssignment.assignment_code}`);
+      }
+    } else {
+      // Deny request
+      result = await denyExtension(requestId, reason || 'Request denied by instructor', authenticatedInstructor.email);
+      log.info(`✅ Request denied: ${requestId}`);
+    }
+
+    return apiSuccess({
+      success: true,
+      data: {
+        message: `Request ${action}ed successfully`,
+        requestId,
+        status: result.status,
+      },
+    });
+  } catch (error) {
+    log.error('Error approving request:', error);
+    return apiError('INTERNAL_ERROR', 500, 'Failed to process request');
+  }
+}

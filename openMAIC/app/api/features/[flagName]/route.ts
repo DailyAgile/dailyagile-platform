@@ -1,0 +1,35 @@
+/**
+ * Get single feature flag status
+ * GET /api/features/[flagName]
+ */
+
+import { NextRequest } from 'next/server';
+import { isFeatureEnabled } from '@/lib/server/feature-flags';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
+import { createLogger } from '@/lib/logger';
+
+const log = createLogger('FeatureAPI');
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ flagName: string }> }
+) {
+  try {
+    const { flagName } = await params;
+
+    // Validate flag name
+    if (!flagName || typeof flagName !== 'string') {
+      return apiError('INVALID_REQUEST', 400, 'Invalid flag name');
+    }
+
+    const enabled = await isFeatureEnabled(flagName);
+
+    log.debug(`Feature "${flagName}": ${enabled}`);
+
+    return apiSuccess({ flagName, enabled });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    log.error('Error checking feature:', error);
+    return apiError('INTERNAL_ERROR', 500, message);
+  }
+}

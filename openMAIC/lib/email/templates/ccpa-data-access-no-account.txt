@@ -1,0 +1,37 @@
+YOUR DATA ACCESS REQUEST
+
+Hello,
+
+Thank you for submitting your California Consumer Privacy Act (CCPA) data access request to DailyAgile. We have received and logged your request.
+
+NO ACCOUNT FOUND:
+
+Our records do not show an existing DailyAgile account associated with this email address.
+
+WHAT THIS MEANS:
+
+We have no personal information on file for this email address. Therefore:
+- No quiz or learning data to provide
+- No account profile or preferences
+- No personal information to access
+
+YOUR RIGHTS:
+
+You still have full protection under California law:
+- If you believe you have an account with DailyAgile, please contact support with details
+- If this is a different email address, you may submit another CCPA request
+- You have the right to lodge a complaint with the California Attorney General if needed
+
+QUESTIONS?
+
+If you believe this is an error or need assistance, please contact us:
+- Email: {{supportEmail}}
+- Subject: "DailyAgile CCPA Request - Account Verification"
+
+---
+
+This email confirms receipt of your CCPA data access request under California Consumer Privacy Act §1798.100. If you did not submit this request, no further action is needed.
+
+© 2026 DailyAgile. All rights reserved.
+Privacy Policy: {{supportLink}}/legal/privacy-policy
+Terms of Service: {{supportLink}}/legal/terms-of-service

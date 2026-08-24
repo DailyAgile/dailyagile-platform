@@ -1,0 +1,52 @@
+YOUR DATA ACCESS REQUEST
+
+Hello,
+
+Thank you for submitting your California Consumer Privacy Act (CCPA) data access request. We have received your request and are processing it.
+
+REQUEST DETAILS:
+- Request ID: {{requestId}}
+- Email: {{email}}
+- Submitted: {{submittedDate}}
+- Response Due: {{responseDeadline}} (45 days from submission)
+- Format: {{format}}
+
+WHAT WE'RE PROVIDING:
+
+Your data access report will include:
+- Personal Information Collected: All data we hold about you
+- Categories of Personal Information: Per CCPA §1798.100
+- Sources of Information: Where we collected your data
+- Business Purposes: Why we collect and use your data
+- Third Parties: Who we share your data with
+- Retention Periods: How long we keep your information
+
+NEXT STEPS:
+
+We will process your request and send your complete data access report within 45 calendar days. Once ready, we'll send you a notification with instructions for downloading your data.
+
+Note: We will verify your identity before releasing your personal information. If we need additional information to complete your request, we will contact you at this email address.
+
+YOUR CCPA RIGHTS:
+
+Under California law, you also have the right to:
+- Delete: Request deletion of your personal information
+- Correct: Request correction of inaccurate information
+- Opt-Out: Opt out of sale or sharing of your data (we don't sell your data)
+- Non-Discrimination: Protection from discrimination for exercising your rights
+
+Learn more about your rights in our CCPA Consumer Rights Notice at {{supportLink}}/legal/ccpa
+
+QUESTIONS?
+
+If you have any questions about your request or need assistance, please reply to this email or contact us:
+- Email: {{supportEmail}}
+- Response Time: Within 45 calendar days
+
+---
+
+This email confirms receipt of your CCPA data access request under California Consumer Privacy Act §1798.100.
+
+© 2026 DailyAgile. All rights reserved.
+Privacy Policy: {{supportLink}}/legal/privacy-policy
+Terms of Service: {{supportLink}}/legal/terms-of-service

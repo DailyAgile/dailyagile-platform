@@ -1,0 +1,60 @@
+YOUR DATA DELETION REQUEST
+
+Hello,
+
+Thank you for submitting your California Consumer Privacy Act (CCPA) deletion request. We have received your request and will process it according to California law.
+
+REQUEST DETAILS:
+- Request ID: {{requestId}}
+- Email: {{email}}
+- Submitted: {{submittedDate}}
+- Response Due: {{responseDeadline}} (45 days from submission)
+
+WHAT WILL BE DELETED:
+
+Upon processing your deletion request, we will delete:
+- Account profile and credentials
+- Quiz attempt history and scores
+- Learning progress data
+- Badges and achievements
+- Preferences and settings
+- All other personal information we hold about you
+
+LEGAL RETENTION EXCEPTIONS:
+
+Some information may be retained longer if required by law:
+- Audit Logs: 7 years (legal compliance requirement)
+- Quiz Records: 3 years (educational regulatory requirement)
+- Consent Records: Permanently, but anonymized (CCPA accountability)
+
+IMPORTANT: Data deletion is permanent and cannot be undone. We will verify your identity before processing the deletion. If we need additional information, we will contact you at this email address.
+
+PROCESSING TIMELINE:
+
+Response Deadline: We will confirm completion of your deletion request by {{responseDeadline}} (45 days from now).
+
+You will receive an email confirmation once your personal information has been deleted.
+
+YOUR CCPA RIGHTS:
+
+You have other rights under California law:
+- Access: Request a copy of your personal information
+- Correct: Request correction of inaccurate information
+- Opt-Out: Opt out of sale or sharing of your data (we don't sell your data)
+- Non-Discrimination: Protection from discrimination for exercising your rights
+
+Learn more about your rights in our CCPA Consumer Rights Notice at {{supportLink}}/legal/ccpa
+
+NEED HELP?
+
+If you have any questions about your deletion request or need to cancel it, please contact us:
+- Email: {{supportEmail}}
+- Response Time: Within 45 calendar days
+
+---
+
+This email confirms receipt of your CCPA deletion request under California Consumer Privacy Act §1798.105.
+
+© 2026 DailyAgile. All rights reserved.
+Privacy Policy: {{supportLink}}/legal/privacy-policy
+Terms of Service: {{supportLink}}/legal/terms-of-service

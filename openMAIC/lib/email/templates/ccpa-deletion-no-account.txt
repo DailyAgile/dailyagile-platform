@@ -1,0 +1,37 @@
+YOUR DATA DELETION REQUEST
+
+Hello,
+
+Thank you for submitting your California Consumer Privacy Act (CCPA) deletion request to DailyAgile. We have received and logged your request.
+
+NO ACCOUNT FOUND:
+
+Our records do not show an existing DailyAgile account associated with this email address.
+
+WHAT THIS MEANS:
+
+Since we have no account for this email address:
+- There is no personal information to delete
+- Your request is already fulfilled
+- No further action is needed on our part
+
+YOUR RIGHTS:
+
+You still have full protection under California law:
+- If you believe you have an account with DailyAgile, please contact support with details
+- If this is a different email address, you may submit another CCPA deletion request
+- You have the right to lodge a complaint with the California Attorney General if needed
+
+QUESTIONS?
+
+If you believe this is an error or need assistance, please contact us:
+- Email: {{supportEmail}}
+- Subject: "DailyAgile CCPA Request - Account Verification"
+
+---
+
+This email confirms receipt of your CCPA deletion request under California Consumer Privacy Act §1798.105. If you did not submit this request, no further action is needed.
+
+© 2026 DailyAgile. All rights reserved.
+Privacy Policy: {{supportLink}}/legal/privacy-policy
+Terms of Service: {{supportLink}}/legal/terms-of-service

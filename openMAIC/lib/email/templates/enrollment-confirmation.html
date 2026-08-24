@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Enrollment Confirmed - DailyAgile</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #1E3A5F 0%, #0891B2 100%);
+      color: white;
+      padding: 24px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .header p {
+      margin: 8px 0 0 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .content {
+      padding: 24px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .label {
+      font-weight: 600;
+      color: #1E3A5F;
+      margin-bottom: 8px;
+    }
+    .info-box {
+      background: #f0f7fa;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 12px 0;
+      border-left: 4px solid #0891B2;
+    }
+    .info-box p {
+      margin: 8px 0;
+    }
+    .cta-button {
+      display: inline-block;
+      background: #0891B2;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      margin: 16px 0;
+    }
+    .cta-button:hover {
+      background: #06B6D4;
+    }
+    .footer {
+      background: #f5f5f5;
+      padding: 20px;
+      text-align: center;
+      border-top: 1px solid #e0e0e0;
+      font-size: 12px;
+      color: #666;
+      border-radius: 0 0 8px 8px;
+    }
+    .footer p {
+      margin: 8px 0;
+    }
+    .footer a {
+      color: #0891B2;
+      text-decoration: none;
+    }
+    .unsubscribe {
+      font-size: 11px;
+      color: #999;
+      margin-top: 12px;
+    }
+    ul {
+      margin: 12px 0;
+      padding-left: 20px;
+    }
+    li {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Course Enrollment Confirmed!</h1>
+      <p>DailyAgile — Accelerate Business Agility</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="section">
+        <p>Hi {{firstName}},</p>
+        <p>Your course enrollment has been successfully confirmed. You're now ready to begin your AI and Agile learning journey with DailyAgile.</p>
+      </div>
+
+      <!-- Enrollment Details -->
+      <div class="section">
+        <div class="label">📚 Enrollment Details</div>
+        <div class="info-box">
+          <p><strong>Course ID:</strong> {{courseId}}</p>
+          <p><strong>Amount Paid:</strong> ${{amount}}</p>
+          <p><strong>Enrollment Date:</strong> {{enrollmentDate}}</p>
+        </div>
+      </div>
+
+      <!-- Next Steps -->
+      <div class="section">
+        <div class="label">🚀 Next Steps</div>
+        <ul>
+          <li>Access your course materials immediately</li>
+          <li>Complete your first module to earn your first badge</li>
+          <li>Join our community forum for peer learning</li>
+          <li>Schedule office hours with your instructor (if available)</li>
+        </ul>
+      </div>
+
+      <!-- CTA Button -->
+      <div class="section">
+        <p><a href="https://dailyagile.com/academy/quiz" class="cta-button">Start Learning Now</a></p>
+      </div>
+
+      <!-- Support -->
+      <div class="section">
+        <p><strong>Need Help?</strong></p>
+        <p>If you have any questions or encounter technical issues, please contact our support team at <a href="mailto:support@dailyagile.com">support@dailyagile.com</a>. We're here to help!</p>
+      </div>
+
+      <!-- Course Features -->
+      <div class="section">
+        <div class="label">✨ What You Get</div>
+        <ul>
+          <li>Interactive lessons and hands-on activities</li>
+          <li>Quiz assessments with instant feedback</li>
+          <li>Progress tracking and performance analytics</li>
+          <li>Downloadable certificates upon completion</li>
+          <li>Lifetime access to course materials</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>&copy; {{currentYear}} DailyAgile. All rights reserved.</p>
+      <p>
+        Accelerate Business Agility |
+        <a href="https://dailyagile.com">Visit Academy</a> |
+        <a href="https://dailyagile.com/privacy">Privacy Policy</a>
+      </p>
+      <div class="unsubscribe">
+        <p>You received this email because you enrolled in a DailyAgile course.</p>
+        <p><a href="https://dailyagile.com/unsubscribe?email={{email}}">Unsubscribe from course emails</a> | <a href="https://dailyagile.com/preferences">Email Preferences</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

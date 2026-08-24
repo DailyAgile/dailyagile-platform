@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Data Access Request</title>
+</head>
+<body style="font-family: Calibri, sans-serif; line-height: 1.6; color: #475569; background-color: #f8fafc;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #1E3A5F 0%, #0891B2 100%); padding: 30px; border-radius: 8px 8px 0 0; text-align: center; color: white;">
+      <h1 style="margin: 0; font-size: 24px; font-family: Cambria, serif;">Your Data Access Request</h1>
+      <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">California Consumer Privacy Act (CCPA) Compliance</p>
+    </div>
+
+    <!-- Body -->
+    <div style="background: white; padding: 30px; border: 1px solid #e2e8f0;">
+      <p>Hello,</p>
+
+      <p>Thank you for submitting your California Consumer Privacy Act (CCPA) data access request. We have received your request and are processing it.</p>
+
+      <!-- Request Details -->
+      <div style="background: #f0f7fa; padding: 16px; border-radius: 6px; border-left: 4px solid #0891B2; margin: 20px 0;">
+        <p style="margin: 0 0 12px 0;"><strong>Request Details:</strong></p>
+        <ul style="margin: 0; padding-left: 20px;">
+          <li><strong>Request ID:</strong> {{requestId}}</li>
+          <li><strong>Email:</strong> {{email}}</li>
+          <li><strong>Submitted:</strong> {{submittedDate}}</li>
+          <li><strong>Response Due:</strong> {{responseDeadline}} (45 days from submission)</li>
+          <li><strong>Format:</strong> {{format}}</li>
+        </ul>
+      </div>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">What We're Providing</h2>
+      <p>Your data access report will include:</p>
+      <ul>
+        <li><strong>Personal Information Collected:</strong> All data we hold about you</li>
+        <li><strong>Categories of Personal Information:</strong> Per CCPA §1798.100</li>
+        <li><strong>Sources of Information:</strong> Where we collected your data</li>
+        <li><strong>Business Purposes:</strong> Why we collect and use your data</li>
+        <li><strong>Third Parties:</strong> Who we share your data with</li>
+        <li><strong>Retention Periods:</strong> How long we keep your information</li>
+      </ul>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">Next Steps</h2>
+      <p>We will process your request and send your complete data access report within 45 calendar days. Once ready, we'll send you a notification with instructions for downloading your data.</p>
+
+      <p style="margin-top: 20px; padding: 12px; background: #fff7ed; border-radius: 6px; border-left: 4px solid #EA580C;">
+        <strong>Note:</strong> We will verify your identity before releasing your personal information. If we need additional information to complete your request, we will contact you at this email address.
+      </p>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">Your CCPA Rights</h2>
+      <p>Under California law, you also have the right to:</p>
+      <ul>
+        <li><strong>Delete:</strong> Request deletion of your personal information</li>
+        <li><strong>Correct:</strong> Request correction of inaccurate information</li>
+        <li><strong>Opt-Out:</strong> Opt out of sale or sharing of your data (we don't sell your data)</li>
+        <li><strong>Non-Discrimination:</strong> Protection from discrimination for exercising your rights</li>
+      </ul>
+
+      <p>Learn more about your rights in our <a href="{{supportLink}}/legal/ccpa" style="color: #0891B2; text-decoration: none;"><strong>CCPA Consumer Rights Notice</strong></a>.</p>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">Questions?</h2>
+      <p>If you have any questions about your request or need assistance, please reply to this email or contact us:</p>
+      <ul>
+        <li><strong>Email:</strong> {{supportEmail}}</li>
+        <li><strong>Response Time:</strong> Within 45 calendar days</li>
+      </ul>
+
+      <p style="margin-top: 24px; font-size: 12px; color: #64748B;">
+        This email confirms receipt of your CCPA data access request under California Consumer Privacy Act §1798.100.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background: #f0f7fa; padding: 20px; border-radius: 0 0 8px 8px; border: 1px solid #e2e8f0; border-top: none; text-align: center; font-size: 12px; color: #64748B;">
+      <p style="margin: 0;">© 2026 DailyAgile. All rights reserved.</p>
+      <p style="margin: 8px 0 0 0;">
+        <a href="{{supportLink}}/legal/privacy-policy" style="color: #0891B2; text-decoration: none;">Privacy Policy</a> |
+        <a href="{{supportLink}}/legal/terms-of-service" style="color: #0891B2; text-decoration: none;">Terms of Service</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

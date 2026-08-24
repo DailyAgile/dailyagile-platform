@@ -1,0 +1,51 @@
+WELCOME TO DAILYAGILE
+Accelerate Business Agility
+
+Hi {{firstName}},
+
+Your course enrollment has been successfully confirmed. You're now ready to begin your AI and Agile learning journey with DailyAgile.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ENROLLMENT DETAILS
+
+Course ID: {{courseId}}
+Amount Paid: ${{amount}}
+Enrollment Date: {{enrollmentDate}}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEXT STEPS
+
+1. Access your course materials immediately
+2. Complete your first module to earn your first badge
+3. Join our community forum for peer learning
+4. Schedule office hours with your instructor (if available)
+
+START LEARNING NOW:
+https://dailyagile.com/academy/quiz
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEED HELP?
+
+If you have any questions or encounter technical issues, please contact our support team at support@dailyagile.com. We're here to help!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT YOU GET
+
+• Interactive lessons and hands-on activities
+• Quiz assessments with instant feedback
+• Progress tracking and performance analytics
+• Downloadable certificates upon completion
+• Lifetime access to course materials
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Copyright © {{currentYear}} DailyAgile. All rights reserved.
+Accelerate Business Agility | https://dailyagile.com
+
+You received this email because you enrolled in a DailyAgile course.
+Unsubscribe: https://dailyagile.com/unsubscribe?email={{email}}
+Email Preferences: https://dailyagile.com/preferences

@@ -15,14 +15,14 @@ These variables **MUST** be set for the application to start:
 ### 1. STRIPE_SECRET_KEY
 - **Description:** Stripe API secret key for payment processing
 - **Format:** Must start with `sk_test_` (development) or `sk_live_` (production)
-- **Example:** `sk_live_1234567890abcdefghijklmnop`
+- **Example:** `sk_live_[your-key-here]`
 - **Where to get:** https://dashboard.stripe.com/apikeys
 - **Used by:** Payment processing, Stripe client initialization
 
 ### 2. STRIPE_WEBHOOK_SECRET
 - **Description:** Stripe webhook signing secret for validating incoming webhooks
 - **Format:** Must start with `whsec_`
-- **Example:** `whsec_test_1234567890abcdefghijklmnop`
+- **Example:** `whsec_[your-webhook-secret]`
 - **Where to get:** https://dashboard.stripe.com/webhooks (click on your endpoint)
 - **Used by:** Webhook signature validation in `/api/quiz/stripe/webhook`
 - **Important:** Rotating this in Stripe invalidates the old secret immediately
@@ -30,14 +30,14 @@ These variables **MUST** be set for the application to start:
 ### 3. SUPABASE_URL
 - **Description:** Database connection URL for Supabase
 - **Format:** Must be an HTTPS URL to supabase.co
-- **Example:** `https://abc123xyz.supabase.co`
+- **Example:** `https://[project-id].supabase.co`
 - **Where to get:** https://app.supabase.com > Settings > Database > Connection string
 - **Used by:** All database operations through the Supabase client
 
 ### 4. SUPABASE_SERVICE_ROLE_KEY
 - **Description:** Supabase service role API key for server-side database operations
 - **Format:** JWT token (starts with `eyJ`)
-- **Example:** `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+- **Example:** `eyJ[your-service-key]`
 - **Where to get:** https://app.supabase.com > Settings > API
 - **Security:** Keep this secret! Only use on server side, never expose to client
 - **Used by:** Server-side API routes, webhook handlers

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Data Deletion Request</title>
+</head>
+<body style="font-family: Calibri, sans-serif; line-height: 1.6; color: #475569; background-color: #f8fafc;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #1E3A5F 0%, #0891B2 100%); padding: 30px; border-radius: 8px 8px 0 0; text-align: center; color: white;">
+      <h1 style="margin: 0; font-size: 24px; font-family: Cambria, serif;">Your Data Deletion Request</h1>
+      <p style="margin: 8px 0 0 0; font-size: 14px; opacity: 0.9;">California Consumer Privacy Act (CCPA) Compliance</p>
+    </div>
+
+    <!-- Body -->
+    <div style="background: white; padding: 30px; border: 1px solid #e2e8f0;">
+      <p>Hello,</p>
+
+      <p>Thank you for submitting your California Consumer Privacy Act (CCPA) deletion request. We have received your request and will process it according to California law.</p>
+
+      <!-- Request Details -->
+      <div style="background: #f0f7fa; padding: 16px; border-radius: 6px; border-left: 4px solid #0891B2; margin: 20px 0;">
+        <p style="margin: 0 0 12px 0;"><strong>Request Details:</strong></p>
+        <ul style="margin: 0; padding-left: 20px;">
+          <li><strong>Request ID:</strong> {{requestId}}</li>
+          <li><strong>Email:</strong> {{email}}</li>
+          <li><strong>Submitted:</strong> {{submittedDate}}</li>
+          <li><strong>Response Due:</strong> {{responseDeadline}} (45 days from submission)</li>
+        </ul>
+      </div>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">What Will Be Deleted</h2>
+      <p>Upon processing your deletion request, we will delete:</p>
+      <ul>
+        <li>Account profile and credentials</li>
+        <li>Quiz attempt history and scores</li>
+        <li>Learning progress data</li>
+        <li>Badges and achievements</li>
+        <li>Preferences and settings</li>
+        <li>All other personal information we hold about you</li>
+      </ul>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">Legal Retention Exceptions</h2>
+      <p>Some information may be retained longer if required by law:</p>
+      <ul>
+        <li><strong>Audit Logs:</strong> 7 years (legal compliance requirement)</li>
+        <li><strong>Quiz Records:</strong> 3 years (educational regulatory requirement)</li>
+        <li><strong>Consent Records:</strong> Permanently, but anonymized (CCPA accountability)</li>
+      </ul>
+
+      <p style="margin-top: 20px; padding: 12px; background: #fef3c7; border-radius: 6px; border-left: 4px solid #EA580C;">
+        <strong>Important:</strong> Data deletion is permanent and cannot be undone. We will verify your identity before processing the deletion. If we need additional information, we will contact you at this email address.
+      </p>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">Processing Timeline</h2>
+      <p><strong>Response Deadline:</strong> We will confirm completion of your deletion request by {{responseDeadline}} (45 days from now).</p>
+      <p>You will receive an email confirmation once your personal information has been deleted.</p>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">Your CCPA Rights</h2>
+      <p>You have other rights under California law:</p>
+      <ul>
+        <li><strong>Access:</strong> Request a copy of your personal information</li>
+        <li><strong>Correct:</strong> Request correction of inaccurate information</li>
+        <li><strong>Opt-Out:</strong> Opt out of sale or sharing of your data (we don't sell your data)</li>
+        <li><strong>Non-Discrimination:</strong> Protection from discrimination for exercising your rights</li>
+      </ul>
+
+      <p>Learn more about your rights in our <a href="{{supportLink}}/legal/ccpa" style="color: #0891B2; text-decoration: none;"><strong>CCPA Consumer Rights Notice</strong></a>.</p>
+
+      <h2 style="font-size: 16px; color: #1E3A5F; font-family: Cambria, serif; margin-top: 24px;">Need Help?</h2>
+      <p>If you have any questions about your deletion request or need to cancel it, please contact us:</p>
+      <ul>
+        <li><strong>Email:</strong> {{supportEmail}}</li>
+        <li><strong>Response Time:</strong> Within 45 calendar days</li>
+      </ul>
+
+      <p style="margin-top: 24px; font-size: 12px; color: #64748B;">
+        This email confirms receipt of your CCPA deletion request under California Consumer Privacy Act §1798.105.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background: #f0f7fa; padding: 20px; border-radius: 0 0 8px 8px; border: 1px solid #e2e8f0; border-top: none; text-align: center; font-size: 12px; color: #64748B;">
+      <p style="margin: 0;">© 2026 DailyAgile. All rights reserved.</p>
+      <p style="margin: 8px 0 0 0;">
+        <a href="{{supportLink}}/legal/privacy-policy" style="color: #0891B2; text-decoration: none;">Privacy Policy</a> |
+        <a href="{{supportLink}}/legal/terms-of-service" style="color: #0891B2; text-decoration: none;">Terms of Service</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

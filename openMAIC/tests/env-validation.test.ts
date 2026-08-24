@@ -32,8 +32,8 @@ describe('Environment Validation', () => {
 
   describe('validateEnvironment()', () => {
     it('should pass when all critical variables are set', () => {
-      process.env.STRIPE_SECRET_KEY = 'sk_live_1234567890abcdefghijklmnop';
-      process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_1234567890abcdefghijklmnop';
+      process.env.STRIPE_SECRET_KEY = 'sk_live_test123abc';
+      process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_abc';
       process.env.SUPABASE_URL = 'https://abc123.supabase.co';
       process.env.SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9';
 

@@ -122,7 +122,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     }));
 
     const response = createPaginatedResponse(transformedData, page, limit, total);
-    return apiSuccess(response);
+    return apiSuccess(response as Record<string, unknown>);
   } catch (error) {
     log.error('Error fetching classrooms:', error);
     return apiError('INTERNAL_ERROR', 500, 'Failed to process request');

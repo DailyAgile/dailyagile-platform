@@ -37,10 +37,10 @@ export default function HomePage() {
           </div>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
             <a href="/courses" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
-              Courses
+              Self-Paced
             </a>
             <a href="/cohorts" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
-              Cohorts
+              Live Courses
             </a>
             <a href="#quizzes" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Quizzes

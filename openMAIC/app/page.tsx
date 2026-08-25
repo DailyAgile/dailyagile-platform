@@ -1,12 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function HomePage() {
   const primaryColor = '#0f172a'; // slate-900
   const accentColor = '#0891b2'; // cyan-600
   const ctaColor = '#ea580c'; // orange-600
   const lightBg = '#f0f9ff'; // blue-50
+
+  const [quizCode, setQuizCode] = useState('');
+
+  const handleTakeQuiz = () => {
+    if (quizCode.trim()) {
+      window.location.href = `/teach/quiz/${quizCode.trim()}`;
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
@@ -100,6 +109,9 @@ export default function HomePage() {
               <input
                 type="text"
                 placeholder="Paste your instructor's 8-digit code"
+                value={quizCode}
+                onChange={(e) => setQuizCode(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleTakeQuiz()}
                 style={{
                   flex: 1,
                   padding: '0.75rem 1rem',
@@ -110,6 +122,7 @@ export default function HomePage() {
                 }}
               />
               <button
+                onClick={handleTakeQuiz}
                 style={{
                   backgroundColor: accentColor,
                   color: 'white',

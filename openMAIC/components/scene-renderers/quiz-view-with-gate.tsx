@@ -85,5 +85,5 @@ export function QuizViewWithGate({ questions, sceneId }: QuizViewWithGateProps) 
   }
 
   // Student is verified, render the actual quiz
-  return <QuizView questions={questions} sceneId={sceneId} sessionToken={sessionToken} studentId={studentId} />;
+  return <QuizView questions={questions} sceneId={sceneId} />;
 }

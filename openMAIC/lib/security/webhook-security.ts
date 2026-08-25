@@ -349,6 +349,18 @@ export class RateLimiter {
   }> {
     return this.redisBacked.getStatus(customerEmail);
   }
+
+  // Static convenience methods for backwards compatibility (added at module level)
+  static checkRateLimit: (customerEmail: string) => Promise<boolean>;
+  static reset: (customerEmail?: string) => Promise<void>;
+  static resetGlobal: () => Promise<void>;
+  static getStatus: (customerEmail: string) => Promise<{
+    customerCount: number;
+    customerLimit: number;
+    globalCount: number;
+    globalLimit: number;
+    usingRedis: boolean;
+  }>;
 }
 
 // ============================================================================

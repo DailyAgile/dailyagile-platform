@@ -15,7 +15,7 @@ const BRAND_COLORS = {
   green: '#16a34a',
 };
 
-const cohorts = [
+const sessions = [
   {
     id: 1,
     title: 'AI for Business Professionals',
@@ -66,17 +66,17 @@ const cohorts = [
   },
 ];
 
-export default function CohortDetailPage({ params }: { params: { id: string } }) {
-  const cohortId = parseInt(params.id);
-  const cohort = cohorts.find((c) => c.id === cohortId);
+export default function IltDetailPage({ params }: { params: { id: string } }) {
+  const sessionId = parseInt(params.id);
+  const session = sessions.find((s) => s.id === sessionId);
   const [enrolling, setEnrolling] = useState(false);
 
-  if (!cohort) {
+  if (!session) {
     return (
       <div style={{ minHeight: '100vh', background: BRAND_COLORS.light, padding: '40px 24px', textAlign: 'center' }}>
-        <h1 style={{ color: BRAND_COLORS.navy }}>Cohort not found</h1>
-        <Link href="/cohorts" style={{ color: BRAND_COLORS.teal }}>
-          ← Back to Cohorts
+        <h1 style={{ color: BRAND_COLORS.navy }}>Session not found</h1>
+        <Link href="/ilt" style={{ color: BRAND_COLORS.teal }}>
+          ← Back to Live Sessions
         </Link>
       </div>
     );
@@ -98,7 +98,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
       >
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Link
-            href="/cohorts"
+            href="/ilt"
             style={{
               fontSize: '16px',
               fontWeight: '600',
@@ -106,7 +106,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
               textDecoration: 'none',
             }}
           >
-            ← Back to Cohorts
+            ← Back to Live Sessions
           </Link>
           <Link
             href="/auth/login"
@@ -128,13 +128,13 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
       {/* Main Content */}
       <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '40px 24px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '40px' }}>
-          {/* Left: Cohort Details */}
+          {/* Left: Session Details */}
           <div>
             <h1 style={{ fontSize: '32px', fontWeight: 'bold', color: BRAND_COLORS.navy, margin: '0 0 8px 0' }}>
-              {cohort.title}
+              {session.title}
             </h1>
             <p style={{ fontSize: '16px', color: BRAND_COLORS.gray, margin: '0 0 24px 0' }}>
-              Led by <strong>{cohort.instructor}</strong>
+              Led by <strong>{session.instructor}</strong>
             </p>
 
             {/* Instructor Bio */}
@@ -143,7 +143,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
                 About Your Instructor
               </h2>
               <p style={{ color: BRAND_COLORS.darkGray, margin: 0 }}>
-                {cohort.instructorBio}
+                {session.instructorBio}
               </p>
             </div>
 
@@ -152,8 +152,8 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
               <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: BRAND_COLORS.navy, margin: '0 0 16px 0' }}>
                 Weekly Schedule
               </h2>
-              {cohort.schedule.map((slot, i) => (
-                <div key={i} style={{ marginBottom: i < cohort.schedule.length - 1 ? '12px' : 0 }}>
+              {session.schedule.map((slot, i) => (
+                <div key={i} style={{ marginBottom: i < session.schedule.length - 1 ? '12px' : 0 }}>
                   <p style={{ margin: 0, color: BRAND_COLORS.darkGray }}>
                     <strong>{slot.day}</strong>: {slot.time}
                   </p>
@@ -191,9 +191,9 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
               {/* Availability Badge */}
               <div
                 style={{
-                  background: cohort.availability > 0 ? '#ecfdf5' : '#fee2e2',
-                  border: `1px solid ${cohort.availability > 0 ? BRAND_COLORS.green : '#fca5a5'}`,
-                  color: cohort.availability > 0 ? '#065f46' : '#7f1d1d',
+                  background: session.availability > 0 ? '#ecfdf5' : '#fee2e2',
+                  border: `1px solid ${session.availability > 0 ? BRAND_COLORS.green : '#fca5a5'}`,
+                  color: session.availability > 0 ? '#065f46' : '#7f1d1d',
                   padding: '8px 12px',
                   borderRadius: '6px',
                   fontSize: '12px',
@@ -202,7 +202,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
                   textAlign: 'center',
                 }}
               >
-                {cohort.availability > 0 ? `${cohort.availability} seats available` : 'Waitlist only'}
+                {session.availability > 0 ? `${session.availability} seats available` : 'Waitlist only'}
               </div>
 
               <div style={{ marginBottom: '24px' }}>
@@ -210,7 +210,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
                   Price
                 </p>
                 <p style={{ fontSize: '32px', fontWeight: 'bold', color: BRAND_COLORS.teal, margin: '8px 0 0 0' }}>
-                  {cohort.price}
+                  {session.price}
                 </p>
               </div>
 
@@ -220,7 +220,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
                     Starts
                   </p>
                   <p style={{ fontSize: '16px', fontWeight: 'bold', color: BRAND_COLORS.navy, margin: '4px 0 0 0' }}>
-                    {cohort.startDate}
+                    {session.startDate}
                   </p>
                 </div>
                 <div>
@@ -228,7 +228,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
                     Duration
                   </p>
                   <p style={{ fontSize: '16px', fontWeight: 'bold', color: BRAND_COLORS.navy, margin: '4px 0 0 0' }}>
-                    {cohort.duration}
+                    {session.duration}
                   </p>
                 </div>
               </div>
@@ -236,7 +236,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
               <button
                 onClick={() => {
                   setEnrolling(true);
-                  window.location.href = `/auth/login?redirect=/cohorts/${cohortId}/enroll`;
+                  window.location.href = `/auth/login?redirect=/ilt/${sessionId}/enroll`;
                 }}
                 disabled={enrolling}
                 style={{

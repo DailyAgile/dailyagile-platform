@@ -15,15 +15,15 @@ const BRAND_COLORS = {
   green: '#10B981',
 };
 
-const cohorts = [
+const sessions = [
   { id: 1, title: 'AI for Business Professionals', instructor: 'Sarah Chen', startDate: 'Sep 15, 2026', price: '£349' },
   { id: 2, title: 'AI Engineer Bootcamp', instructor: 'Marcus Johnson', startDate: 'Oct 1, 2026', price: '£699' },
   { id: 3, title: 'Prompt Engineering Masterclass', instructor: 'Jennifer Park', startDate: 'Sep 22, 2026', price: '£199' },
 ];
 
-export default function EnrollCohortPage({ params }: { params: { id: string } }) {
-  const cohortId = parseInt(params.id);
-  const cohort = cohorts.find((c) => c.id === cohortId);
+export default function EnrollIltPage({ params }: { params: { id: string } }) {
+  const sessionId = parseInt(params.id);
+  const session = sessions.find((s) => s.id === sessionId);
   const [studentId, setStudentId] = useState<string | null>(null);
   const [enrolling, setEnrolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,14 +33,14 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
     // Check if user is logged in
     const stored = localStorage.getItem('studentId');
     if (!stored) {
-      window.location.href = `/auth/login?redirect=/cohorts/${cohortId}`;
+      window.location.href = `/auth/login?redirect=/ilt/${sessionId}`;
       return;
     }
     setStudentId(stored);
-  }, [cohortId]);
+  }, [sessionId]);
 
   const handleEnroll = async () => {
-    if (!studentId || !cohort) return;
+    if (!studentId || !session) return;
 
     setEnrolling(true);
     setError(null);
@@ -52,11 +52,11 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           studentId,
-          cohortId,
-          cohortTitle: cohort.title,
+          sessionId,
+          sessionTitle: session.title,
           type: 'live',
-          instructor: cohort.instructor,
-          startDate: cohort.startDate,
+          instructor: session.instructor,
+          startDate: session.startDate,
         }),
       });
 
@@ -76,12 +76,12 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
     }
   };
 
-  if (!cohort) {
+  if (!session) {
     return (
       <div style={{ minHeight: '100vh', background: BRAND_COLORS.light, padding: '40px 24px', textAlign: 'center' }}>
-        <h1 style={{ color: BRAND_COLORS.navy }}>Cohort not found</h1>
-        <Link href="/cohorts" style={{ color: BRAND_COLORS.teal }}>
-          ← Back to Cohorts
+        <h1 style={{ color: BRAND_COLORS.navy }}>Session not found</h1>
+        <Link href="/ilt" style={{ color: BRAND_COLORS.teal }}>
+          ← Back to Live Sessions
         </Link>
       </div>
     );
@@ -104,10 +104,10 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
             Enrollment Successful!
           </h1>
           <p style={{ color: BRAND_COLORS.gray, margin: '0 0 8px 0' }}>
-            Welcome to {cohort.title}
+            Welcome to {session.title}
           </p>
           <p style={{ color: BRAND_COLORS.gray, margin: '0 0 24px 0', fontSize: '14px' }}>
-            Starts {cohort.startDate}
+            Starts {session.startDate}
           </p>
           <Link
             href="/student/dashboard"
@@ -132,8 +132,8 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
     <div style={{ minHeight: '100vh', background: BRAND_COLORS.light, padding: '40px 24px' }}>
       <div style={{ maxWidth: '600px', margin: '0 auto' }}>
         <div style={{ marginBottom: '32px' }}>
-          <Link href={`/cohorts/${cohortId}`} style={{ color: BRAND_COLORS.teal, textDecoration: 'none', fontWeight: '600' }}>
-            ← Back to Cohort
+          <Link href={`/ilt/${sessionId}`} style={{ color: BRAND_COLORS.teal, textDecoration: 'none', fontWeight: '600' }}>
+            ← Back to Session
           </Link>
         </div>
 
@@ -142,17 +142,17 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
             Complete Your Enrollment
           </h1>
           <p style={{ color: BRAND_COLORS.gray, margin: '0 0 32px 0' }}>
-            You're about to join <strong>{cohort.title}</strong>
+            You're about to join <strong>{session.title}</strong>
           </p>
 
-          {/* Cohort Summary */}
+          {/* Session Summary */}
           <div style={{ background: BRAND_COLORS.light, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
             <div style={{ marginBottom: '16px' }}>
               <p style={{ fontSize: '12px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
-                Cohort
+                Training Session
               </p>
               <p style={{ fontSize: '16px', fontWeight: '600', color: BRAND_COLORS.navy, margin: '4px 0 0 0' }}>
-                {cohort.title}
+                {session.title}
               </p>
             </div>
             <div style={{ marginBottom: '16px' }}>
@@ -160,7 +160,7 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
                 Led by
               </p>
               <p style={{ fontSize: '14px', color: BRAND_COLORS.darkGray, margin: '4px 0 0 0' }}>
-                {cohort.instructor}
+                {session.instructor}
               </p>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -169,7 +169,7 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
                   Starts
                 </p>
                 <p style={{ fontSize: '14px', color: BRAND_COLORS.darkGray, margin: '4px 0 0 0' }}>
-                  {cohort.startDate}
+                  {session.startDate}
                 </p>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -177,7 +177,7 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
                   Price
                 </p>
                 <p style={{ fontSize: '20px', fontWeight: 'bold', color: BRAND_COLORS.teal, margin: '4px 0 0 0' }}>
-                  {cohort.price}
+                  {session.price}
                 </p>
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function EnrollCohortPage({ params }: { params: { id: string } })
               ✅ <strong>Live instruction</strong> from industry expert
             </p>
             <p style={{ margin: '8px 0 0 0', fontSize: '14px', color: '#065f46' }}>
-              ✅ <strong>Peer learning</strong> with cohort members
+              ✅ <strong>Peer learning</strong> with other participants
             </p>
           </div>
 

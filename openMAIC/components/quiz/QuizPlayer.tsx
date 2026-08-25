@@ -523,7 +523,7 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
           <div data-answer-options style={{ display: 'grid', gap: '10px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
             {(['A', 'B', 'C', 'D', 'E'] as const).map((letter) => {
               const key = `option_${letter.toLowerCase()}` as keyof typeof current;
-              const option = current[key];
+              const option = String(current[key]);
               const isSelected = selectedAnswer === letter;
               const isCorrect = current.correct_answer === letter;
 

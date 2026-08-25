@@ -105,11 +105,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Allow testing with ?country=US query parameter (for local dev)
+    const testCountry = request.nextUrl.searchParams.get('country');
+    const finalCountry = testCountry || countryCode || 'GB';
+
     // DEBUG: Log detection info
     console.log('[GEO/CURRENCY] Detected country:', countryCode);
+    console.log('[GEO/CURRENCY] Test parameter:', testCountry);
+    console.log('[GEO/CURRENCY] Final country:', finalCountry);
     console.log('[GEO/CURRENCY] Vercel header present:', !!request.headers.get('x-vercel-ip-country'));
-
-    const finalCountry = countryCode || 'GB';
 
     // Get currency info for country, default to GBP
     const currencyInfo = COUNTRY_TO_CURRENCY[finalCountry.toUpperCase()] || COUNTRY_TO_CURRENCY['GB'];

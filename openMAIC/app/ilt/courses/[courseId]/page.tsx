@@ -572,21 +572,19 @@ function SessionsTable({ sessions, course, currency, conversionRate }: { session
                   <div>
                     {session.sale ? (
                       <>
-                        <p style={{ margin: 0, fontWeight: '600', color: BRAND_COLORS.teal }}>
+                        <p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: BRAND_COLORS.orange }}>
                           {formatPrice(session.sale)}
                         </p>
-                        <p style={{ margin: '2px 0 0 0', fontSize: '12px', textDecoration: 'line-through', color: BRAND_COLORS.gray }}>
-                          {formatPrice(session.regular)}
+                        <p style={{ margin: '4px 0 0 0', fontSize: '12px', textDecoration: 'line-through', color: BRAND_COLORS.gray }}>
+                          Regular: {formatPrice(session.regular)}
+                        </p>
+                        <p style={{ margin: '2px 0 0 0', fontSize: '12px', fontWeight: '600', color: BRAND_COLORS.green }}>
+                          💰 Save {formatPrice(session.regular - session.sale)} ({Math.round(((session.regular - session.sale) / session.regular) * 100)}%)
                         </p>
                       </>
                     ) : (
-                      <p style={{ margin: 0, fontWeight: '600', color: BRAND_COLORS.teal }}>
+                      <p style={{ margin: 0, fontSize: '18px', fontWeight: '700', color: BRAND_COLORS.teal }}>
                         {formatPrice(session.regular)}
-                      </p>
-                    )}
-                    {session.discount && (
-                      <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: BRAND_COLORS.orange, fontWeight: '600' }}>
-                        {session.discount}
                       </p>
                     )}
                   </div>

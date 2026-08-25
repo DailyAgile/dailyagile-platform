@@ -69,16 +69,17 @@ export async function POST(req: NextRequest) {
 
     if (!rateLimitResult.allowed) {
       log.warn(`CCPA data access rate limit exceeded for: ${email}`);
+      const retryAfter = rateLimitResult.retryAfterSeconds ?? 3600;
       return NextResponse.json(
         {
           error: 'RATE_LIMITED',
-          message: `You have exceeded the maximum number of data access requests. Please try again in ${Math.ceil(rateLimitResult.retryAfterSeconds / 3600)} hours.`,
-          retryAfterSeconds: rateLimitResult.retryAfterSeconds,
+          message: `You have exceeded the maximum number of data access requests. Please try again in ${Math.ceil(retryAfter / 3600)} hours.`,
+          retryAfterSeconds: retryAfter,
         },
         {
           status: 429,
           headers: {
-            'Retry-After': String(rateLimitResult.retryAfterSeconds),
+            'Retry-After': String(retryAfter),
           },
         }
       );

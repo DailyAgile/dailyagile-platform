@@ -70,16 +70,17 @@ export async function POST(req: NextRequest) {
 
     if (!rateLimitResult.allowed) {
       log.warn(`Rate limit exceeded for data export: student ${studentId}`);
+      const retryAfter = rateLimitResult.retryAfterSeconds ?? 3600;
       return NextResponse.json(
         {
           error: 'RATE_LIMITED',
           message: RATE_LIMITS.DATA_EXPORT.message,
-          retryAfter: rateLimitResult.retryAfterSeconds,
+          retryAfter,
         },
         {
           status: 429,
           headers: {
-            'Retry-After': String(rateLimitResult.retryAfterSeconds),
+            'Retry-After': String(retryAfter),
           },
         }
       );

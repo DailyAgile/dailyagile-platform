@@ -50,7 +50,8 @@ export type EmailTemplateType =
   | 'account-deleted-confirmed'
   | 'data-export-ready'
   | 'consent-withdrawn'
-  | 'privacy-policy-accepted';
+  | 'privacy-policy-accepted'
+  | 'ccpa-data-access-no-account';
 
 /**
  * Template-specific data types
@@ -176,6 +177,10 @@ export interface EmailTemplateData {
     firstName: string;
     acceptedDate: string;
     policyVersion?: string;
+  };
+  'ccpa-data-access-no-account': {
+    email: string;
+    supportEmail?: string;
   };
 }
 

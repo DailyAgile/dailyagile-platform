@@ -68,7 +68,7 @@ describe('Correlation ID in Logs', () => {
     });
 
     // Capture console output
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     logger.logWebhookReceived(true, 1024);
 
@@ -87,7 +87,7 @@ describe('Correlation ID in Logs', () => {
       jsonFormat: true,
     });
 
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     logger.logWebhookProcessing('checkout.session.completed');
 
@@ -107,7 +107,7 @@ describe('Correlation ID in Logs', () => {
       jsonFormat: true,
     });
 
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     logger.logWebhookProcessing('checkout.session.completed');
 
@@ -126,7 +126,7 @@ describe('Correlation ID in Logs', () => {
       jsonFormat: true,
     });
 
-    const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     logger.logWebhookCompleted(200, 1234);
 
@@ -347,12 +347,12 @@ describe('End-to-End Correlation ID Flow', () => {
       debug: vi.fn(),
       getCorrelationId: () => logger.getCorrelationId(),
       logStudentOperation: (...args: any[]) =>
-        logger.logStudentOperation(...args),
+        logger.logStudentOperation(...(args as any)),
       logBillingOperation: (...args: any[]) =>
-        logger.logBillingOperation(...args),
+        logger.logBillingOperation(...(args as any)),
       logEmailOperation: (...args: any[]) =>
-        logger.logEmailOperation(...args),
-      logError: (...args: any[]) => logger.logError(...args),
+        logger.logEmailOperation(...(args as any)),
+      logError: (...args: any[]) => logger.logError(...(args as any)),
     };
 
     // Verify correlation ID is accessible from processor logger

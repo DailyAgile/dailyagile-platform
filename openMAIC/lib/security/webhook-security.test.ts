@@ -135,8 +135,8 @@ describe('Webhook Security', () => {
       const body = JSON.stringify(createCheckoutCompletedEvent());
       const signature = generateValidSignature(body, MOCK_SECRET);
 
-      // @ts-ignore (intentional null test)
       expect(() => {
+        // @ts-ignore (intentional null test)
         WebhookValidator.validateSignature(body, signature, null);
       }).toThrow('STRIPE_WEBHOOK_SECRET');
     });

@@ -370,7 +370,7 @@ describe('RedisRateLimiter', () => {
         result = await RedisRateLimiter.checkRateLimit(email);
       } catch (err) {
         // Should not throw
-        fail(`Rate limiter threw error: ${err}`);
+        expect.fail(`Rate limiter threw error: ${err}`);
       }
 
       expect(result).toBeDefined();
@@ -450,7 +450,7 @@ describe('RedisRateLimiter', () => {
         result = await RedisRateLimiter.checkRateLimit(email);
       } catch (err) {
         // Should not throw
-        fail(`Rate limiter threw for invalid email: ${err}`);
+        expect.fail(`Rate limiter threw for invalid email: ${err}`);
       }
 
       // Should still return valid result (graceful degradation)
@@ -466,7 +466,7 @@ describe('RedisRateLimiter', () => {
         result = await RedisRateLimiter.checkRateLimit(email);
       } catch (err) {
         // Should not throw
-        fail(`Rate limiter threw for empty email: ${err}`);
+        expect.fail(`Rate limiter threw for empty email: ${err}`);
       }
 
       expect(result).toBeDefined();
@@ -481,7 +481,7 @@ describe('RedisRateLimiter', () => {
         result = await RedisRateLimiter.checkRateLimit(email);
       } catch (err) {
         // Should not throw
-        fail(`Rate limiter threw for long email: ${err}`);
+        expect.fail(`Rate limiter threw for long email: ${err}`);
       }
 
       expect(result).toBeDefined();

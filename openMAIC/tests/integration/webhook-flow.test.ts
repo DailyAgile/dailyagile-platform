@@ -154,7 +154,7 @@ describe('Webhook E2E Integration', () => {
 
       // Should log warning about email failure if processing got that far
       const warnCalls = mockLogger.warn.mock.calls;
-      const hasEmailWarning = warnCalls.some(call =>
+      const hasEmailWarning = warnCalls.some((call: any[]) =>
         call[0]?.includes?.('Email') || JSON.stringify(call).includes('Email')
       );
       expect(hasEmailWarning || result.httpStatus === 500).toBe(true);
@@ -451,7 +451,7 @@ describe('Webhook E2E Integration', () => {
 
       // Should log warning about email failure if it got that far
       const warnCalls = mockLogger.warn.mock.calls;
-      const hasEmailWarning = warnCalls.some(call =>
+      const hasEmailWarning = warnCalls.some((call: any[]) =>
         call[0]?.includes?.('Email') || call[1]?.['error']?.includes?.('Email')
       );
       expect(hasEmailWarning || result.httpStatus === 500).toBe(true);

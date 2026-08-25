@@ -107,7 +107,10 @@ export async function GET(request: NextRequest) {
 
     // Allow testing with ?country=US query parameter (for local dev)
     const testCountry = request.nextUrl.searchParams.get('country');
-    const finalCountry = testCountry || countryCode || 'GB';
+
+    // Default to USD on localhost, GB on production
+    const defaultCountry = process.env.NODE_ENV === 'development' ? 'US' : 'GB';
+    const finalCountry = testCountry || countryCode || defaultCountry;
 
     // DEBUG: Log detection info
     console.log('[GEO/CURRENCY] Detected country:', countryCode);

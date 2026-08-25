@@ -95,7 +95,8 @@ export async function setupBullDeletionQueue() {
   });
 
   return deletionQueue;
-};
+  */
+}
 
 // ============================================================================
 // OPTION 2: Inngest Integration (Serverless)
@@ -249,7 +250,7 @@ export async function handler(event: SQSEvent) {
  * Run this as a cron job or background worker
  *
  * Example cron schedule: Every 5 minutes
- * 0 */5 * * * * node lib/gdpr/run-deletion-jobs.ts
+ * `0 * /5 * * * *` node lib/gdpr/run-deletion-jobs.ts
  */
 
 export async function pollAndProcessVerifiedDeletions() {

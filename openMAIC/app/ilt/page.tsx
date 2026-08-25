@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 const BRAND_COLORS = {
   navy: '#1E3A5F',
@@ -15,6 +16,39 @@ const BRAND_COLORS = {
 };
 
 export default function IltPage() {
+  const [currency, setCurrency] = useState<any>({ code: 'GBP', symbol: '£', name: 'British Pound' });
+  const [conversionRate, setConversionRate] = useState(1.0);
+
+  // Fetch currency on mount
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const res = await fetch('/api/geo/currency');
+        const data = await res.json();
+        setCurrency(data.currency);
+        setConversionRate(data.conversionRate);
+      } catch (error) {
+        console.error('Failed to fetch currency:', error);
+      }
+    };
+    fetchCurrency();
+  }, []);
+
+  // Helper to convert GBP prices
+  const convertPrice = (gbpPrice: number): number => {
+    return Math.round(gbpPrice * conversionRate * 100) / 100;
+  };
+
+  // Helper to format price with currency
+  const formatPrice = (gbpPrice: number | string): string => {
+    const numPrice = typeof gbpPrice === 'string' ? parseFloat(gbpPrice.replace(/[^0-9.-]/g, '')) : gbpPrice;
+    const converted = convertPrice(numPrice);
+    if (currency.code === 'JPY' || currency.code === 'KRW') {
+      return `${currency.symbol}${Math.round(converted)}`;
+    }
+    return `${currency.symbol}${converted.toFixed(2)}`;
+  };
+
   const sessions = [
     {
       id: 1,
@@ -251,15 +285,15 @@ export default function IltPage() {
                   {session.salePrice ? (
                     <>
                       <p style={{ fontSize: '20px', fontWeight: '700', color: BRAND_COLORS.orange, margin: 0 }}>
-                        {session.salePrice}
+                        {formatPrice(session.salePrice)}
                       </p>
                       <p style={{ fontSize: '12px', color: BRAND_COLORS.gray, margin: '4px 0 0 0', textDecoration: 'line-through' }}>
-                        Regular: {session.price}
+                        Regular: {formatPrice(session.price)}
                       </p>
                     </>
                   ) : (
                     <p style={{ fontSize: '20px', fontWeight: '700', color: BRAND_COLORS.teal, margin: 0 }}>
-                      {session.price}
+                      {formatPrice(session.price)}
                     </p>
                   )}
                 </div>

@@ -248,10 +248,10 @@ export default function IltPage() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  {session.sale ? (
+                  {session.salePrice ? (
                     <>
                       <p style={{ fontSize: '20px', fontWeight: '700', color: BRAND_COLORS.orange, margin: 0 }}>
-                        {session.salePrice || session.price}
+                        {session.salePrice}
                       </p>
                       <p style={{ fontSize: '12px', color: BRAND_COLORS.gray, margin: '4px 0 0 0', textDecoration: 'line-through' }}>
                         Regular: {session.price}

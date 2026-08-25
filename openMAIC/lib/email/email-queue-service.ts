@@ -320,7 +320,7 @@ async function sendSingleEmail(
       .from('email_queue')
       .update({ status: 'failed', error_message: message })
       .eq('id', queuedEmail.id)
-      .catch((err) => log.error(`Failed to update email status: ${err.message}`));
+      .catch((err: any) => log.error(`Failed to update email status: ${err.message}`));
 
     return 'retry';
   }

@@ -183,7 +183,7 @@ const handleSubmitOTP = async (e: React.FormEvent) => {
                   log.error('Verification error:', err);
                 }
               }}
-              isLoading={state === 'loading'}
+              isLoading={(state as PageState) === 'loading'}
               error={error}
             />
           )}
@@ -217,24 +217,24 @@ const handleSubmitOTP = async (e: React.FormEvent) => {
 
               <button
                 onClick={handleSubmitOTP}
-                disabled={state === 'loading'}
+                disabled={(state as PageState) === 'loading'}
                 style={{
                   width: '100%',
                   height: '48px',
                   padding: '12px 16px',
-                  backgroundColor: state === 'loading' ? COLORS.gray : COLORS.teal,
+                  backgroundColor: (state as PageState) === 'loading' ? COLORS.gray : COLORS.teal,
                   color: COLORS.white,
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',
                   fontWeight: 600,
                   fontFamily: 'Calibri, sans-serif',
-                  cursor: state === 'loading' ? 'not-allowed' : 'pointer',
-                  opacity: state === 'loading' ? 0.6 : 1,
+                  cursor: (state as PageState) === 'loading' ? 'not-allowed' : 'pointer',
+                  opacity: (state as PageState) === 'loading' ? 0.6 : 1,
                   transition: 'all 150ms ease',
                 }}
                 onMouseEnter={(e) => {
-                  if (state !== 'loading') {
+                  if ((state as PageState) !== 'loading') {
                     e.currentTarget.style.backgroundColor = '#0677A1';
                     e.currentTarget.style.transform = 'translateY(-2px)';
                     e.currentTarget.style.boxShadow = '0 8px 16px rgba(8, 145, 178, 0.2)';
@@ -246,7 +246,7 @@ const handleSubmitOTP = async (e: React.FormEvent) => {
                   e.currentTarget.style.boxShadow = 'none';
                 }}
               >
-                {state === 'loading' ? 'Completing Setup...' : 'Complete Signup'}
+                {(state as PageState) === 'loading' ? 'Completing Setup...' : 'Complete Signup'}
               </button>
             </>
           )}

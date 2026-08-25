@@ -5,7 +5,7 @@ export type LocaleEntry = {
   /** Short label shown on the toggle button, e.g. 'CN' */
   shortLabel: string;
   /** Whether this locale uses right-to-left text direction */
-  rtl?: boolean;
+  rtl: boolean;
 };
 
 /**
@@ -16,12 +16,12 @@ export type LocaleEntry = {
  *   2. Add an entry here
  */
 export const supportedLocales = [
-  { code: 'zh-CN', label: '简体中文', shortLabel: 'CN' },
-  { code: 'zh-TW', label: '繁體中文', shortLabel: 'TW' },
-  { code: 'en-US', label: 'English', shortLabel: 'EN' },
-  { code: 'ja-JP', label: '日本語', shortLabel: 'JA' },
-  { code: 'ru-RU', label: 'Русский', shortLabel: 'RU' },
+  { code: 'zh-CN', label: '简体中文', shortLabel: 'CN', rtl: false },
+  { code: 'zh-TW', label: '繁體中文', shortLabel: 'TW', rtl: false },
+  { code: 'en-US', label: 'English', shortLabel: 'EN', rtl: false },
+  { code: 'ja-JP', label: '日本語', shortLabel: 'JA', rtl: false },
+  { code: 'ru-RU', label: 'Русский', shortLabel: 'RU', rtl: false },
   { code: 'ar-SA', label: 'العربية', shortLabel: 'AR', rtl: true },
-  { code: 'pt-BR', label: 'Português (Brasil)', shortLabel: 'BR' },
-  { code: 'ko-KR', label: '한국어', shortLabel: 'KO' },
+  { code: 'pt-BR', label: 'Português (Brasil)', shortLabel: 'BR', rtl: false },
+  { code: 'ko-KR', label: '한국어', shortLabel: 'KO', rtl: false },
 ] as const satisfies readonly LocaleEntry[];

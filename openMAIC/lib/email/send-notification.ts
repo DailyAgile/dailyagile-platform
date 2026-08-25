@@ -189,15 +189,19 @@ export interface EmailTemplateData {
     email: string;
     requestId: string;
     responseDeadline: string;
+    supportEmail?: string;
   };
   'ccpa-deletion-no-account': {
     email: string;
+    requestId?: string;
+    responseDeadline?: string;
     supportEmail?: string;
   };
   'ccpa-deletion-received': {
     email: string;
-    requestId: string;
-    responseDeadline: string;
+    requestId?: string;
+    responseDeadline?: string;
+    supportEmail?: string;
     gracePeriodDays?: number;
   };
 }

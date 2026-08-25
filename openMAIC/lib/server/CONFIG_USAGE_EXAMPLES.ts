@@ -1,9 +1,13 @@
+// @ts-nocheck
 /**
  * Configuration Usage Examples
  * ============================
  *
  * Quick reference showing before/after usage of centralized configuration.
  * Copy-paste these examples when refactoring webhook handler code.
+ *
+ * NOTE: This file contains code examples and is not meant to be executed.
+ * TypeScript checking is disabled to allow incomplete example snippets.
  */
 
 // ============================================================================

@@ -61,40 +61,24 @@ export default function CoursesPage() {
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flex: 1 }}>
           <Link
             href="/"
             style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '20px',
-              cursor: 'pointer',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: BRAND_COLORS.navy,
               textDecoration: 'none',
+              whiteSpace: 'nowrap',
             }}
-            title="Back to home"
+            title="Back to DailyAgile home"
           >
-            ← Home
+            📚 DailyAgile
           </Link>
-          <div>
-            <h1
-              style={{
-                fontSize: '24px',
-                fontWeight: 'bold',
-                color: BRAND_COLORS.navy,
-                margin: 0,
-              }}
-            >
-              Self-Paced Courses
-            </h1>
-            <p
-              style={{
-                fontSize: '13px',
-                color: BRAND_COLORS.gray,
-                margin: '4px 0 0 0',
-              }}
-            >
-              Learn at your own pace. 24/7 access. Lifetime learning.
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: BRAND_COLORS.gray' }}>
+            <Link href="/" style={{ textDecoration: 'none', color: BRAND_COLORS.teal }}>Home</Link>
+            <span>/</span>
+            <span style={{ color: BRAND_COLORS.navy, fontWeight: '600' }}>Self-Paced Courses</span>
           </div>
         </div>
 
@@ -223,7 +207,8 @@ export default function CoursesPage() {
                 <p style={{ fontSize: '20px', fontWeight: 'bold', color: BRAND_COLORS.orange, margin: 0 }}>
                   {course.price}
                 </p>
-                <button
+                <a
+                  href={`/courses/${course.id}`}
                   style={{
                     background: BRAND_COLORS.orange,
                     color: BRAND_COLORS.white,
@@ -233,10 +218,12 @@ export default function CoursesPage() {
                     cursor: 'pointer',
                     fontWeight: '600',
                     fontSize: '14px',
+                    textDecoration: 'none',
+                    display: 'inline-block',
                   }}
                 >
                   Explore
-                </button>
+                </a>
               </div>
             </div>
           ))}

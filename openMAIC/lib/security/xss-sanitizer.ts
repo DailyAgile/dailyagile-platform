@@ -32,7 +32,7 @@ function escapeHtml(text: string): string {
  * Configuration for DOMPurify sanitization
  * Allows safe HTML elements for rich content support
  */
-const QUIZ_PURIFY_CONFIG: DOMPurify.Config = {
+const QUIZ_PURIFY_CONFIG: any = {
   ALLOWED_TAGS: [
     'p', 'br', 'strong', 'b', 'em', 'i', 'u',
     'ul', 'ol', 'li',
@@ -47,7 +47,7 @@ const QUIZ_PURIFY_CONFIG: DOMPurify.Config = {
 /**
  * Strict sanitization config - only plain text, no HTML tags
  */
-const STRICT_TEXT_CONFIG: DOMPurify.Config = {
+const STRICT_TEXT_CONFIG: any = {
   ALLOWED_TAGS: [],
   ALLOWED_ATTR: [],
   KEEP_CONTENT: true,
@@ -158,7 +158,7 @@ export function sanitizeExplanation(explanation: string | null | undefined): str
  * @returns Object with sanitized string values
  */
 export function sanitizeQuizObject<T extends Record<string, any>>(obj: T): T {
-  const sanitized = { ...obj };
+  const sanitized = { ...obj } as Record<string, any>;
 
   for (const key in sanitized) {
     const value = sanitized[key];
@@ -166,22 +166,22 @@ export function sanitizeQuizObject<T extends Record<string, any>>(obj: T): T {
     if (typeof value === 'string') {
       // Apply field-specific sanitization rules
       if (key === 'question') {
-        sanitized[key] = sanitizeQuestionText(value);
+        sanitized[key] = sanitizeQuestionText(value) as any;
       } else if (
         key.startsWith('option_') ||
         key === 'label' ||
         key === 'value'
       ) {
-        sanitized[key] = sanitizeOptionText(value);
+        sanitized[key] = sanitizeOptionText(value) as any;
       } else if (key === 'explanation' || key === 'analysis') {
-        sanitized[key] = sanitizeExplanation(value);
+        sanitized[key] = sanitizeExplanation(value) as any;
       } else {
-        sanitized[key] = sanitizeText(value);
+        sanitized[key] = sanitizeText(value) as any;
       }
     } else if (typeof value === 'object' && value !== null) {
-      sanitized[key] = sanitizeQuizObject(value);
+      sanitized[key] = sanitizeQuizObject(value) as any;
     }
   }
 
-  return sanitized;
+  return sanitized as T;
 }

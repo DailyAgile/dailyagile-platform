@@ -1,24 +1,5 @@
 import type { NextConfig } from 'next';
 
-/**
- * Startup Environment Validation
- * ==============================
- *
- * Imports the environment validation module which runs at build time
- * and on every app startup to ensure all critical environment variables
- * are set. If any required variable is missing, the build/startup will fail
- * immediately with a clear error message.
- *
- * Validated Variables:
- * - STRIPE_SECRET_KEY: Stripe API secret key
- * - STRIPE_WEBHOOK_SECRET: Stripe webhook signing secret
- * - SUPABASE_URL: Database connection URL
- * - SUPABASE_SERVICE_ROLE_KEY: Database service role key
- *
- * See lib/env/validation.ts for implementation details
- */
-import '@/lib/env/validation';
-
 const nextConfig: NextConfig = {
   output: process.env.VERCEL ? undefined : 'standalone',
   transpilePackages: ['mathml2omml', 'pptxgenjs', '@openmaic/importer'],

@@ -28,11 +28,11 @@ export async function GET(req: NextRequest): Promise<Response> {
       process.env.SUPABASE_SERVICE_ROLE_KEY || '',
     );
 
-    // Look up quiz by code
+    // Look up quiz by code (case-insensitive)
     const { data: quiz, error: quizError } = await getSupabaseClient()
       .from('quizzes')
       .select('id, quiz_code, title')
-      .eq('quiz_code', code)
+      .ilike('quiz_code', code)
       .single();
 
     if (quizError || !quiz) {

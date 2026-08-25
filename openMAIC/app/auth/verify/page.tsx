@@ -82,12 +82,10 @@ export default function VerifyPage() {
           localStorage.setItem('studentEmail', data.data.email);
 
           setStatus('success');
-          setMessage('Email verified! Redirecting to your dashboard...');
+          setMessage('Email verified! Redirecting to your assignments...');
 
-          // Redirect after 2 seconds
-          setTimeout(() => {
-            router.push('/learn/assignments');
-          }, 2000);
+          // Redirect immediately
+          router.push('/learn/assignments');
         } else {
           setStatus('error');
           setMessage('Verification failed. Please try again.');

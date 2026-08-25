@@ -75,7 +75,7 @@ export default function CoursesPage() {
           >
             📚 DailyAgile
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: BRAND_COLORS.gray' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: BRAND_COLORS.gray }}>
             <Link href="/" style={{ textDecoration: 'none', color: BRAND_COLORS.teal }}>Home</Link>
             <span>/</span>
             <span style={{ color: BRAND_COLORS.navy, fontWeight: '600' }}>Self-Paced Courses</span>

@@ -371,14 +371,14 @@ export async function checkDeletionJobHealth() {
 
     if (stuckCount > 0) {
       log.warn(`⚠️ Found ${stuckCount} stuck deletion requests (verified >1 hour)`);
-      stuckDeletions?.forEach((d) => {
+      stuckDeletions?.forEach((d: any) => {
         log.warn(`  - ${d.id} (${d.student_email})`);
       });
     }
 
     if (failedCount > 0) {
       log.error(`❌ Found ${failedCount} failed deletion requests`);
-      failedDeletions?.forEach((d) => {
+      failedDeletions?.forEach((d: any) => {
         log.error(`  - ${d.id} (${d.student_email}): ${d.error_message}`);
       });
     }
@@ -393,8 +393,4 @@ export async function checkDeletionJobHealth() {
 // ============================================================================
 // EXPORTS
 // ============================================================================
-
-export {
-  pollAndProcessVerifiedDeletions,
-  checkDeletionJobHealth,
-};
+// (exported functions are already declared above)

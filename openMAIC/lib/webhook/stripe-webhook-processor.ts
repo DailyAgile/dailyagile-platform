@@ -225,8 +225,9 @@ export class StripeWebhookProcessor {
 
       if (!valid || !email || !courseId) {
         // PERMANENT error - invalid input, will never be valid
+        const errorMessage = validationError || 'Invalid session metadata';
         const classificationResult = this.errorClassifier.classify(
-          new Error(validationError),
+          new Error(errorMessage),
           { studentEmail: email, courseId }
         );
 
@@ -236,9 +237,9 @@ export class StripeWebhookProcessor {
 
         await this.idempotencyManager.markAsFailed(
           processingId,
-          validationError,
+          errorMessage,
           ErrorClass.PERMANENT,
-          { validationError }
+          { validationError: errorMessage }
         );
 
         this.logger?.warn('Webhook validation failed (permanent)', {
@@ -250,7 +251,7 @@ export class StripeWebhookProcessor {
         return {
           success: false,
           httpStatus: 200,  // Return 200 to prevent Stripe retry
-          message: validationError,
+          message: errorMessage,
           processingId,
           retryable: false,
         };
@@ -446,7 +447,7 @@ export class StripeWebhookProcessor {
       event.type,
       session.id,
       'checkout_session',
-      event.data,
+      event.data as Record<string, unknown>,
       {
         studentEmail: session.customer_email || session.metadata?.email,
         courseId: session.metadata?.course_id,

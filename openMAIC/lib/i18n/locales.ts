@@ -4,6 +4,8 @@ export type LocaleEntry = {
   label: string;
   /** Short label shown on the toggle button, e.g. 'CN' */
   shortLabel: string;
+  /** Whether this locale uses right-to-left text direction */
+  rtl?: boolean;
 };
 
 /**
@@ -19,7 +21,7 @@ export const supportedLocales = [
   { code: 'en-US', label: 'English', shortLabel: 'EN' },
   { code: 'ja-JP', label: '日本語', shortLabel: 'JA' },
   { code: 'ru-RU', label: 'Русский', shortLabel: 'RU' },
-  { code: 'ar-SA', label: 'العربية', shortLabel: 'AR' },
+  { code: 'ar-SA', label: 'العربية', shortLabel: 'AR', rtl: true },
   { code: 'pt-BR', label: 'Português (Brasil)', shortLabel: 'BR' },
   { code: 'ko-KR', label: '한국어', shortLabel: 'KO' },
 ] as const satisfies readonly LocaleEntry[];

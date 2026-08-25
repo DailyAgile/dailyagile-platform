@@ -3,6 +3,39 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
+// Responsive styles
+const styles = `
+  @media (max-width: 768px) {
+    .ilt-header { padding: 12px 16px !important; }
+    .ilt-logo { height: 45px !important; }
+    .ilt-breadcrumb { font-size: 12px !important; }
+    .ilt-sign-in { padding: 8px 12px !important; font-size: 12px !important; }
+    .ilt-main-title { font-size: 24px !important; }
+    .ilt-main-description { font-size: 14px !important; }
+    .ilt-card { padding: 20px !important; }
+    .ilt-card-title { font-size: 18px !important; }
+    .ilt-card-instructor { font-size: 13px !important; }
+    .ilt-card-label { font-size: 10px !important; }
+    .ilt-card-value { font-size: 13px !important; }
+    .ilt-card-price { font-size: 18px !important; }
+    .ilt-card-regular { font-size: 11px !important; }
+    .ilt-card-button { padding: 8px 14px !important; font-size: 13px !important; }
+    .ilt-grid { gap: 16px !important; grid-template-columns: 1fr !important; }
+    .ilt-section-title { font-size: 20px !important; }
+    .ilt-benefit-title { font-size: 14px !important; }
+    .ilt-benefit-desc { font-size: 12px !important; }
+  }
+
+  @media (max-width: 480px) {
+    .ilt-header { padding: 10px 12px !important; }
+    .ilt-logo { height: 40px !important; }
+    .ilt-main-title { font-size: 20px !important; }
+    .ilt-main-description { font-size: 13px !important; }
+    .ilt-card { padding: 16px !important; }
+    .ilt-card-button { padding: 8px 12px !important; font-size: 12px !important; }
+  }
+`;
+
 const BRAND_COLORS = {
   navy: '#1E3A5F',
   teal: '#0891B2',
@@ -93,8 +126,10 @@ export default function IltPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: BRAND_COLORS.light }}>
+      <style>{styles}</style>
       {/* Header */}
       <header
+        className="ilt-header"
         style={{
           background: BRAND_COLORS.white,
           borderBottom: `1px solid ${BRAND_COLORS.border}`,
@@ -118,9 +153,9 @@ export default function IltPage() {
             }}
             title="Back to DailyAgile home"
           >
-            <img src="/assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '40px', width: 'auto' }} />
+            <img className="ilt-logo" src="/assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '55px', width: 'auto' }} />
           </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: BRAND_COLORS.gray }}>
+          <div className="ilt-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: BRAND_COLORS.gray }}>
             <Link href="/" style={{ textDecoration: 'none', color: BRAND_COLORS.teal }}>Home</Link>
             <span>/</span>
             <span style={{ color: BRAND_COLORS.navy, fontWeight: '600' }}>Live Courses</span>
@@ -128,6 +163,7 @@ export default function IltPage() {
         </div>
 
         <Link
+          className="ilt-sign-in"
           href="/auth/login"
           style={{
             background: BRAND_COLORS.teal,
@@ -138,6 +174,7 @@ export default function IltPage() {
             fontSize: '14px',
             fontWeight: '600',
             cursor: 'pointer',
+            whiteSpace: 'nowrap',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = BRAND_COLORS.orange)}
           onMouseLeave={(e) => (e.currentTarget.style.background = BRAND_COLORS.teal)}
@@ -150,6 +187,7 @@ export default function IltPage() {
       <main style={{ padding: '40px 24px', maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ marginBottom: '40px' }}>
           <h2
+            className="ilt-main-title"
             style={{
               fontSize: '28px',
               fontWeight: 'bold',
@@ -160,6 +198,7 @@ export default function IltPage() {
             Learn Live with Expert Instructors
           </h2>
           <p
+            className="ilt-main-description"
             style={{
               fontSize: '16px',
               color: BRAND_COLORS.gray,
@@ -173,6 +212,7 @@ export default function IltPage() {
 
         {/* Live Sessions Grid */}
         <div
+          className="ilt-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -182,6 +222,7 @@ export default function IltPage() {
         >
           {sessions.map((session) => (
             <div
+              className="ilt-card"
               key={session.id}
               style={{
                 background: BRAND_COLORS.white,
@@ -205,6 +246,7 @@ export default function IltPage() {
             >
               <div style={{ fontSize: '40px', marginBottom: '12px' }}>{session.image}</div>
               <h3
+                className="ilt-card-title"
                 style={{
                   fontSize: '18px',
                   fontWeight: 'bold',
@@ -215,6 +257,7 @@ export default function IltPage() {
                 {session.title}
               </h3>
               <p
+                className="ilt-card-instructor"
                 style={{
                   fontSize: '13px',
                   color: BRAND_COLORS.gray,
@@ -235,7 +278,7 @@ export default function IltPage() {
                 }}
               >
                 <div>
-                  <p style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
+                  <p className="ilt-card-label" style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
                     Start Date
                   </p>
                   <p style={{ fontSize: '14px', fontWeight: 'bold', color: BRAND_COLORS.navy, margin: '4px 0 0 0' }}>
@@ -243,7 +286,7 @@ export default function IltPage() {
                   </p>
                 </div>
                 <div>
-                  <p style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
+                  <p className="ilt-card-label" style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
                     Duration
                   </p>
                   <p style={{ fontSize: '14px', fontWeight: 'bold', color: BRAND_COLORS.navy, margin: '4px 0 0 0' }}>
@@ -263,7 +306,7 @@ export default function IltPage() {
                 }}
               >
                 <div>
-                  <p style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
+                  <p className="ilt-card-label" style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
                     Pace
                   </p>
                   <p style={{ fontSize: '13px', color: BRAND_COLORS.darkGray, margin: '4px 0 0 0' }}>
@@ -271,7 +314,7 @@ export default function IltPage() {
                   </p>
                 </div>
                 <div>
-                  <p style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
+                  <p className="ilt-card-label" style={{ fontSize: '11px', color: BRAND_COLORS.gray, margin: 0, textTransform: 'uppercase', fontWeight: '600' }}>
                     Class Size
                   </p>
                   <p style={{ fontSize: '13px', color: BRAND_COLORS.darkGray, margin: '4px 0 0 0' }}>
@@ -284,20 +327,21 @@ export default function IltPage() {
                 <div>
                   {session.salePrice ? (
                     <>
-                      <p style={{ fontSize: '20px', fontWeight: '700', color: BRAND_COLORS.orange, margin: 0 }}>
+                      <p className="ilt-card-price" style={{ fontSize: '20px', fontWeight: '700', color: BRAND_COLORS.orange, margin: 0 }}>
                         {formatPrice(session.salePrice)}
                       </p>
-                      <p style={{ fontSize: '12px', color: BRAND_COLORS.gray, margin: '4px 0 0 0', textDecoration: 'line-through' }}>
+                      <p className="ilt-card-regular" style={{ fontSize: '12px', color: BRAND_COLORS.gray, margin: '4px 0 0 0', textDecoration: 'line-through' }}>
                         Regular: {formatPrice(session.price)}
                       </p>
                     </>
                   ) : (
-                    <p style={{ fontSize: '20px', fontWeight: '700', color: BRAND_COLORS.teal, margin: 0 }}>
+                    <p className="ilt-card-price" style={{ fontSize: '20px', fontWeight: '700', color: BRAND_COLORS.teal, margin: 0 }}>
                       {formatPrice(session.price)}
                     </p>
                   )}
                 </div>
                 <Link
+                  className="ilt-card-button"
                   href={`/ilt/courses/${session.courseId}`}
                   style={{
                     background: BRAND_COLORS.teal,
@@ -310,6 +354,7 @@ export default function IltPage() {
                     fontSize: '14px',
                     textDecoration: 'none',
                     display: 'inline-block',
+                    whiteSpace: 'nowrap',
                   }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = BRAND_COLORS.orange)}
                   onMouseLeave={(e) => (e.currentTarget.style.background = BRAND_COLORS.teal)}
@@ -332,6 +377,7 @@ export default function IltPage() {
           }}
         >
           <h3
+            className="ilt-section-title"
             style={{
               fontSize: '24px',
               fontWeight: 'bold',
@@ -356,10 +402,10 @@ export default function IltPage() {
             ].map((item, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '32px', marginBottom: '8px' }}>{item.icon}</div>
-                <h4 style={{ fontSize: '16px', fontWeight: '600', color: BRAND_COLORS.navy, margin: '0 0 4px 0' }}>
+                <h4 className="ilt-benefit-title" style={{ fontSize: '16px', fontWeight: '600', color: BRAND_COLORS.navy, margin: '0 0 4px 0' }}>
                   {item.title}
                 </h4>
-                <p style={{ fontSize: '14px', color: BRAND_COLORS.gray, margin: 0 }}>
+                <p className="ilt-benefit-desc" style={{ fontSize: '14px', color: BRAND_COLORS.gray, margin: 0 }}>
                   {item.desc}
                 </p>
               </div>

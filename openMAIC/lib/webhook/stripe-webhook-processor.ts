@@ -447,7 +447,7 @@ export class StripeWebhookProcessor {
       event.type,
       session.id,
       'checkout_session',
-      event.data as Record<string, unknown>,
+      (event.data as unknown) as Record<string, unknown>,
       {
         studentEmail: session.customer_email || session.metadata?.email,
         courseId: session.metadata?.course_id,

@@ -51,7 +51,10 @@ export type EmailTemplateType =
   | 'data-export-ready'
   | 'consent-withdrawn'
   | 'privacy-policy-accepted'
-  | 'ccpa-data-access-no-account';
+  | 'ccpa-data-access-no-account'
+  | 'ccpa-data-access-received'
+  | 'ccpa-deletion-no-account'
+  | 'ccpa-deletion-received';
 
 /**
  * Template-specific data types
@@ -181,6 +184,21 @@ export interface EmailTemplateData {
   'ccpa-data-access-no-account': {
     email: string;
     supportEmail?: string;
+  };
+  'ccpa-data-access-received': {
+    email: string;
+    requestId: string;
+    responseDeadline: string;
+  };
+  'ccpa-deletion-no-account': {
+    email: string;
+    supportEmail?: string;
+  };
+  'ccpa-deletion-received': {
+    email: string;
+    requestId: string;
+    responseDeadline: string;
+    gracePeriodDays?: number;
   };
 }
 

@@ -13,7 +13,7 @@ export default function HomePage() {
 
   const handleTakeQuiz = () => {
     if (quizCode.trim()) {
-      window.location.href = `/teach/quiz/${quizCode.trim()}`;
+      window.location.href = `/student/quiz/${quizCode.trim().toUpperCase()}`;
     }
   };
 

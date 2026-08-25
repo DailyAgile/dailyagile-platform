@@ -19,4 +19,5 @@ export {
   isEnvironmentVariableSet,
 } from './validation';
 
-export { default as initializeEnvironment } from './init';
+// Note: init.ts runs initialization code at module level when imported
+// Import it directly with: import '@/lib/env/init'

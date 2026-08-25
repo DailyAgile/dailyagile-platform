@@ -36,28 +36,20 @@ export default function HomePage() {
             <img src="assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '48px', width: 'auto' }} />
           </div>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <a href="#features" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
-              Why Us
+            <a href="/courses" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
+              Courses
+            </a>
+            <a href="/cohorts" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
+              Cohorts
+            </a>
+            <a href="#quizzes" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
+              Quizzes
             </a>
             <a href="#pricing" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Pricing
             </a>
             <a href="#reviews" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
-              Reviews
-            </a>
-            <a
-              href="#pricing"
-              style={{
-                background: `linear-gradient(to right, ${accentColor}, ${ctaColor})`,
-                color: 'white',
-                padding: '0.5rem 1rem',
-                borderRadius: '9999px',
-                fontSize: '0.875rem',
-                fontWeight: 'bold',
-                textDecoration: 'none',
-              }}
-            >
-              Get Started
+              Testimonials
             </a>
             <Link
               href="/auth/login"

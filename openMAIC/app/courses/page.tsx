@@ -65,15 +65,13 @@ export default function CoursesPage() {
           <Link
             href="/"
             style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: BRAND_COLORS.navy,
               textDecoration: 'none',
-              whiteSpace: 'nowrap',
+              display: 'flex',
+              alignItems: 'center',
             }}
             title="Back to DailyAgile home"
           >
-            📚 DailyAgile
+            <img src="/assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '40px', width: 'auto' }} />
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: BRAND_COLORS.gray }}>
             <Link href="/" style={{ textDecoration: 'none', color: BRAND_COLORS.teal }}>Home</Link>
@@ -208,7 +206,7 @@ export default function CoursesPage() {
                   {course.price}
                 </p>
                 <a
-                  href={`/courses/${course.id}`}
+                  href={`/auth/login?redirect=/courses&course=${course.id}`}
                   style={{
                     background: BRAND_COLORS.orange,
                     color: BRAND_COLORS.white,

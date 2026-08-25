@@ -138,7 +138,7 @@ export default function HomePage() {
           {/* Three-Path CTA Buttons */}
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
             <a
-              href="/academy"
+              href="/courses"
               style={{
                 backgroundColor: ctaColor,
                 color: 'white',
@@ -152,7 +152,7 @@ export default function HomePage() {
               Browse Self-Paced Courses
             </a>
             <a
-              href="/academy"
+              href="/cohorts"
               style={{
                 backgroundColor: accentColor,
                 color: 'white',

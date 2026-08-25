@@ -166,7 +166,7 @@ export default function CohortDetailPage({ params }: { params: { id: string } })
               <h2 style={{ fontSize: '16px', fontWeight: 'bold', color: BRAND_COLORS.navy, margin: '0 0 16px 0' }}>
                 What to Expect
               </h2>
-              <ul style={{ margin: 0, paddingLeft: '20px', color: BRAND_COLORS.darkGray' }}>
+              <ul style={{ margin: 0, paddingLeft: '20px', color: BRAND_COLORS.darkGray }}>
                 <li style={{ marginBottom: '8px' }}>Live instruction from industry expert</li>
                 <li style={{ marginBottom: '8px' }}>Interactive Q&A sessions</li>
                 <li style={{ marginBottom: '8px' }}>Peer learning with cohort members</li>

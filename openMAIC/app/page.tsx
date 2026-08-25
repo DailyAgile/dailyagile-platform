@@ -72,7 +72,7 @@ export default function HomePage() {
                 display: 'inline-block',
               }}
             >
-              🧪 Test Platform
+              Sign In
             </Link>
           </nav>
         </div>
@@ -98,12 +98,47 @@ export default function HomePage() {
           <h1 style={{ fontSize: '3.5rem', fontWeight: 'bold', color: primaryColor, marginBottom: '1.5rem', fontFamily: 'Cambria, serif' }}>
             Accelerate Business Agility
           </h1>
-          <p style={{ fontSize: '1.25rem', color: '#374151', marginBottom: '2rem', maxWidth: '42rem', margin: '0 auto 2rem' }}>
+          <p style={{ fontSize: '1.25rem', color: '#374151', marginBottom: '2.5rem', maxWidth: '42rem', margin: '0 auto 2.5rem' }}>
             Master AI and Agile skills in real-time. Learn theory in minutes, apply insights immediately. Get certified and credibility that employers actually recognize.
           </p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+
+          {/* Quiz Entry Section */}
+          <div style={{ marginBottom: '2.5rem', maxWidth: '36rem', margin: '0 auto 2.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="Paste your instructor's 8-digit code"
+                style={{
+                  flex: 1,
+                  padding: '0.75rem 1rem',
+                  borderRadius: '9999px',
+                  border: `2px solid ${accentColor}`,
+                  fontSize: '1rem',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                }}
+              />
+              <button
+                style={{
+                  backgroundColor: accentColor,
+                  color: 'white',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '9999px',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                Take Quiz
+              </button>
+            </div>
+            <p style={{ fontSize: '0.875rem', color: '#4b5563', marginTop: '0.5rem', textAlign: 'center' }}>Or browse quizzes below</p>
+          </div>
+
+          {/* Three-Path CTA Buttons */}
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
             <a
-              href="#pricing"
+              href="/academy"
               style={{
                 backgroundColor: ctaColor,
                 color: 'white',
@@ -114,13 +149,13 @@ export default function HomePage() {
                 display: 'inline-block',
               }}
             >
-              Explore Courses
+              Browse Self-Paced Courses
             </a>
             <a
-              href="#reviews"
+              href="/academy"
               style={{
-                border: `2px solid ${primaryColor}`,
-                color: primaryColor,
+                backgroundColor: accentColor,
+                color: 'white',
                 padding: '0.75rem 2rem',
                 borderRadius: '9999px',
                 fontWeight: 'bold',
@@ -128,7 +163,7 @@ export default function HomePage() {
                 display: 'inline-block',
               }}
             >
-              See What Others Say
+              View Instructor-Led Cohorts
             </a>
           </div>
 
@@ -139,6 +174,29 @@ export default function HomePage() {
             </div>
             <div style={{ borderRadius: '0.75rem', overflow: 'hidden', height: '256px', backgroundColor: '#e5e7eb' }}>
               <img src="assets/hero-robots.png" alt="AI Robots Teaching" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefit Stripe */}
+      <section style={{ backgroundColor: primaryColor, color: 'white', padding: '2rem 1rem' }}>
+        <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', textAlign: 'center' }}>
+            <div>
+              <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📚</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>Self-Paced Courses</div>
+              <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>24/7 Access · Lifetime Learning</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🎓</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>Instructor-Led Cohorts</div>
+              <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Live Training · Sep 15 Start</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>✨</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>Take a Quiz</div>
+              <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Instant Results · No Signup Needed</div>
             </div>
           </div>
         </div>

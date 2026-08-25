@@ -32,6 +32,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@earendil-works/pi-ai', '@earendil-works/pi-agent-core'],
   experimental: {
     proxyClientMaxBodySize: '200mb',
+    turbopack: false,
   },
   async headers() {
     const extraAncestors = process.env.ALLOWED_FRAME_ANCESTORS?.trim();

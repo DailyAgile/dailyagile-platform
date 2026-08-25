@@ -221,9 +221,6 @@ function isLocale12Hour(locale: Locale): boolean {
 function normalizeLocale(locale: Locale): string {
   const localeMap: Record<Locale, string> = {
     'en-US': 'en-US',
-    'es-ES': 'es-ES',
-    'fr-FR': 'fr-FR',
-    'de-DE': 'de-DE',
     'zh-CN': 'zh-Hans-CN',
     'zh-TW': 'zh-Hant-TW',
     'ja-JP': 'ja-JP',

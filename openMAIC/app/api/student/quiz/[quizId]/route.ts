@@ -51,7 +51,7 @@ export async function GET(
 
     if (questionsError) {
       log.warn(`Failed to fetch questions for quiz ${quiz.id}:`, questionsError);
-      return apiError('QUIZ_LOAD_ERROR', 500, 'Failed to load quiz questions');
+      return apiError('QUESTIONS_FETCH_FAILED', 500, 'Failed to load quiz questions');
     }
 
     log.info(`Quiz loaded: ${quiz.id} with ${(questions || []).length} questions`);

@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const { quizCode, answers } = body;
 
     if (!quizCode || !answers) {
-      return apiError('MISSING_PARAMS', 400, 'quizCode and answers required');
+      return apiError('MISSING_PARAM', 400, 'quizCode and answers required');
     }
 
     const supabase = getSupabaseClient();
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
         quiz_id: quiz.id,
         quiz_code: quizCode,
         answers: Object.fromEntries(
-          answers.map((ans, idx) => [idx + 1, ans])
+          answers.map((ans: any, idx: number) => [idx + 1, ans])
         ),
         score_percentage: scorePercentage,
         correct_count: correctCount,

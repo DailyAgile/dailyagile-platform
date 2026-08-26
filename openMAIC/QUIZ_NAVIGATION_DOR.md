@@ -464,6 +464,15 @@ Three agents work **in parallel**:
 - [ ] No ambiguity in scope or features
 - [ ] PM has final approval before engineering starts
 
+### SEO/GEO Criteria (Product)
+- [ ] Route decision confirmed: `/quizzes` (not `/#quizzes`) for search engine crawlability
+- [ ] User stories include geographic variations (if applicable)
+- [ ] Analytics requirements support detailed tracking (for user content/testimonials)
+- [ ] Instructor code persistence planned (localStorage for repeat traffic)
+- [ ] Feature scope complete (not deferred) for maximum keyword opportunities
+- [ ] Call-to-action copy optimized for high-intent keywords
+- [ ] User journey supports multiple entry points (direct URL, search, instructor link)
+
 ### Product Deliverables
 - `QUIZ_NAVIGATION_REQUIREMENTS.md` — User stories + acceptance criteria
 - Flowcharts (3 main paths) — Image or ASCII format
@@ -526,6 +535,17 @@ Three agents work **in parallel**:
 - [ ] Tap zones ≥ 44x44px on mobile
 - [ ] Design document shared with engineering (clear, no ambiguity)
 - [ ] Design has final say on visual treatment
+
+### SEO/GEO Criteria (Design)
+- [ ] Page hierarchy supports crawlability: H1 (page title), H2 (sections), H3 (subsections)
+- [ ] CTA buttons have high-contrast, readable text (orange primary, teal secondary per brand)
+- [ ] Hero section includes compelling value prop (optimized for search snippet)
+- [ ] Images include descriptive alt text (for image search + accessibility)
+- [ ] Schema markup structure planned (breadcrumbs, organization schema)
+- [ ] Mobile-first design improves Core Web Vitals (fast load, low CLS)
+- [ ] Geographic indicators visible (if targeting multiple regions)
+- [ ] Instructor code input prominent (supports free traffic from instructors)
+- [ ] Quiz cards scannable (supports user engagement = lower bounce rate)
 
 ### Design Deliverables
 - Wireframes: 9 (3 dashboards × 3 breakpoints)
@@ -600,6 +620,23 @@ Three agents work **in parallel**:
 - [ ] All styling applied per design spec (colors, fonts, spacing match)
 - [ ] Code reviewed: no dead code, all imports used, clean logic
 - [ ] Commit includes test proof (which flows tested, screenshots)
+
+### SEO/GEO Criteria (Engineering)
+- [ ] Page route is `/quizzes` (not `/#quizzes`) for search engine crawlability
+- [ ] Meta tags: title, description, canonical URL set (for SERP display)
+- [ ] Open Graph tags added (for social sharing = backlinks)
+- [ ] Structured data (JSON-LD): breadcrumbs, Organization schema
+- [ ] Page load time < 2 seconds (Core Web Vitals = ranking factor)
+- [ ] Images optimized: WebP format, lazy loading, descriptive filenames
+- [ ] Instructor code localStorage persists (supports repeat traffic from instructors)
+- [ ] All links crawlable (no javascript-only navigation that blocks Googlebot)
+- [ ] Breadcrumb navigation helps search engine understand page hierarchy
+- [ ] Internal linking: quiz cards link to quiz player (distributes page authority)
+- [ ] robots.txt allows `/quizzes` (not blocked from crawling)
+- [ ] Sitemap includes `/quizzes` route (helps search engines discover it)
+- [ ] Mobile responsiveness verified (mobile-first index = ranking factor)
+- [ ] No render-blocking resources (CSS/JS deferred or async)
+- [ ] Button click flows tracked (if using analytics, supports engagement metrics)
 
 ### Engineering Deliverables
 - `app/quizzes/page.tsx` — Main quiz navigation page (or section with #quizzes anchor)

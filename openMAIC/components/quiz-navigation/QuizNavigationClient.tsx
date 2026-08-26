@@ -8,13 +8,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { UserType, User, UserDetectionResult } from '@/lib/quiz-navigation/types';
-import {
-  detectUserType,
-  getInstructorCodeFromStorage,
-} from '@/lib/quiz-navigation/user-type-detector';
+import { detectUserType } from '@/lib/quiz-navigation/user-type-detector';
 import InstructorDashboard from './InstructorDashboard';
 import StudentDashboard from './StudentDashboard';
-import PublicDashboard from './PublicDashboard';
+import QuizHub from './QuizHub';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('QuizNavigationClient');
@@ -149,6 +146,6 @@ export default function QuizNavigationClient() {
 
     case 'public':
     default:
-      return <PublicDashboard initialInstructorCode={getInstructorCodeFromStorage() || undefined} />;
+      return <QuizHub />;
   }
 }

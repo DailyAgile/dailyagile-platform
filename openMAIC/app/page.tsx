@@ -49,8 +49,8 @@ export default function HomePage() {
 
   const handleSelectMode = (_mode: 'practice' | 'mock-test') => {
     if (selectedCode) {
-      // Redirect to Quiz Hub - user enters code through the normal "I Have a Code" flow
-      window.location.href = `/quizzes`;
+      // Redirect to Quiz Hub and pass the code so user doesn't have to re-enter it
+      window.location.href = `/quizzes?code=${selectedCode}`;
     }
   };
 

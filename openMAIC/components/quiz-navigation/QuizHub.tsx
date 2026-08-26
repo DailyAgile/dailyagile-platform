@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import PublicDashboard from './PublicDashboard';
 import InstructorCodeModal from './InstructorCodeModal';
 import { createLogger } from '@/lib/logger';
@@ -27,9 +29,21 @@ interface HubChoice {
 }
 
 export default function QuizHub() {
+  const searchParams = useSearchParams();
   const [showPublicQuizzes, setShowPublicQuizzes] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [instructorCode, setInstructorCode] = useState<string | null>(null);
+
+  // Check for code in query params on mount (passed from home page)
+  useEffect(() => {
+    const codeFromParams = searchParams.get('code');
+    if (codeFromParams) {
+      // Auto-validate and load the code
+      handleCodeSubmit(codeFromParams).catch((err) => {
+        log.error('Failed to auto-load code from params:', err);
+      });
+    }
+  }, []);
 
   const handleNavigateToAuth = (redirect: string) => {
     window.location.href = `/auth/login?redirect=${encodeURIComponent(redirect)}`;
@@ -101,9 +115,36 @@ export default function QuizHub() {
   // Default: Show hub with 4 choice cards (with optional code modal overlay)
   return (
     <>
+      {/* Header */}
+      <header
+        style={{
+          backgroundColor: BRAND_COLORS.white,
+          borderBottom: `1px solid ${BRAND_COLORS.light}`,
+          padding: '16px 20px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <img src="/assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '40px', width: 'auto', cursor: 'pointer' }} />
+          </Link>
+          <Link href="/" style={{ color: BRAND_COLORS.teal, fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
+            ← Back to Home
+          </Link>
+        </div>
+      </header>
+
       <div
         style={{
-          minHeight: '100vh',
+          minHeight: 'calc(100vh - 73px)',
           backgroundColor: BRAND_COLORS.white,
           padding: '40px 20px',
         }}

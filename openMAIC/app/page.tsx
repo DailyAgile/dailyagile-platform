@@ -10,14 +10,122 @@ export default function HomePage() {
   const lightBg = '#f0f9ff'; // blue-50
 
   const [quizCode, setQuizCode] = useState('');
+  const [showModeSelector, setShowModeSelector] = useState(false);
+  const [selectedCode, setSelectedCode] = useState('');
 
   const handleTakeQuiz = () => {
     if (quizCode.trim()) {
-      window.location.href = `/student/quiz/${quizCode.trim().toUpperCase()}`;
+      setSelectedCode(quizCode.trim().toUpperCase());
+      setShowModeSelector(true);
+    }
+  };
+
+  const handleSelectMode = (mode: 'practice' | 'mock-test') => {
+    if (selectedCode) {
+      window.location.href = `/student/quiz/${selectedCode}/${mode}`;
     }
   };
 
   return (
+    <>
+      {/* Mode Selector Modal */}
+      {showModeSelector && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setShowModeSelector(false)}
+        >
+          <div
+            style={{
+              backgroundColor: '#ffffff',
+              borderRadius: '12px',
+              padding: '32px',
+              maxWidth: '400px',
+              width: '90%',
+              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ color: '#0f172a', margin: '0 0 8px 0', fontSize: '20px', fontWeight: 'bold' }}>
+              Choose Quiz Mode
+            </h2>
+            <p style={{ color: '#64748b', margin: '0 0 24px 0', fontSize: '14px' }}>
+              Quiz: {selectedCode}
+            </p>
+
+            <div style={{ display: 'grid', gap: '12px' }}>
+              <button
+                onClick={() => handleSelectMode('practice')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#dcfce7',
+                  border: '2px solid #16a34a',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  color: '#166534',
+                  textAlign: 'left',
+                }}
+              >
+                📚 Practice Mode
+                <div style={{ fontSize: '12px', fontWeight: '400', marginTop: '4px', color: '#065f46' }}>
+                  Unlimited attempts, view answers
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleSelectMode('mock-test')}
+                style={{
+                  padding: '16px',
+                  backgroundColor: '#fef3c7',
+                  border: '2px solid #d97706',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  color: '#92400e',
+                  textAlign: 'left',
+                }}
+              >
+                🎯 Mock Test Mode
+                <div style={{ fontSize: '12px', fontWeight: '400', marginTop: '4px', color: '#78350f' }}>
+                  Timed, scored, realistic exam format
+                </div>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowModeSelector(false)}
+              style={{
+                width: '100%',
+                marginTop: '16px',
+                padding: '10px',
+                backgroundColor: '#f3f4f6',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                color: '#6b7280',
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
     <div style={{ minHeight: '100vh', backgroundColor: '#ffffff' }}>
       {/* Header */}
       <header
@@ -48,16 +156,16 @@ export default function HomePage() {
             <a href="/courses" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Self-Paced
             </a>
-            <a href="/cohorts" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
+            <a href="/ilt" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Live Courses
             </a>
-            <a href="#quizzes" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
+            <a href="/quizzes" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Quizzes
             </a>
-            <a href="#pricing" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
+            <a href="/#pricing" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Pricing
             </a>
-            <a href="#reviews" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
+            <a href="/#reviews" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Testimonials
             </a>
             <Link
@@ -137,7 +245,9 @@ export default function HomePage() {
                 Take Quiz
               </button>
             </div>
-            <p style={{ fontSize: '0.875rem', color: '#4b5563', marginTop: '0.5rem', textAlign: 'center' }}>Or browse quizzes below</p>
+            <Link href="/student/quizzes" style={{ fontSize: '0.875rem', color: accentColor, marginTop: '0.5rem', textAlign: 'center', display: 'block', textDecoration: 'none', fontWeight: 500 }}>
+              Or browse public quizzes below →
+            </Link>
           </div>
 
           {/* Three-Path CTA Buttons */}
@@ -157,7 +267,7 @@ export default function HomePage() {
               Browse Self-Paced Courses
             </a>
             <a
-              href="/cohorts"
+              href="/ilt"
               style={{
                 backgroundColor: accentColor,
                 color: 'white',
@@ -168,7 +278,7 @@ export default function HomePage() {
                 display: 'inline-block',
               }}
             >
-              View Instructor-Led Cohorts
+              View Live Courses
             </a>
           </div>
 
@@ -195,7 +305,7 @@ export default function HomePage() {
             </div>
             <div>
               <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🎓</div>
-              <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>Instructor-Led Cohorts</div>
+              <div style={{ fontWeight: 'bold', marginBottom: '0.25rem' }}>Instructor-Led Training</div>
               <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Live Training · Sep 15 Start</div>
             </div>
             <div>
@@ -445,5 +555,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

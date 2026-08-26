@@ -39,8 +39,8 @@ export async function GET(_request: NextRequest): Promise<NextResponse<PublicQui
     // Mock public quizzes (TODO: replace with real Supabase query when data exists)
     const mockPublicQuizzes: PublicQuiz[] = [
       {
-        id: '1',
-        quiz_code: '12345678',
+        id: 'PY101',
+        quiz_code: 'PY101',
         title: 'Python Basics Quiz',
         description: 'Test your Python fundamentals knowledge',
         total_questions: 10,
@@ -50,8 +50,8 @@ export async function GET(_request: NextRequest): Promise<NextResponse<PublicQui
         difficulty: 'easy',
       },
       {
-        id: '2',
-        quiz_code: '87654321',
+        id: 'JS201',
+        quiz_code: 'JS201',
         title: 'JavaScript Advanced Concepts',
         description: 'Challenge yourself with advanced JS concepts',
         total_questions: 15,
@@ -61,8 +61,8 @@ export async function GET(_request: NextRequest): Promise<NextResponse<PublicQui
         difficulty: 'hard',
       },
       {
-        id: '3',
-        quiz_code: '55555555',
+        id: 'REACT101',
+        quiz_code: 'REACT101',
         title: 'React Fundamentals',
         description: 'Learn React basics and best practices',
         total_questions: 12,
@@ -72,8 +72,8 @@ export async function GET(_request: NextRequest): Promise<NextResponse<PublicQui
         difficulty: 'medium',
       },
       {
-        id: '4',
-        quiz_code: '99999999',
+        id: 'WEB101',
+        quiz_code: 'WEB101',
         title: 'Web Development Quiz',
         description: 'HTML, CSS, and web development essentials',
         total_questions: 20,
@@ -84,12 +84,27 @@ export async function GET(_request: NextRequest): Promise<NextResponse<PublicQui
       },
     ];
 
-    log.info(`Returned ${mockPublicQuizzes.length} public quizzes`);
+    // Transform to match Quiz interface (code not quiz_code, questionCount not total_questions)
+    const transformedQuizzes = mockPublicQuizzes.map((q) => ({
+      id: q.id,
+      code: q.quiz_code,
+      title: q.title,
+      description: q.description,
+      questionCount: q.total_questions,
+      createdBy: 'system',
+      isPublished: q.is_published,
+      status: q.is_published ? ('published' as const) : ('draft' as const),
+      createdAt: q.created_at,
+      topic: q.topic,
+      difficulty: q.difficulty,
+    }));
+
+    log.info(`Returned ${transformedQuizzes.length} public quizzes`);
 
     return NextResponse.json({
       success: true,
       data: {
-        quizzes: mockPublicQuizzes,
+        quizzes: transformedQuizzes,
       },
     });
   } catch (error) {

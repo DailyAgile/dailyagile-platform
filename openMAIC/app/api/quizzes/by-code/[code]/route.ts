@@ -102,8 +102,8 @@ export async function GET(
         instructorName: 'Dr. Sarah Chen',
         quizzes: [
           {
-            id: '1',
-            quiz_code: '12345678',
+            id: 'AI101',
+            quiz_code: 'AI101',
             title: 'Introduction to AI',
             description: 'Learn the fundamentals of artificial intelligence',
             total_questions: 20,
@@ -112,8 +112,8 @@ export async function GET(
             created_at: new Date().toISOString(),
           },
           {
-            id: '2',
-            quiz_code: '12345679',
+            id: 'ML102',
+            quiz_code: 'ML102',
             title: 'Machine Learning Basics',
             description: 'Explore ML algorithms and concepts',
             total_questions: 25,
@@ -127,8 +127,8 @@ export async function GET(
         instructorName: 'Prof. James Wilson',
         quizzes: [
           {
-            id: '3',
-            quiz_code: '87654321',
+            id: 'DS101',
+            quiz_code: 'DS101',
             title: 'Data Science Fundamentals',
             description: 'Master data analysis and visualization',
             total_questions: 18,
@@ -142,8 +142,8 @@ export async function GET(
         instructorName: 'Dr. Emily Rodriguez',
         quizzes: [
           {
-            id: '4',
-            quiz_code: '55555555',
+            id: 'PY201',
+            quiz_code: 'PY201',
             title: 'Python Programming',
             description: 'Learn Python from basics to advanced',
             total_questions: 30,
@@ -152,8 +152,8 @@ export async function GET(
             created_at: new Date().toISOString(),
           },
           {
-            id: '5',
-            quiz_code: '55555556',
+            id: 'WEB201',
+            quiz_code: 'WEB201',
             title: 'Web Development with Python',
             description: 'Build web apps using Django and Flask',
             total_questions: 22,
@@ -179,12 +179,36 @@ export async function GET(
       );
     }
 
-    log.info(`Found ${instructorData.quizzes.length} quizzes for instructor code: ${code}`);
+    // Transform to match Quiz interface (code not quiz_code, questionCount not total_questions)
+    const transformedQuizzes = instructorData.quizzes.map(
+      (q: {
+        id: string;
+        quiz_code: string;
+        title: string;
+        description?: string;
+        total_questions: number;
+        created_by?: string;
+        is_published: boolean;
+        created_at: string;
+      }) => ({
+        id: q.id,
+        code: q.quiz_code,
+        title: q.title,
+        description: q.description,
+        questionCount: q.total_questions,
+        createdBy: q.created_by || 'instructor',
+        isPublished: q.is_published,
+        status: q.is_published ? ('published' as const) : ('draft' as const),
+        createdAt: q.created_at,
+      })
+    );
+
+    log.info(`Found ${transformedQuizzes.length} quizzes for instructor code: ${code}`);
 
     return NextResponse.json({
       success: true,
       data: {
-        quizzes: instructorData.quizzes,
+        quizzes: transformedQuizzes,
         instructorName: instructorData.instructorName,
       },
     });

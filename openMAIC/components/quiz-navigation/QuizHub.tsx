@@ -137,9 +137,9 @@ export default function QuizHub() {
               fontFamily: 'Calibri, sans-serif',
             }}
           >
-            Choose how you'd like to access quizzes. Whether you're an instructor managing courses,
-            a student exploring purchases, or someone with an instructor code, we have a path for
-            you.
+            Choose how you&apos;d like to access quizzes. Whether you&apos;re an instructor managing
+            courses, a student exploring purchases, or someone with an instructor code, we have a path
+            for you.
           </p>
         </div>
 

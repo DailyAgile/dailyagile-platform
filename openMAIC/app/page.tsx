@@ -47,9 +47,10 @@ export default function HomePage() {
     }
   };
 
-  const handleSelectMode = (mode: 'practice' | 'mock-test') => {
+  const handleSelectMode = (_mode: 'practice' | 'mock-test') => {
     if (selectedCode) {
-      window.location.href = `/student/quiz/${selectedCode}/${mode}`;
+      // Redirect to Quiz Hub - user enters code through the normal "I Have a Code" flow
+      window.location.href = `/quizzes`;
     }
   };
 

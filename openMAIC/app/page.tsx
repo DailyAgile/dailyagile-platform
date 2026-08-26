@@ -12,11 +12,38 @@ export default function HomePage() {
   const [quizCode, setQuizCode] = useState('');
   const [showModeSelector, setShowModeSelector] = useState(false);
   const [selectedCode, setSelectedCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [isValidatingCode, setIsValidatingCode] = useState(false);
 
-  const handleTakeQuiz = () => {
-    if (quizCode.trim()) {
-      setSelectedCode(quizCode.trim().toUpperCase());
+  const handleTakeQuiz = async () => {
+    const code = quizCode.trim().toUpperCase();
+    if (!code) {
+      setCodeError('Please enter a quiz code');
+      return;
+    }
+
+    setIsValidatingCode(true);
+    setCodeError('');
+
+    try {
+      const response = await fetch(`/api/quizzes/by-code/${code}`);
+      if (!response.ok) {
+        setCodeError('Invalid quiz code. Please check and try again.');
+        return;
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        setCodeError('This quiz code is not recognized.');
+        return;
+      }
+
+      setSelectedCode(code);
       setShowModeSelector(true);
+    } catch (err) {
+      setCodeError('Failed to validate code. Please try again.');
+    } finally {
+      setIsValidatingCode(false);
     }
   };
 
@@ -218,19 +245,23 @@ export default function HomePage() {
                 type="text"
                 placeholder="Paste your instructor's 8-digit code"
                 value={quizCode}
-                onChange={(e) => setQuizCode(e.target.value)}
+                onChange={(e) => {
+                  setQuizCode(e.target.value);
+                  setCodeError('');
+                }}
                 onKeyPress={(e) => e.key === 'Enter' && handleTakeQuiz()}
                 style={{
                   flex: 1,
                   padding: '0.75rem 1rem',
                   borderRadius: '9999px',
-                  border: `2px solid ${accentColor}`,
+                  border: `2px solid ${codeError ? '#dc2626' : accentColor}`,
                   fontSize: '1rem',
                   fontFamily: 'system-ui, -apple-system, sans-serif',
                 }}
               />
               <button
                 onClick={handleTakeQuiz}
+                disabled={isValidatingCode}
                 style={{
                   backgroundColor: accentColor,
                   color: 'white',
@@ -238,13 +269,19 @@ export default function HomePage() {
                   borderRadius: '9999px',
                   fontWeight: 'bold',
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: isValidatingCode ? 'not-allowed' : 'pointer',
                   whiteSpace: 'nowrap',
+                  opacity: isValidatingCode ? 0.6 : 1,
                 }}
               >
-                Take Quiz
+                {isValidatingCode ? 'Checking...' : 'Take Quiz'}
               </button>
             </div>
+            {codeError && (
+              <p style={{ color: '#dc2626', fontSize: '0.875rem', marginTop: '0.5rem', marginBottom: '0', fontWeight: 500 }}>
+                ❌ {codeError}
+              </p>
+            )}
             <Link href="/student/quizzes" style={{ fontSize: '0.875rem', color: accentColor, marginTop: '0.5rem', textAlign: 'center', display: 'block', textDecoration: 'none', fontWeight: 500 }}>
               Or browse public quizzes below →
             </Link>

@@ -178,7 +178,9 @@ export default function HomePage() {
           }}
         >
           <div>
-            <img src="assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '48px', width: 'auto' }} />
+            <Link href="/">
+              <img src="/assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '48px', width: 'auto', cursor: 'pointer' }} />
+            </Link>
           </div>
           <nav style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
             <a href="/courses" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>

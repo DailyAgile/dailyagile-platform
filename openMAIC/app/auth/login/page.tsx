@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import { EmailLoginForm } from '@/components/auth/email-login-form';
 import { OTPVerifyForm } from '@/components/auth/otp-verify-form';
+import { ContactSupportModal } from '@/components/auth/contact-support-modal';
 
 export default function LoginPage() {
   const router = useRouter();
   const [authStep, setAuthStep] = useState<'email' | 'otp'>('email');
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [isChecking, setIsChecking] = useState(true);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-block mb-6">
             <img
-              src="assets/dailyagile_logo.png"
+              src="/assets/dailyagile_logo.png"
               alt="DailyAgile"
               className="h-12 w-auto"
             />
@@ -112,11 +114,19 @@ export default function LoginPage() {
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground mt-6">
           Need help?{' '}
-          <a href="mailto:support@dailyagile.com" className="text-primary hover:underline">
+          <button
+            onClick={() => setShowContactModal(true)}
+            className="text-primary hover:underline bg-transparent border-none cursor-pointer"
+          >
             Contact support
-          </a>
+          </button>
         </p>
       </motion.div>
+
+      {/* Contact Support Modal */}
+      {showContactModal && (
+        <ContactSupportModal onClose={() => setShowContactModal(false)} />
+      )}
     </div>
   );
 }

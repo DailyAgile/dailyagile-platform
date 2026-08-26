@@ -6,6 +6,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Quiz } from '@/lib/quiz-navigation/types';
 import QuizCard from './QuizCard';
 import InstructorCodeModal from './InstructorCodeModal';
@@ -146,9 +147,43 @@ export default function PublicDashboard({ initialInstructorCode }: PublicDashboa
   });
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ marginBottom: '32px' }}>
+    <>
+      {/* Top Navigation */}
+      <div
+        style={{
+          backgroundColor: BRAND_COLORS.white,
+          borderBottom: `1px solid ${BRAND_COLORS.light}`,
+          padding: '16px 24px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1400px',
+            margin: '0 auto',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <img src="/assets/dailyagile_logo.png" alt="DailyAgile" style={{ height: '40px', width: 'auto', cursor: 'pointer' }} />
+          </Link>
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <Link href="/quizzes" style={{ color: BRAND_COLORS.teal, fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
+              ← Back to Quiz Hub
+            </Link>
+            <Link href="/" style={{ color: BRAND_COLORS.teal, fontSize: '14px', fontWeight: 500, textDecoration: 'none' }}>
+              Home
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
+        {/* Header */}
+        <div style={{ marginBottom: '32px' }}>
         <h1
           style={{
             margin: '0 0 8px 0',
@@ -442,6 +477,7 @@ export default function PublicDashboard({ initialInstructorCode }: PublicDashboa
           </div>
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 }

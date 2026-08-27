@@ -134,33 +134,39 @@ export default function QuizPlayerPage() {
   const handleQuizCompletion = async () => {
     try {
       setIsSubmitting(true);
-      const questions = quizData!.questions;
-      let totalPoints = 0;
-      let earnedPoints = 0;
 
-      questions.forEach((q, idx) => {
-        totalPoints += q.points || 5;
-        const selected = answers[idx];
+      // Convert answers array to proper format for submission
+      const answersArray = Object.keys(answers)
+        .sort((a, b) => Number(a) - Number(b))
+        .map(idx => answers[Number(idx)]);
 
-        if (selected === q.correctAnswer) {
-          earnedPoints += q.points || 5;
-        }
+      // Save quiz attempt to database
+      const submitResponse = await fetch('/api/student/quiz/submit-simple', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quizCode: quizData!.quiz_code,
+          answers: answersArray,
+        }),
       });
 
+      if (!submitResponse.ok) {
+        throw new Error(`Failed to submit quiz: ${submitResponse.status}`);
+      }
+
+      const submitData = await submitResponse.json();
+      const realAttemptId = submitData.data.attemptId;
       const timeTaken = Math.round((Date.now() - quizStartTime) / 1000);
-      const percentage = Math.round((earnedPoints / totalPoints) * 100);
-      const passed = percentage >= (quizData!.passingScore || 70);
 
-      log.info(`Quiz completed: ${earnedPoints}/${totalPoints} (${percentage}%)`);
+      log.info(`Quiz submitted: ${submitData.data.scorePercentage}% (Attempt ID: ${realAttemptId})`);
 
-      const tempAttemptId = `attempt_${Date.now()}`;
-
+      // Redirect to results page with real attemptId from database
       router.push(
-        `/student/quiz/${quizId}/results/${tempAttemptId}?score=${earnedPoints}&total=${totalPoints}&percentage=${percentage}&passed=${passed}&time=${timeTaken}`
+        `/student/quiz/${quizId}/results/${realAttemptId}?score=${submitData.data.correctCount}&total=${submitData.data.totalQuestions}&percentage=${submitData.data.scorePercentage}&passed=${submitData.data.passed}&time=${timeTaken}`
       );
     } catch (err) {
       log.error('Error completing quiz:', err);
-      setError('Failed to complete quiz');
+      setError('Failed to complete quiz. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

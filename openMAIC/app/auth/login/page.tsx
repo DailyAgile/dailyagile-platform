@@ -86,6 +86,7 @@ export default function LoginPage() {
               src="/assets/dailyagile_logo.png"
               alt="DailyAgile"
               className="h-12 w-auto"
+              style={{ height: '48px', width: 'auto', maxWidth: '100%' }}
             />
           </Link>
           <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: 'Cambria, serif' }}>

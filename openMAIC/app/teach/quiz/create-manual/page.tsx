@@ -8,6 +8,29 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+/**
+ * Copy URL to clipboard with graceful fallback
+ * Returns true if copy succeeded, false if fallback instructions shown
+ */
+const copyToClipboard = async (text: string, onSuccess: () => void, onFallback: () => void) => {
+  try {
+    // Try modern Clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+      onSuccess();
+      return true;
+    } else {
+      // Fallback for older browsers or non-secure contexts
+      onFallback();
+      return false;
+    }
+  } catch (_err) {
+    // If Clipboard API fails, show fallback instructions
+    onFallback();
+    return false;
+  }
+};
+
 const BRAND_COLORS = {
   navy: '#1E3A5F',
   teal: '#0891B2',
@@ -142,6 +165,7 @@ export default function ManualCreatePage() {
   const [activeTab, setActiveTab] = useState<'manual' | 'csv' | 'ai'>('manual');
   const [aiTopic, setAiTopic] = useState('');
   const [showAIModal, setShowAIModal] = useState(false);
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null); // Track which URL was copied
 
   // Toast notification state
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -503,16 +527,23 @@ export default function ManualCreatePage() {
 
             {/* Practice Mode */}
             <div className="mb-6 p-4 bg-blue-50 rounded-lg border" style={{ borderColor: '#93C5FD' }}>
-              <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">
-                📚 Practice Mode (Unlimited Attempts)
-              </p>
-              <div style={{ backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-1">
+                    📚 Practice Mode
+                  </p>
+                  <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0', fontWeight: 'normal' }}>
+                    Students retake unlimited times • See correct answers immediately • Learn at their pace
+                  </p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
                 <input
                   type="text"
                   readOnly
                   value={createdQuizData.shareable_urls.practice}
                   style={{
-                    width: '100%',
+                    flex: 1,
                     padding: '8px',
                     border: `2px solid ${BRAND_COLORS.teal}`,
                     borderRadius: '4px',
@@ -520,24 +551,59 @@ export default function ManualCreatePage() {
                     cursor: 'text',
                   }}
                 />
+                <button
+                  onClick={() =>
+                    copyToClipboard(
+                      createdQuizData.shareable_urls.practice,
+                      () => {
+                        setCopiedUrl('practice');
+                        setTimeout(() => setCopiedUrl(null), 2000);
+                      },
+                      () => {
+                        showToast('Copy failed. Triple-click the URL and press Ctrl+C (or Cmd+C on Mac)', 'error');
+                      }
+                    )
+                  }
+                  style={{
+                    backgroundColor: copiedUrl === 'practice' ? '#10B981' : BRAND_COLORS.teal,
+                    color: 'white',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    transition: 'background-color 0.2s',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {copiedUrl === 'practice' ? '✅ Copied!' : 'Copy'}
+                </button>
               </div>
-              <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0' }}>
-                📌 Tip: Triple-click to select all, then Ctrl+C to copy
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '11px', margin: '0' }}>
+                💡 Can&apos;t copy? Triple-click the URL, then press Ctrl+C (or Cmd+C on Mac)
               </p>
             </div>
 
             {/* Game Mode */}
             <div className="mb-6 p-4 bg-green-50 rounded-lg border" style={{ borderColor: '#86EFAC' }}>
-              <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">
-                🎮 Game Mode (Live Class)
-              </p>
-              <div style={{ backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-1">
+                    🎮 Game Mode
+                  </p>
+                  <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0', fontWeight: 'normal' }}>
+                    60-second timer per question • Live leaderboard • Competitive scoring • Perfect for live classes
+                  </p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
                 <input
                   type="text"
                   readOnly
                   value={createdQuizData.shareable_urls.game_mode}
                   style={{
-                    width: '100%',
+                    flex: 1,
                     padding: '8px',
                     border: `2px solid ${BRAND_COLORS.teal}`,
                     borderRadius: '4px',
@@ -545,24 +611,59 @@ export default function ManualCreatePage() {
                     cursor: 'text',
                   }}
                 />
+                <button
+                  onClick={() =>
+                    copyToClipboard(
+                      createdQuizData.shareable_urls.game_mode,
+                      () => {
+                        setCopiedUrl('game');
+                        setTimeout(() => setCopiedUrl(null), 2000);
+                      },
+                      () => {
+                        showToast('Copy failed. Triple-click the URL and press Ctrl+C (or Cmd+C on Mac)', 'error');
+                      }
+                    )
+                  }
+                  style={{
+                    backgroundColor: copiedUrl === 'game' ? '#10B981' : BRAND_COLORS.teal,
+                    color: 'white',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    transition: 'background-color 0.2s',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {copiedUrl === 'game' ? '✅ Copied!' : 'Copy'}
+                </button>
               </div>
-              <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0' }}>
-                📌 Tip: Triple-click to select all, then Ctrl+C to copy
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '11px', margin: '0' }}>
+                💡 Can&apos;t copy? Triple-click the URL, then press Ctrl+C (or Cmd+C on Mac)
               </p>
             </div>
 
             {/* Mock Test */}
             <div className="mb-6 p-4 bg-orange-50 rounded-lg border" style={{ borderColor: '#FDBA74' }}>
-              <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">
-                📋 Mock Test (Offline Practice)
-              </p>
-              <div style={{ backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-1">
+                    📋 Mock Test
+                  </p>
+                  <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0', fontWeight: 'normal' }}>
+                    Timed assessment • Single attempt • Get score & feedback when done • Realistic exam format
+                  </p>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
                 <input
                   type="text"
                   readOnly
                   value={createdQuizData.shareable_urls.mock_test}
                   style={{
-                    width: '100%',
+                    flex: 1,
                     padding: '8px',
                     border: `2px solid ${BRAND_COLORS.teal}`,
                     borderRadius: '4px',
@@ -570,9 +671,37 @@ export default function ManualCreatePage() {
                     cursor: 'text',
                   }}
                 />
+                <button
+                  onClick={() =>
+                    copyToClipboard(
+                      createdQuizData.shareable_urls.mock_test,
+                      () => {
+                        setCopiedUrl('mock');
+                        setTimeout(() => setCopiedUrl(null), 2000);
+                      },
+                      () => {
+                        showToast('Copy failed. Triple-click the URL and press Ctrl+C (or Cmd+C on Mac)', 'error');
+                      }
+                    )
+                  }
+                  style={{
+                    backgroundColor: copiedUrl === 'mock' ? '#10B981' : BRAND_COLORS.teal,
+                    color: 'white',
+                    padding: '8px 12px',
+                    borderRadius: '4px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    transition: 'background-color 0.2s',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {copiedUrl === 'mock' ? '✅ Copied!' : 'Copy'}
+                </button>
               </div>
-              <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0' }}>
-                📌 Tip: Triple-click to select all, then Ctrl+C to copy
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '11px', margin: '0' }}>
+                💡 Can&apos;t copy? Triple-click the URL, then press Ctrl+C (or Cmd+C on Mac)
               </p>
             </div>
 

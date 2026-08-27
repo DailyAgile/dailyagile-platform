@@ -45,6 +45,9 @@ export default function QuizManagementPage() {
   const [selectedQuizzes, setSelectedQuizzes] = useState<Set<string>>(new Set());
   const [cloningId, setCloningId] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<{ visible: boolean; text: string }>({ visible: false, text: '' });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'draft'>('all');
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     loadQuizzes();
@@ -213,10 +216,93 @@ export default function QuizManagementPage() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedQuizzes.size === quizzes.length) {
+    if (selectedQuizzes.size === filteredQuizzes.length) {
       setSelectedQuizzes(new Set());
     } else {
-      setSelectedQuizzes(new Set(quizzes.map((q) => q.id)));
+      setSelectedQuizzes(new Set(filteredQuizzes.map((q) => q.id)));
+    }
+  };
+
+  const getFilteredQuizzes = () => {
+    let filtered = quizzes;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (quiz) =>
+          quiz.title.toLowerCase().includes(query) ||
+          quiz.quiz_code.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply status filter
+    if (filterStatus === 'published') {
+      filtered = filtered.filter((quiz) => quiz.is_published);
+    } else if (filterStatus === 'draft') {
+      filtered = filtered.filter((quiz) => !quiz.is_published);
+    }
+
+    return filtered;
+  };
+
+  const filteredQuizzes = getFilteredQuizzes();
+
+  const handleExportCSV = () => {
+    if (quizzes.length === 0) {
+      setError('No quizzes to export');
+      return;
+    }
+
+    try {
+      setExporting(true);
+
+      // Create CSV header
+      const headers = ['Quiz Code', 'Title', 'Questions', 'Points', 'Published', 'Assigned', 'Completed', 'Created Date'];
+      const rows = quizzes.map((quiz) => [
+        quiz.quiz_code,
+        `"${quiz.title}"`, // Quote title in case it contains commas
+        quiz.total_questions,
+        quiz.total_points,
+        quiz.is_published ? 'Yes' : 'No',
+        quiz.assignment_count,
+        quiz.completed_count,
+        new Date(quiz.created_at).toLocaleDateString(),
+      ]);
+
+      // Combine headers and rows
+      const csvContent = [headers, ...rows]
+        .map((row) => row.join(','))
+        .join('\n');
+
+      // Create blob and download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', `quizzes_export_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      log.info('✅ Quizzes exported to CSV successfully');
+      setSuccessMessage({
+        visible: true,
+        text: `✓ Exported ${quizzes.length} quiz${quizzes.length !== 1 ? 'zes' : ''} to CSV`,
+      });
+
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage({ visible: false, text: '' });
+      }, 3000);
+    } catch (err) {
+      log.error('Error exporting CSV:', err);
+      setError(err instanceof Error ? err.message : 'Failed to export CSV');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -607,9 +693,9 @@ export default function QuizManagementPage() {
 
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     const links = {
-      practice: `${baseUrl}/learn/quizzes/${shareModal.quizCode}/practice`,
-      mockTest: `${baseUrl}/learn/quizzes/${shareModal.quizCode}/mock-test`,
-      gameMode: `${baseUrl}/teach/quizzes/${shareModal.quizCode}/game-mode`,
+      practice: `${baseUrl}/student/quiz/${shareModal.quizCode}/practice`,
+      mockTest: `${baseUrl}/student/quiz/${shareModal.quizCode}/mock-test`,
+      gameMode: `${baseUrl}/student/quiz/${shareModal.quizCode}/game-mode`,
     };
 
     if (!baseUrl) {
@@ -853,6 +939,53 @@ export default function QuizManagementPage() {
           </div>
         )}
 
+        {/* Search & Filter Section */}
+        <div style={{ marginBottom: '24px', display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ color: BRAND_COLORS.navy, fontSize: '12px', fontWeight: '600' }}>
+              Search by Title or Code
+            </label>
+            <input
+              type="text"
+              placeholder="Search quizzes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                padding: '10px 12px',
+                border: `1px solid ${BRAND_COLORS.border}`,
+                borderRadius: '4px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                fontFamily: 'inherit',
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <label style={{ color: BRAND_COLORS.navy, fontSize: '12px', fontWeight: '600' }}>
+              Filter by Status
+            </label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'published' | 'draft')}
+              style={{
+                padding: '10px 12px',
+                border: `1px solid ${BRAND_COLORS.border}`,
+                borderRadius: '4px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                fontFamily: 'inherit',
+                backgroundColor: BRAND_COLORS.white,
+                color: BRAND_COLORS.navy,
+              }}
+            >
+              <option value="all">All Quizzes</option>
+              <option value="published">Published Only</option>
+              <option value="draft">Drafts Only</option>
+            </select>
+          </div>
+        </div>
+
         {/* Action Buttons */}
         <div style={{ marginBottom: '24px', display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
           <button
@@ -873,10 +1006,30 @@ export default function QuizManagementPage() {
 
           {quizzes.length > 0 && (
             <button
+              onClick={handleExportCSV}
+              disabled={exporting}
+              style={{
+                backgroundColor: BRAND_COLORS.orange,
+                color: BRAND_COLORS.white,
+                border: 'none',
+                borderRadius: '4px',
+                padding: '10px 16px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: exporting ? 'not-allowed' : 'pointer',
+                opacity: exporting ? 0.6 : 1,
+              }}
+            >
+              {exporting ? '⬇️ Exporting...' : '⬇️ Export CSV'}
+            </button>
+          )}
+
+          {filteredQuizzes.length > 0 && (
+            <button
               onClick={toggleSelectAll}
               style={{
-                backgroundColor: selectedQuizzes.size === quizzes.length ? BRAND_COLORS.teal : 'transparent',
-                color: selectedQuizzes.size === quizzes.length ? BRAND_COLORS.white : BRAND_COLORS.teal,
+                backgroundColor: selectedQuizzes.size === filteredQuizzes.length ? BRAND_COLORS.teal : 'transparent',
+                color: selectedQuizzes.size === filteredQuizzes.length ? BRAND_COLORS.white : BRAND_COLORS.teal,
                 border: `1px solid ${BRAND_COLORS.teal}`,
                 borderRadius: '4px',
                 padding: '8px 12px',
@@ -885,14 +1038,14 @@ export default function QuizManagementPage() {
                 cursor: 'pointer',
               }}
             >
-              ☑️ {selectedQuizzes.size === quizzes.length ? 'Deselect All' : 'Select All'}
+              ☑️ {selectedQuizzes.size === filteredQuizzes.length ? 'Deselect All' : 'Select All'}
             </button>
           )}
 
           {selectedQuizzes.size > 0 && (
             <>
               <span style={{ color: BRAND_COLORS.gray, fontSize: '14px', fontWeight: '600', marginLeft: '8px' }}>
-                {selectedQuizzes.size}/{quizzes.length} selected
+                {selectedQuizzes.size}/{filteredQuizzes.length} selected
               </span>
 
               <button
@@ -1015,9 +1168,49 @@ export default function QuizManagementPage() {
               Create Quiz
             </button>
           </div>
+        ) : filteredQuizzes.length === 0 ? (
+          <div
+            style={{
+              backgroundColor: BRAND_COLORS.white,
+              border: `2px dashed ${BRAND_COLORS.border}`,
+              borderRadius: '8px',
+              padding: '40px',
+              textAlign: 'center',
+            }}
+          >
+            <p
+              style={{
+                margin: '0 0 8px 0',
+                color: BRAND_COLORS.navy,
+                fontSize: '18px',
+                fontWeight: '600',
+              }}
+            >
+              No quizzes found
+            </p>
+            <p
+              style={{
+                margin: '0',
+                color: BRAND_COLORS.gray,
+                fontSize: '14px',
+              }}
+            >
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
         ) : (
           <div>
-            {quizzes.map((quiz) => (
+            <p
+              style={{
+                margin: '0 0 12px 0',
+                color: BRAND_COLORS.gray,
+                fontSize: '13px',
+                fontWeight: '500',
+              }}
+            >
+              Showing {filteredQuizzes.length} of {quizzes.length} quiz{quizzes.length !== 1 ? 'zes' : ''}
+            </p>
+            {filteredQuizzes.map((quiz) => (
               <QuizCard key={quiz.id} quiz={quiz} />
             ))}
           </div>

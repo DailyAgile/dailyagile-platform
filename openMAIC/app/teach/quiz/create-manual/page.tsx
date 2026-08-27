@@ -17,15 +17,151 @@ const BRAND_COLORS = {
   border: '#E2E8F0',
 };
 
+/**
+ * Toast Notification Component
+ * Displays temporary notifications at the top of the page
+ */
+type ToastType = 'success' | 'error' | 'info';
+
+interface Toast {
+  id: string;
+  message: string;
+  type: ToastType;
+}
+
+function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: string) => void }) {
+  return (
+    <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 9999, maxWidth: '400px' }}>
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          style={{
+            marginBottom: '12px',
+            padding: '16px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            backgroundColor:
+              toast.type === 'success'
+                ? '#D1FAE5'
+                : toast.type === 'error'
+                ? '#FEE2E2'
+                : '#DBEAFE',
+            borderLeft: `4px solid ${
+              toast.type === 'success' ? '#10B981' : toast.type === 'error' ? '#EF4444' : '#3B82F6'
+            }`,
+            color:
+              toast.type === 'success'
+                ? '#065F46'
+                : toast.type === 'error'
+                ? '#7F1D1D'
+                : '#1E40AF',
+            fontSize: '14px',
+            fontWeight: '500',
+            wordWrap: 'break-word',
+            whiteSpace: 'pre-wrap',
+            animation: 'slideIn 0.3s ease-out',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span>{toast.message}</span>
+            <button
+              onClick={() => onRemove(toast.id)}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                marginLeft: '12px',
+                fontSize: '18px',
+                opacity: '0.6',
+                padding: '0',
+              }}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      ))}
+      <style>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        @keyframes slideOut {
+          from {
+            transform: translateX(0);
+            opacity: 1;
+          }
+          to {
+            transform: translateX(400px);
+            opacity: 0;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+interface Question {
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  option_e: string;
+  correct_answer: string;
+  explanation: string;
+  source_link: string;
+  timer_seconds: string;
+}
+
+interface CreatedQuizData {
+  title: string;
+  quiz_code: string;
+  total_questions: number;
+  total_points: number;
+  shareable_urls: {
+    practice: string;
+    game_mode: string;
+    mock_test: string;
+  };
+}
+
 export default function ManualCreatePage() {
   const router = useRouter();
   const [quizTitle, setQuizTitle] = useState('');
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isParsingCSV, setIsParsingCSV] = useState(false);
   const [activeTab, setActiveTab] = useState<'manual' | 'csv' | 'ai'>('manual');
+  const [aiTopic, setAiTopic] = useState('');
+  const [showAIModal, setShowAIModal] = useState(false);
 
-  const [currentQuestion, setCurrentQuestion] = useState({
+  // Toast notification state
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  // Add toast notification
+  const showToast = (message: string, type: ToastType = 'info') => {
+    const id = Date.now().toString();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+      removeToast(id);
+    }, 3000);
+  };
+
+  // Remove toast notification
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
+
+  const [currentQuestion, setCurrentQuestion] = useState<Question>({
     question: '',
     option_a: '',
     option_b: '',
@@ -40,7 +176,7 @@ export default function ManualCreatePage() {
 
   const handleAddQuestion = () => {
     if (!currentQuestion.question.trim()) {
-      alert('Please enter a question');
+      showToast('Please enter a question', 'error');
       return;
     }
 
@@ -51,11 +187,12 @@ export default function ManualCreatePage() {
       !currentQuestion.option_d.trim() ||
       !currentQuestion.option_e.trim()
     ) {
-      alert('Please fill in all answer options');
+      showToast('Please fill in all answer options', 'error');
       return;
     }
 
     setQuestions([...questions, currentQuestion]);
+    showToast(`✅ Question ${questions.length + 1} added successfully`, 'success');
     setCurrentQuestion({
       question: '',
       option_a: '',
@@ -106,6 +243,7 @@ export default function ManualCreatePage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setIsParsingCSV(true);
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -113,7 +251,8 @@ export default function ManualCreatePage() {
         const lines = csv.split('\n').filter(line => line.trim());
 
         if (lines.length < 2) {
-          alert('❌ CSV must have a header row and at least one question row');
+          showToast('CSV must have a header row and at least one question row', 'error');
+          setIsParsingCSV(false);
           return;
         }
 
@@ -123,18 +262,17 @@ export default function ManualCreatePage() {
 
         const missingHeaders = expectedHeaders.filter(h => !headers.includes(h));
         if (missingHeaders.length > 0) {
-          alert(`❌ Missing columns: ${missingHeaders.join(', ')}\n\nRequired: ${expectedHeaders.join(', ')}`);
+          showToast(`Missing columns: ${missingHeaders.join(', ')}\n\nRequired: ${expectedHeaders.join(', ')}`, 'error');
+          setIsParsingCSV(false);
           return;
         }
 
         // Parse all questions and collect errors
-        const successfulQuestions: any[] = [];
+        const successfulQuestions: Question[] = [];
         const failedQuestions: Array<{ row: number; error: string }> = [];
-        const totalToProcess = lines.length - 1;
 
         lines.slice(1).forEach((line, idx) => {
           const rowNumber = idx + 2;
-          const progressPercent = Math.round(((idx + 1) / totalToProcess) * 100);
 
           try {
             const values = parseCSVLine(line);
@@ -201,53 +339,53 @@ export default function ManualCreatePage() {
         }
 
         if (successfulQuestions.length === 0 && failedQuestions.length === 0) {
-          alert('❌ No valid questions found in CSV');
+          showToast('No valid questions found in CSV', 'error');
         } else if (failedQuestions.length === 0) {
           // Perfect upload - all questions valid
-          const message = `🎉 CSV UPLOAD COMPLETE!\n\n` +
-            `✅ All ${successfulQuestions.length} question${successfulQuestions.length !== 1 ? 's' : ''} loaded successfully!\n` +
-            `📊 Success Rate: 100%\n\n` +
-            `📝 Questions Ready:\n` +
-            `   • Total: ${successfulQuestions.length}\n` +
-            `   • Total Points: ${successfulQuestions.length * 10}\n\n` +
-            `🚀 Next Step: Click "🎯 Create Quiz" to finalize`;
-          alert(message);
+          showToast(
+            `✅ All ${successfulQuestions.length} question${successfulQuestions.length !== 1 ? 's' : ''} loaded successfully!\n📊 Success Rate: 100%\n\n📝 Ready to create quiz with ${successfulQuestions.length} questions.`,
+            'success'
+          );
         } else {
           // Partial upload - some questions failed
-          const message = `📋 CSV UPLOAD COMPLETE\n\n` +
-            `✅ Loaded: ${successfulQuestions.length}/${totalAttempted} questions (${successRate}%)\n\n` +
-            `📊 Summary:\n` +
-            `   • Successful: ${successfulQuestions.length} ✓\n` +
-            `   • Failed: ${failedQuestions.length} ✗\n` +
-            `   • Success Rate: ${successRate}%\n\n` +
-            `❌ Issues Found:\n\n` +
-            `${failedQuestions.map(f => `   • Row ${f.row}: ${f.error}`).join('\n')}\n\n` +
-            `💡 Options:\n` +
-            `   1️⃣ Click "🎯 Create Quiz" to use ${successfulQuestions.length} loaded questions\n` +
-            `   2️⃣ Fix the failed rows and upload again\n` +
-            `   3️⃣ Add more questions manually`;
-          alert(message);
+          const failureDetails = failedQuestions
+            .slice(0, 3)
+            .map(f => `Row ${f.row}: ${f.error}`)
+            .join('\n');
+          const moreFailures = failedQuestions.length > 3 ? `\n...and ${failedQuestions.length - 3} more` : '';
+
+          showToast(
+            `✅ Loaded: ${successfulQuestions.length}/${totalAttempted} questions (${successRate}%)\n\n❌ Issues:\n${failureDetails}${moreFailures}`,
+            'error'
+          );
         }
 
         event.target.value = '';
+        setIsParsingCSV(false);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-        alert(`❌ Error reading CSV file:\n${errorMsg}`);
+        showToast(`Error reading CSV file: ${errorMsg}`, 'error');
+        setIsParsingCSV(false);
       }
     };
     reader.readAsText(file);
   };
 
   const handleAIGeneration = async () => {
-    const topic = prompt('Enter topic or prompt for AI quiz generation (e.g., "Python Basics" or "Write 5 questions about machine learning")');
-    if (!topic || !topic.trim()) return;
+    if (!aiTopic.trim()) {
+      showToast('Please enter a topic or prompt', 'error');
+      return;
+    }
 
     setIsGenerating(true);
+    setShowAIModal(false);
+    showToast('Generating questions with AI...', 'info');
+
     try {
       const response = await fetch('/api/instructor/quiz/generate-ai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, count: 5 }),
+        body: JSON.stringify({ topic: aiTopic, count: 5 }),
       });
 
       const result = await response.json();
@@ -257,26 +395,30 @@ export default function ManualCreatePage() {
       }
 
       setQuestions([...questions, ...result.data.questions]);
-      alert(`✅ Generated ${result.data.questions.length} questions with AI`);
+      setAiTopic('');
+      showToast(`✅ Generated ${result.data.questions.length} questions with AI`, 'success');
     } catch (err) {
-      alert(`Error: ${err instanceof Error ? err.message : 'Failed to generate quiz'}`);
+      showToast(`Error: ${err instanceof Error ? err.message : 'Failed to generate quiz'}`, 'error');
     } finally {
       setIsGenerating(false);
     }
   };
 
+  const [createdQuizData, setCreatedQuizData] = useState<CreatedQuizData | null>(null);
+
   const handleCreateQuiz = async () => {
     if (!quizTitle.trim()) {
-      alert('Please enter a quiz title');
+      showToast('Please enter a quiz title', 'error');
       return;
     }
 
     if (questions.length === 0) {
-      alert('Please add at least one question');
+      showToast('Please add at least one question', 'error');
       return;
     }
 
     setIsCreating(true);
+    showToast('Creating quiz...', 'info');
 
     try {
       // Create quiz via API
@@ -298,33 +440,258 @@ export default function ManualCreatePage() {
         throw new Error(result.error?.message || 'Failed to create quiz');
       }
 
-      const message = `🎉 QUIZ CREATED SUCCESSFULLY!\n\n` +
-        `📌 Quiz Details:\n` +
-        `   • Title: ${result.data.title}\n` +
-        `   • Quiz Code: ${result.data.quiz_code}\n` +
-        `   • Questions: ${result.data.total_questions}\n` +
-        `   • Total Points: ${result.data.total_points}\n\n` +
-        `🔗 Share These URLs:\n\n` +
-        `📚 Practice Mode (Unlimited Attempts):\n` +
-        `   ${result.data.shareable_urls.practice}\n\n` +
-        `🎮 Game Mode (Live Class):\n` +
-        `   ${result.data.shareable_urls.game_mode}\n\n` +
-        `📋 Mock Test (Offline Practice):\n` +
-        `   ${result.data.shareable_urls.mock_test}\n\n` +
-        `💡 Copy any URL above to share with students!\n` +
-        `   Or share just the code: ${result.data.quiz_code}`;
-
-      alert(message);
-      router.push('/teach/dashboard');
+      setCreatedQuizData(result.data);
+      showToast(`🎉 Quiz "${result.data.title}" created successfully!`, 'success');
     } catch (err) {
-      alert(`Error: ${err instanceof Error ? err.message : 'Failed to create quiz'}`);
+      showToast(`Error: ${err instanceof Error ? err.message : 'Failed to create quiz'}`, 'error');
     } finally {
       setIsCreating(false);
     }
   };
 
+  // Show success screen after quiz creation
+  if (createdQuizData) {
+    return (
+      <div className="min-h-screen bg-white">
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+        {/* SUCCESS HEADER */}
+        <div style={{ backgroundColor: BRAND_COLORS.navy }} className="text-white py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-4xl font-bold">🎉 Quiz Created Successfully!</h1>
+          </div>
+        </div>
+
+        {/* SUCCESS CONTENT */}
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Quiz Details Card */}
+          <div className="mb-8 border rounded-lg p-6" style={{ borderColor: BRAND_COLORS.border }}>
+            <h2 style={{ color: BRAND_COLORS.navy }} className="text-2xl font-bold mb-4">
+              📌 Quiz Details
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', fontSize: '16px' }}>
+              <div>
+                <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', marginBottom: '4px' }}>TITLE</p>
+                <p style={{ color: BRAND_COLORS.navy, fontWeight: 'bold' }}>{createdQuizData.title}</p>
+              </div>
+              <div>
+                <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', marginBottom: '4px' }}>QUIZ CODE</p>
+                <p style={{ color: BRAND_COLORS.teal, fontWeight: 'bold', fontSize: '18px' }}>
+                  {createdQuizData.quiz_code}
+                </p>
+              </div>
+              <div>
+                <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', marginBottom: '4px' }}>QUESTIONS</p>
+                <p style={{ color: BRAND_COLORS.navy, fontWeight: 'bold' }}>
+                  {createdQuizData.total_questions} questions
+                </p>
+              </div>
+              <div>
+                <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', marginBottom: '4px' }}>TOTAL POINTS</p>
+                <p style={{ color: BRAND_COLORS.navy, fontWeight: 'bold' }}>
+                  {createdQuizData.total_points} points
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Share Links */}
+          <div className="mb-8 border rounded-lg p-6" style={{ borderColor: BRAND_COLORS.border }}>
+            <h2 style={{ color: BRAND_COLORS.navy }} className="text-2xl font-bold mb-6">
+              🔗 Share with Students
+            </h2>
+
+            {/* Practice Mode */}
+            <div className="mb-6 p-4 bg-blue-50 rounded-lg border" style={{ borderColor: '#93C5FD' }}>
+              <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">
+                📚 Practice Mode (Unlimited Attempts)
+              </p>
+              <div style={{ backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
+                <input
+                  type="text"
+                  readOnly
+                  value={createdQuizData.shareable_urls.practice}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: `2px solid ${BRAND_COLORS.teal}`,
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    cursor: 'text',
+                  }}
+                />
+              </div>
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0' }}>
+                📌 Tip: Triple-click to select all, then Ctrl+C to copy
+              </p>
+            </div>
+
+            {/* Game Mode */}
+            <div className="mb-6 p-4 bg-green-50 rounded-lg border" style={{ borderColor: '#86EFAC' }}>
+              <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">
+                🎮 Game Mode (Live Class)
+              </p>
+              <div style={{ backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
+                <input
+                  type="text"
+                  readOnly
+                  value={createdQuizData.shareable_urls.game_mode}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: `2px solid ${BRAND_COLORS.teal}`,
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    cursor: 'text',
+                  }}
+                />
+              </div>
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0' }}>
+                📌 Tip: Triple-click to select all, then Ctrl+C to copy
+              </p>
+            </div>
+
+            {/* Mock Test */}
+            <div className="mb-6 p-4 bg-orange-50 rounded-lg border" style={{ borderColor: '#FDBA74' }}>
+              <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">
+                📋 Mock Test (Offline Practice)
+              </p>
+              <div style={{ backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px', marginBottom: '8px' }}>
+                <input
+                  type="text"
+                  readOnly
+                  value={createdQuizData.shareable_urls.mock_test}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    border: `2px solid ${BRAND_COLORS.teal}`,
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    cursor: 'text',
+                  }}
+                />
+              </div>
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '0' }}>
+                📌 Tip: Triple-click to select all, then Ctrl+C to copy
+              </p>
+            </div>
+
+            {/* Quiz Code Alternative */}
+            <div className="p-4 bg-purple-50 rounded-lg border" style={{ borderColor: '#D8B4FE' }}>
+              <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">
+                💡 Or Share Just the Code
+              </p>
+              <div style={{ backgroundColor: '#F0F7FA', padding: '12px', borderRadius: '4px' }}>
+                <p style={{ color: BRAND_COLORS.teal, fontWeight: 'bold', fontSize: '18px', textAlign: 'center', margin: '0' }}>
+                  {createdQuizData.quiz_code}
+                </p>
+              </div>
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '12px', margin: '8px 0 0 0' }}>
+                Students can enter this code on the quiz player to join
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={() => router.push('/teach/dashboard')}
+              style={{ borderColor: BRAND_COLORS.gray, color: BRAND_COLORS.gray }}
+              className="px-6 py-3 border rounded-lg font-semibold hover:bg-gray-50"
+            >
+              Back to Dashboard
+            </button>
+            <button
+              onClick={() => router.push(`/teach/quiz/management?code=${createdQuizData.quiz_code}`)}
+              style={{ backgroundColor: BRAND_COLORS.teal, color: 'white' }}
+              className="px-6 py-3 rounded-lg font-semibold hover:opacity-90"
+            >
+              📊 Manage Quiz
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+      {/* AI GENERATION MODAL */}
+      {showAIModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+          }}
+          onClick={() => setShowAIModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              padding: '32px',
+              maxWidth: '500px',
+              boxShadow: '0 20px 25px rgba(0,0,0,0.15)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 style={{ color: BRAND_COLORS.navy, fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
+              🤖 Generate Quiz with AI
+            </h2>
+            <p style={{ color: BRAND_COLORS.gray, marginBottom: '20px', fontSize: '14px' }}>
+              Enter a topic or prompt and Claude will generate 5 multiple-choice questions for your quiz.
+            </p>
+            <textarea
+              value={aiTopic}
+              onChange={(e) => setAiTopic(e.target.value)}
+              placeholder="e.g., &quot;Python Basics&quot; or &quot;Write 5 questions about machine learning fundamentals&quot;"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: `2px solid ${BRAND_COLORS.border}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                marginBottom: '20px',
+                minHeight: '100px',
+                resize: 'vertical',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowAIModal(false)}
+                style={{ borderColor: BRAND_COLORS.gray, color: BRAND_COLORS.gray }}
+                className="px-4 py-2 border rounded-lg font-semibold hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAIGeneration}
+                disabled={isGenerating}
+                style={{
+                  backgroundColor: BRAND_COLORS.orange,
+                  color: 'white',
+                  opacity: isGenerating ? 0.5 : 1,
+                }}
+                className="px-4 py-2 rounded-lg font-semibold hover:opacity-90 disabled:cursor-not-allowed"
+              >
+                {isGenerating ? '⏳ Generating...' : '✨ Generate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* HEADER */}
       <div style={{ backgroundColor: BRAND_COLORS.navy }} className="text-white py-8 px-4">
         <div className="max-w-4xl mx-auto">
@@ -521,12 +888,29 @@ export default function ManualCreatePage() {
             Upload a CSV file with one question per row. Question numbers are automatically assigned in order.
           </p>
 
+          {/* LOADING STATE */}
+          {isParsingCSV && (
+            <div style={{ padding: '20px', textAlign: 'center', marginBottom: '16px' }}>
+              <div style={{ fontSize: '24px', marginBottom: '12px' }}>⏳</div>
+              <p style={{ color: BRAND_COLORS.navy, fontWeight: 'bold' }}>Parsing CSV...</p>
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '13px' }}>Processing your file, please wait</p>
+            </div>
+          )}
+
           {/* UPLOAD AREA */}
-          <div className="border-2 border-dashed rounded-lg p-8 text-center mb-6" style={{ borderColor: BRAND_COLORS.teal }}>
+          <div
+            className="border-2 border-dashed rounded-lg p-8 text-center mb-6"
+            style={{
+              borderColor: BRAND_COLORS.teal,
+              opacity: isParsingCSV ? 0.5 : 1,
+              pointerEvents: isParsingCSV ? 'none' : 'auto',
+            }}
+          >
             <input
               type="file"
               accept=".csv"
               onChange={handleCSVUpload}
+              disabled={isParsingCSV}
               className="hidden"
               id="csv-upload"
             />
@@ -577,7 +961,7 @@ export default function ManualCreatePage() {
             <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-3">📌 What Each Column Means:</p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '12px', fontSize: '13px' }}>
               <div><strong style={{ color: BRAND_COLORS.navy }}>question</strong></div>
-              <div style={{ color: BRAND_COLORS.gray }}>The question text (e.g., "What is 2+2?")</div>
+              <div style={{ color: BRAND_COLORS.gray }}>The question text (e.g., &quot;What is 2+2?&quot;)</div>
 
               <div><strong style={{ color: BRAND_COLORS.navy }}>option_a to option_e</strong></div>
               <div style={{ color: BRAND_COLORS.gray }}>The 5 answer choices</div>
@@ -600,7 +984,7 @@ export default function ManualCreatePage() {
           <div className="mt-6 p-4 bg-yellow-50 rounded-lg border" style={{ borderColor: '#FCD34D' }}>
             <p style={{ color: BRAND_COLORS.navy }} className="text-sm font-semibold mb-2">ℹ️ Question Numbering:</p>
             <p style={{ color: BRAND_COLORS.gray, fontSize: '13px', margin: 0 }}>
-              Questions are automatically numbered 1, 2, 3, etc. in the order they appear in your CSV file. You don't need to add a question number column.
+              Questions are automatically numbered 1, 2, 3, etc. in the order they appear in your CSV file. You don&apos;t need to add a question number column.
             </p>
           </div>
         </div>
@@ -613,18 +997,27 @@ export default function ManualCreatePage() {
             🤖 Generate Quiz with AI
           </h2>
           <p style={{ color: BRAND_COLORS.gray }} className="mb-6 text-sm">
-            Enter a topic and Claude will generate 5 multiple-choice questions with options and explanations.
+            Enter a topic or prompt and Claude will generate 5 multiple-choice questions with options and explanations.
           </p>
+
+          {isGenerating && (
+            <div style={{ padding: '20px', textAlign: 'center', marginBottom: '16px' }}>
+              <div style={{ fontSize: '24px', marginBottom: '12px' }}>✨</div>
+              <p style={{ color: BRAND_COLORS.navy, fontWeight: 'bold' }}>Generating quiz with AI...</p>
+              <p style={{ color: BRAND_COLORS.gray, fontSize: '13px' }}>This may take a moment</p>
+            </div>
+          )}
+
           <button
-            onClick={handleAIGeneration}
+            onClick={() => setShowAIModal(true)}
             disabled={isGenerating}
             style={{ backgroundColor: BRAND_COLORS.orange, color: 'white' }}
             className="w-full px-6 py-3 rounded-lg font-semibold hover:opacity-90 disabled:opacity-50"
           >
-            {isGenerating ? '⏳ Generating...' : '🤖 Generate Questions with AI'}
+            {isGenerating ? '✨ Generating...' : '🤖 Generate Questions with AI'}
           </button>
           <p style={{ color: BRAND_COLORS.gray }} className="text-xs mt-4">
-            Click the button and enter a topic. AI will generate 5 questions for your quiz.
+            Click the button, enter a topic, and AI will generate 5 questions for your quiz.
           </p>
         </div>
         )}

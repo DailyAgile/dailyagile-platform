@@ -14,6 +14,14 @@ export default function LoginPage() {
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [isChecking, setIsChecking] = useState(true);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [isInstructorLogin, setIsInstructorLogin] = useState(false);
+
+  useEffect(() => {
+    // Check if this is an instructor login based on redirect URL
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirect = searchParams.get('redirect') || '';
+    setIsInstructorLogin(redirect.includes('/teach') || redirect.includes('instructor'));
+  }, []);
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -81,10 +89,12 @@ export default function LoginPage() {
             />
           </Link>
           <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: 'Cambria, serif' }}>
-            Access Classroom
+            {isInstructorLogin ? '👨‍🏫 Instructor Login' : 'Access Classroom'}
           </h1>
           <p className="text-muted-foreground">
-            Sign in with your email to get started
+            {isInstructorLogin
+              ? 'Sign in to manage your quizzes and track student progress'
+              : 'Sign in with your email to get started'}
           </p>
         </div>
 

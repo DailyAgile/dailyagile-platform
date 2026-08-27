@@ -49,8 +49,8 @@ export default function HomePage() {
 
   const handleSelectMode = (_mode: 'practice' | 'mock-test') => {
     if (selectedCode) {
-      // Redirect to Quiz Hub and pass the code so user doesn't have to re-enter it
-      window.location.href = `/quizzes?code=${selectedCode}`;
+      // Redirect to SEO-friendly path-based URL for the instructor code
+      window.location.href = `/quizzes/code/${selectedCode}`;
     }
   };
 
@@ -198,6 +198,21 @@ export default function HomePage() {
             <a href="/#reviews" style={{ color: accentColor, fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>
               Testimonials
             </a>
+            <Link
+              href="/auth/login?redirect=/teach/quiz/management"
+              style={{
+                backgroundColor: ctaColor,
+                color: 'white',
+                padding: '0.5rem 1rem',
+                borderRadius: '9999px',
+                fontSize: '0.875rem',
+                fontWeight: 'bold',
+                textDecoration: 'none',
+                display: 'inline-block',
+              }}
+            >
+              Teach a Quiz
+            </Link>
             <Link
               href="/auth/login"
               style={{

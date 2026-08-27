@@ -106,25 +106,70 @@ export async function POST(
       );
     }
 
-    // Add or update the instructor role
-    const { error: upsertError } = await supabase
+    // Check if role already exists
+    const { data: existingRole } = await supabase
       .from('instructor_roles')
-      .upsert(
-        {
+      .select('id')
+      .eq('quiz_id', quizId)
+      .eq('instructor_id', targetInstructor.id)
+      .single();
+
+    let roleResponse;
+    let roleError;
+
+    if (existingRole) {
+      // Update existing role
+      const result = await supabase
+        .from('instructor_roles')
+        .update({
+          role,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('quiz_id', quizId)
+        .eq('instructor_id', targetInstructor.id)
+        .select()
+        .single();
+
+      roleResponse = result.data;
+      roleError = result.error;
+    } else {
+      // Insert new role
+      const result = await supabase
+        .from('instructor_roles')
+        .insert({
           quiz_id: quizId,
           instructor_id: targetInstructor.id,
           role,
           assigned_by: authenticatedInstructor.id,
-          assigned_at: new Date().toISOString(),
-        },
-        {
-          onConflict: 'quiz_id,instructor_id',
-        }
-      );
+        })
+        .select()
+        .single();
 
-    if (upsertError) {
-      log.error('Failed to add admin to quiz:', upsertError);
-      return apiError('INTERNAL_ERROR', 500, 'Failed to add admin to quiz');
+      roleResponse = result.data;
+      roleError = result.error;
+    }
+
+    if (roleError) {
+      log.error('Failed to manage instructor role:', {
+        error: roleError,
+        quiz_id: quizId,
+        instructor_id: targetInstructor.id,
+        operation: existingRole ? 'update' : 'insert',
+      });
+      return apiError(
+        'DATABASE_ERROR',
+        500,
+        'Failed to assign role to instructor'
+      );
+    }
+
+    if (!roleResponse) {
+      log.error('Role operation succeeded but returned no data');
+      return apiError(
+        'DATABASE_ERROR',
+        500,
+        'Role assignment did not return data'
+      );
     }
 
     log.info(

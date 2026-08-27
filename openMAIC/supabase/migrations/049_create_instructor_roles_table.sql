@@ -7,9 +7,9 @@
 CREATE TABLE instructor_roles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   quiz_id UUID NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
-  instructor_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  instructor_id UUID NOT NULL REFERENCES instructors(id) ON DELETE CASCADE,
   role TEXT NOT NULL CHECK (role IN ('owner', 'admin', 'viewer')),
-  assigned_by UUID NOT NULL REFERENCES auth.users(id),
+  assigned_by UUID NOT NULL REFERENCES instructors(id) ON DELETE CASCADE,
   assigned_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
 

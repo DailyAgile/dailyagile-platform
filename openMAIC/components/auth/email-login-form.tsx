@@ -64,55 +64,61 @@ export function EmailLoginForm({ onEmailSubmitted, isLoading = false }: EmailLog
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="space-y-4 w-full"
+      className="space-y-5 w-full"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, duration: 0.4 }}
     >
-      <div className="relative">
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-          <Mail className="h-5 w-5" />
+      {/* Email Input Label */}
+      <div>
+        <label className="block text-sm font-medium text-foreground mb-2">
+          Enter Your Instructor Email
+        </label>
+        <div className="relative">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            <Mail className="h-5 w-5" />
+          </div>
+          <input
+            ref={inputRef}
+            type="email"
+            placeholder="instructor@example.com"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError('');
+            }}
+            className={`
+              w-full rounded-xl border bg-background/60 px-4 py-3 pl-10 pr-12 text-sm
+              outline-none transition-all duration-200
+              placeholder:text-muted-foreground/50
+              focus:border-primary/40 focus:ring-2 focus:ring-primary/10
+              ${error ? 'border-destructive/50 focus:border-destructive/50 focus:ring-destructive/10' : 'border-border/60'}
+            `}
+            disabled={isSubmitting || isLoading}
+            autoComplete="email"
+          />
+          <button
+            type="submit"
+            disabled={!email || isSubmitting || isLoading}
+            className={`
+              absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center
+              justify-center rounded-lg transition-all duration-200
+              ${email && !isSubmitting && !isLoading ? 'bg-primary text-primary-foreground hover:opacity-90 cursor-pointer' : 'text-muted-foreground/30 cursor-default'}
+            `}
+          >
+            {isSubmitting || isLoading ? (
+              <LoaderCircle className="h-4 w-4 animate-spin" />
+            ) : (
+              <ArrowRight className="h-4 w-4" />
+            )}
+          </button>
         </div>
-        <input
-          ref={inputRef}
-          type="email"
-          placeholder="your@email.com"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            if (error) setError('');
-          }}
-          className={`
-            w-full rounded-xl border bg-background/60 px-4 py-3 pl-10 pr-12 text-sm
-            outline-none transition-all duration-200
-            placeholder:text-muted-foreground/50
-            focus:border-primary/40 focus:ring-2 focus:ring-primary/10
-            ${error ? 'border-destructive/50 focus:border-destructive/50 focus:ring-destructive/10' : 'border-border/60'}
-          `}
-          disabled={isSubmitting || isLoading}
-          autoComplete="email"
-        />
-        <button
-          type="submit"
-          disabled={!email || isSubmitting || isLoading}
-          className={`
-            absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center
-            justify-center rounded-lg transition-all duration-200
-            ${email && !isSubmitting && !isLoading ? 'bg-primary text-primary-foreground hover:opacity-90 cursor-pointer' : 'text-muted-foreground/30 cursor-default'}
-          `}
-        >
-          {isSubmitting || isLoading ? (
-            <LoaderCircle className="h-4 w-4 animate-spin" />
-          ) : (
-            <ArrowRight className="h-4 w-4" />
-          )}
-        </button>
       </div>
 
       <AnimatePresence mode="wait">
         {error && (
           <motion.p
-            className="text-center text-sm text-destructive"
+            className="text-center text-sm text-destructive bg-destructive/10 p-2 rounded-lg"
             initial={{ opacity: 0, y: -4, height: 0 }}
             animate={{ opacity: 1, y: 0, height: 'auto' }}
             exit={{ opacity: 0, y: -4, height: 0 }}
@@ -124,7 +130,18 @@ export function EmailLoginForm({ onEmailSubmitted, isLoading = false }: EmailLog
       </AnimatePresence>
 
       <p className="text-center text-xs text-muted-foreground">
-        We'll send a verification code to your email
+        We'll send a verification code to your email inbox
+      </p>
+
+      {/* Forgot Email Recovery Link */}
+      <p className="text-center text-xs">
+        <span className="text-muted-foreground">Don't have access to your email? </span>
+        <button
+          type="button"
+          className="text-primary hover:underline font-medium transition-colors"
+        >
+          Recover your account
+        </button>
       </p>
     </motion.form>
   );

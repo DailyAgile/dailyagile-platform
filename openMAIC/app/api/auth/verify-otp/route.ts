@@ -23,6 +23,7 @@ import { createAccessToken } from '@/lib/server/access-token';
 interface VerifyOTPRequest {
   email?: string;
   otp?: string;
+  rememberDevice?: boolean;
 }
 
 export async function POST(request: Request) {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     return apiError('INVALID_REQUEST', 400, 'Invalid JSON body');
   }
 
-  const { email, otp } = body;
+  const { email, otp, rememberDevice = false } = body;
 
   // Validate inputs
   if (!email || typeof email !== 'string' || !email.includes('@')) {
@@ -58,13 +59,18 @@ export async function POST(request: Request) {
     // This is similar to the access code system but uses email instead
     const token = createAccessToken(normalizedEmail);
 
+    // Determine session duration based on rememberDevice flag
+    const sessionDuration = rememberDevice
+      ? 60 * 60 * 24 * 30  // 30 days if remembered
+      : 60 * 60 * 24;       // 1 day if not remembered
+
     // Set authentication cookie
     const cookieStore = await cookies();
     cookieStore.set('dailyagile_auth', token, {
       httpOnly: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: sessionDuration,
       secure: process.env.NODE_ENV === 'production',
     });
 
@@ -72,9 +78,19 @@ export async function POST(request: Request) {
     cookieStore.set('dailyagile_email', normalizedEmail, {
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: sessionDuration,
       secure: process.env.NODE_ENV === 'production',
     });
+
+    // Store remember device flag for analytics/audit
+    if (rememberDevice) {
+      cookieStore.set('dailyagile_trusted_device', 'true', {
+        sameSite: 'lax',
+        path: '/',
+        maxAge: sessionDuration,
+        secure: process.env.NODE_ENV === 'production',
+      });
+    }
 
     // Clear OTP from store
     clearOTP(normalizedEmail);

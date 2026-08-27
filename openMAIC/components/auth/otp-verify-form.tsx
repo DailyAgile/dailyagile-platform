@@ -8,16 +8,18 @@ interface OTPVerifyFormProps {
   email: string;
   onSuccess: () => void;
   onBackClick: () => void;
+  onShowContactSupport?: () => void;
   isLoading?: boolean;
 }
 
-export function OTPVerifyForm({ email, onSuccess, onBackClick, isLoading = false }: OTPVerifyFormProps) {
+export function OTPVerifyForm({ email, onSuccess, onBackClick, onShowContactSupport, isLoading = false }: OTPVerifyFormProps) {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [canResend, setCanResend] = useState(false);
+  const [rememberDevice, setRememberDevice] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Countdown timer for resend button
@@ -55,7 +57,7 @@ export function OTPVerifyForm({ email, onSuccess, onBackClick, isLoading = false
       const res = await fetch('/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ email, otp, rememberDevice }),
       });
 
       const data = await res.json();
@@ -192,7 +194,20 @@ export function OTPVerifyForm({ email, onSuccess, onBackClick, isLoading = false
             </AnimatePresence>
           </form>
 
-          <div className="flex gap-2 text-center text-xs">
+          {/* Remember Device Checkbox */}
+          <label className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 hover:bg-primary/10 cursor-pointer transition-colors">
+            <input
+              type="checkbox"
+              checked={rememberDevice}
+              onChange={(e) => setRememberDevice(e.target.checked)}
+              className="w-4 h-4 rounded border-2 border-primary/30 cursor-pointer accent-primary"
+              disabled={isSubmitting || isLoading}
+            />
+            <span className="text-sm text-foreground">Remember this device for 30 days</span>
+          </label>
+
+          {/* Resend & Back Actions */}
+          <div className="flex gap-2 text-center text-sm">
             {!canResend ? (
               <p className="flex-1 text-muted-foreground">
                 Resend code in {countdown}s
@@ -202,20 +217,32 @@ export function OTPVerifyForm({ email, onSuccess, onBackClick, isLoading = false
                 type="button"
                 onClick={handleResend}
                 disabled={isSubmitting}
-                className="flex-1 text-primary hover:underline font-medium disabled:opacity-50"
+                className="flex-1 text-primary hover:underline font-medium disabled:opacity-50 transition-colors"
               >
-                Resend code
+                Didn't receive code?
               </button>
             )}
             <button
               type="button"
               onClick={onBackClick}
               disabled={isSubmitting}
-              className="flex-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+              className="flex-1 text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
             >
-              Back
+              Use different email
             </button>
           </div>
+
+          {/* Help Text */}
+          <p className="text-center text-xs text-muted-foreground mt-2">
+            Check your spam folder if you don't see the code. Need help?{' '}
+            <button
+              type="button"
+              onClick={onShowContactSupport}
+              className="text-primary hover:underline font-medium"
+            >
+              Contact support
+            </button>
+          </p>
         </motion.div>
       )}
     </AnimatePresence>

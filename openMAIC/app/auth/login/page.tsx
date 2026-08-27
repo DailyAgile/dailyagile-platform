@@ -118,6 +118,7 @@ export default function LoginPage() {
                 setAuthStep('email');
                 setSubmittedEmail('');
               }}
+              onShowContactSupport={() => setShowContactModal(true)}
             />
           )}
         </div>

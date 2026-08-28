@@ -17,13 +17,11 @@ export default function LoginPage() {
   const [isInstructorLogin, setIsInstructorLogin] = useState(false);
 
   useEffect(() => {
-    // Check if this is an instructor login based on redirect URL
     const searchParams = new URLSearchParams(window.location.search);
     const redirect = searchParams.get('redirect') || '';
     setIsInstructorLogin(redirect.includes('/teach') || redirect.includes('instructor'));
   }, []);
 
-  // Check if user is already authenticated
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -44,63 +42,129 @@ export default function LoginPage() {
 
   if (isChecking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-3">
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
+        <div style={{ textAlign: 'center' }}>
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full"
+            style={{
+              width: '32px',
+              height: '32px',
+              border: '4px solid #0891b2',
+              borderTop: '4px solid transparent',
+              borderRadius: '50%',
+              margin: '0 auto 12px',
+            }}
           />
-          <p className="text-sm text-muted-foreground">Loading...</p>
+          <p style={{ fontSize: '14px', color: '#64748b' }}>Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      {/* Background gradient */}
-      <div className="absolute inset-0 -z-10">
-        <div
-          className="absolute inset-0 opacity-30 dark:opacity-20"
-          style={{
-            backgroundImage: `
-              radial-gradient(ellipse 80% 60% at 20% 40%, var(--primary) 0%, transparent 60%),
-              radial-gradient(ellipse 60% 80% at 80% 20%, oklch(0.6 0.15 280) 0%, transparent 50%),
-              radial-gradient(ellipse 50% 50% at 60% 80%, oklch(0.5 0.12 300) 0%, transparent 50%)
-            `,
-          }}
-        />
-      </div>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '16px',
+      background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {/* Animated Background Elements */}
+      <div style={{
+        position: 'absolute',
+        top: '-50%',
+        right: '-10%',
+        width: '500px',
+        height: '500px',
+        background: 'radial-gradient(circle, rgba(8, 145, 178, 0.15) 0%, transparent 70%)',
+        borderRadius: '50%',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-30%',
+        left: '-5%',
+        width: '400px',
+        height: '400px',
+        background: 'radial-gradient(circle, rgba(30, 58, 95, 0.1) 0%, transparent 70%)',
+        borderRadius: '50%',
+        pointerEvents: 'none',
+      }} />
 
       <motion.div
-        className="w-full max-w-md"
-        initial={{ opacity: 0, y: 20 }}
+        style={{
+          width: '100%',
+          maxWidth: '480px',
+          position: 'relative',
+          zIndex: 10,
+        }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
       >
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <Link href="/" className="inline-block mb-6">
-            <img
-              src="/assets/dailyagile_logo.png"
-              alt="DailyAgile"
-              className="h-12 w-auto"
-              style={{ height: '48px', width: 'auto', maxWidth: '100%' }}
-            />
-          </Link>
-          <h1 className="text-3xl font-bold text-foreground mb-2" style={{ fontFamily: 'Cambria, serif' }}>
-            {isInstructorLogin ? '👨‍🏫 Instructor Login' : 'Access Classroom'}
-          </h1>
-          <p className="text-muted-foreground">
-            {isInstructorLogin
-              ? 'Sign in to manage your quizzes and track student progress'
-              : 'Sign in with your email to get started'}
-          </p>
+        {/* Logo & Header */}
+        <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            style={{ marginBottom: '24px' }}
+          >
+            <Link href="/" style={{ display: 'inline-block', textDecoration: 'none' }}>
+              <img
+                src="/assets/dailyagile_logo.png"
+                alt="DailyAgile"
+                style={{ height: '50px', width: 'auto', maxWidth: '100%' }}
+              />
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <h1 style={{
+              fontSize: '32px',
+              fontWeight: '700',
+              color: '#1e3a5f',
+              margin: '0 0 12px 0',
+              fontFamily: 'Cambria, serif',
+            }}>
+              {isInstructorLogin ? '👨‍🏫 Instructor' : '📚 Access'} {isInstructorLogin ? 'Portal' : 'Classroom'}
+            </h1>
+            <p style={{
+              fontSize: '16px',
+              color: '#64748b',
+              margin: '0',
+              lineHeight: '1.6',
+            }}>
+              {isInstructorLogin
+                ? 'Securely manage quizzes and track student progress'
+                : 'Sign in to your learning dashboard'}
+            </p>
+          </motion.div>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-border/50 bg-card/80 p-8 shadow-xl shadow-black/5 backdrop-blur-xl dark:bg-card/60 dark:shadow-black/20">
+        {/* Main Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          style={{
+            background: '#ffffff',
+            borderRadius: '16px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.08)',
+            padding: '40px 32px',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(8, 145, 178, 0.1)',
+            marginBottom: '24px',
+          }}
+        >
           {authStep === 'email' ? (
             <EmailLoginForm
               onEmailSubmitted={(email) => {
@@ -121,18 +185,37 @@ export default function LoginPage() {
               onShowContactSupport={() => setShowContactModal(true)}
             />
           )}
-        </div>
+        </motion.div>
 
-        {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Need help?{' '}
+        {/* Footer Help Text */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          style={{
+            textAlign: 'center',
+            fontSize: '13px',
+            color: '#64748b',
+            margin: '0',
+            lineHeight: '1.6',
+          }}
+        >
+          Secured with OTP verification. Your data is encrypted end-to-end.{' '}
           <button
             onClick={() => setShowContactModal(true)}
-            className="text-primary hover:underline bg-transparent border-none cursor-pointer"
+            style={{
+              color: '#0891b2',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              textDecoration: 'underline',
+              font: 'inherit',
+              fontWeight: '500',
+            }}
           >
-            Contact support
+            Need help?
           </button>
-        </p>
+        </motion.p>
       </motion.div>
 
       {/* Contact Support Modal */}

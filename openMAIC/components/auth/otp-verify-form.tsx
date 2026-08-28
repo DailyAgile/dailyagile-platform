@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, ShieldCheck, LoaderCircle, CheckCircle } from 'lucide-react';
+import { ArrowRight, LoaderCircle, CheckCircle } from 'lucide-react';
 
 interface OTPVerifyFormProps {
   email: string;
@@ -110,40 +110,61 @@ export function OTPVerifyForm({ email, onSuccess, onBackClick, onShowContactSupp
       {success ? (
         <motion.div
           key="success"
-          className="flex flex-col items-center gap-4"
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
         >
           <motion.div
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/20"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              background: 'rgba(16, 185, 129, 0.15)',
+            }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           >
-            <CheckCircle className="h-8 w-8 text-emerald-500" />
+            <CheckCircle size={32} color="#10b981" />
           </motion.div>
-          <p className="text-center text-sm font-medium text-emerald-600">
-            Welcome! Redirecting to classroom...
+          <p style={{ textAlign: 'center', fontSize: '14px', fontWeight: '500', color: '#059669', margin: '0' }}>
+            ✓ Verified! Redirecting to your dashboard...
           </p>
         </motion.div>
       ) : (
         <motion.div
           key="form"
-          className="space-y-4 w-full"
-          initial={{ opacity: 0, y: 8 }}
+          style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <div className="text-center mb-2">
-            <p className="text-sm text-muted-foreground">
-              Verification code sent to
+          {/* Email Confirmation */}
+          <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 4px 0' }}>
+              Verification code sent to:
             </p>
-            <p className="text-sm font-medium text-foreground">{email}</p>
+            <p style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b', margin: '0' }}>
+              {email}
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="relative">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* OTP Input */}
+            <div style={{ position: 'relative' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#1e293b',
+                marginBottom: '8px',
+              }}>
+                Enter 6-Digit Code
+              </label>
               <input
                 ref={inputRef}
                 type="text"
@@ -151,73 +172,138 @@ export function OTPVerifyForm({ email, onSuccess, onBackClick, onShowContactSupp
                 value={otp}
                 onChange={(e) => handleOtpChange(e.target.value)}
                 maxLength={6}
-                className={`
-                  w-full rounded-xl border bg-background/60 px-4 py-3 text-center text-2xl font-bold
-                  outline-none transition-all duration-200 tracking-widest
-                  placeholder:text-muted-foreground/50
-                  focus:border-primary/40 focus:ring-2 focus:ring-primary/10
-                  ${error ? 'border-destructive/50 focus:border-destructive/50 focus:ring-destructive/10' : 'border-border/60'}
-                `}
+                style={{
+                  width: '100%',
+                  padding: '16px 48px 16px 16px',
+                  border: error ? '2px solid #ef4444' : '2px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  letterSpacing: '8px',
+                  fontFamily: 'monospace',
+                  outline: 'none',
+                  background: error ? 'rgba(239, 68, 68, 0.05)' : '#f8fafc',
+                  transition: 'all 0.2s ease',
+                  boxSizing: 'border-box',
+                }}
                 disabled={isSubmitting || isLoading}
                 autoComplete="one-time-code"
                 inputMode="numeric"
+                onFocus={(e) => {
+                  e.target.style.borderColor = error ? '#ef4444' : '#0891b2';
+                  e.target.style.boxShadow = error ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : '0 0 0 3px rgba(8, 145, 178, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = error ? '#ef4444' : '#e2e8f0';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
               <button
                 type="submit"
                 disabled={otp.length !== 6 || isSubmitting || isLoading}
-                className={`
-                  absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center
-                  justify-center rounded-lg transition-all duration-200
-                  ${otp.length === 6 && !isSubmitting && !isLoading ? 'bg-primary text-primary-foreground hover:opacity-90 cursor-pointer' : 'text-muted-foreground/30 cursor-default'}
-                `}
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  top: 'calc(50% + 12px)',
+                  transform: 'translateY(-50%)',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: 'none',
+                  borderRadius: '8px',
+                  background: otp.length === 6 && !isSubmitting && !isLoading ? '#0891b2' : '#cbd5e1',
+                  color: '#ffffff',
+                  cursor: otp.length === 6 && !isSubmitting && !isLoading ? 'pointer' : 'not-allowed',
+                  transition: 'all 0.2s ease',
+                  padding: '0',
+                }}
               >
                 {isSubmitting || isLoading ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                  <LoaderCircle size={16} style={{ animation: 'spin 1s linear infinite' }} />
                 ) : (
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight size={16} />
                 )}
               </button>
             </div>
 
+            {/* Error Message */}
             <AnimatePresence mode="wait">
               {error && (
-                <motion.p
-                  className="text-center text-sm text-destructive"
-                  initial={{ opacity: 0, y: -4, height: 0 }}
-                  animate={{ opacity: 1, y: 0, height: 'auto' }}
-                  exit={{ opacity: 0, y: -4, height: 0 }}
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
+                  style={{
+                    background: '#fee2e2',
+                    border: '1px solid #fecaca',
+                    borderRadius: '8px',
+                    padding: '10px 12px',
+                  }}
                 >
-                  {error}
-                </motion.p>
+                  <p style={{ margin: '0', fontSize: '13px', color: '#dc2626' }}>{error}</p>
+                </motion.div>
               )}
             </AnimatePresence>
           </form>
 
-          {/* Remember Device Checkbox */}
-          <label className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 hover:bg-primary/10 cursor-pointer transition-colors">
+          {/* Remember Device */}
+          <label style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '12px 14px',
+            borderRadius: '10px',
+            background: 'rgba(8, 145, 178, 0.05)',
+            cursor: isSubmitting || isLoading ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => !isSubmitting && !isLoading && (e.currentTarget.style.background = 'rgba(8, 145, 178, 0.1)')}
+          onMouseLeave={(e) => !isSubmitting && !isLoading && (e.currentTarget.style.background = 'rgba(8, 145, 178, 0.05)')}
+          >
             <input
               type="checkbox"
               checked={rememberDevice}
               onChange={(e) => setRememberDevice(e.target.checked)}
-              className="w-4 h-4 rounded border-2 border-primary/30 cursor-pointer accent-primary"
+              style={{
+                width: '18px',
+                height: '18px',
+                cursor: isSubmitting || isLoading ? 'not-allowed' : 'pointer',
+                accentColor: '#0891b2',
+              }}
               disabled={isSubmitting || isLoading}
             />
-            <span className="text-sm text-foreground">Remember this device for 30 days</span>
+            <span style={{ fontSize: '14px', color: '#1e293b', margin: '0' }}>
+              Remember this device for 30 days
+            </span>
           </label>
 
           {/* Resend & Back Actions */}
-          <div className="flex gap-2 text-center text-sm">
+          <div style={{ display: 'flex', gap: '12px', fontSize: '13px' }}>
             {!canResend ? (
-              <p className="flex-1 text-muted-foreground">
+              <div style={{ flex: 1, textAlign: 'center', color: '#64748b' }}>
                 Resend code in {countdown}s
-              </p>
+              </div>
             ) : (
               <button
                 type="button"
                 onClick={handleResend}
                 disabled={isSubmitting}
-                className="flex-1 text-primary hover:underline font-medium disabled:opacity-50 transition-colors"
+                style={{
+                  flex: 1,
+                  background: 'none',
+                  border: 'none',
+                  color: '#0891b2',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  fontWeight: '500',
+                  textDecoration: 'underline',
+                  font: 'inherit',
+                  opacity: isSubmitting ? 0.5 : 1,
+                  transition: 'opacity 0.2s',
+                }}
               >
                 Didn't receive code?
               </button>
@@ -226,21 +312,44 @@ export function OTPVerifyForm({ email, onSuccess, onBackClick, onShowContactSupp
               type="button"
               onClick={onBackClick}
               disabled={isSubmitting}
-              className="flex-1 text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors"
+              style={{
+                flex: 1,
+                background: 'none',
+                border: 'none',
+                color: '#64748b',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                font: 'inherit',
+                opacity: isSubmitting ? 0.5 : 1,
+                transition: 'opacity 0.2s',
+              }}
             >
               Use different email
             </button>
           </div>
 
           {/* Help Text */}
-          <p className="text-center text-xs text-muted-foreground mt-2">
-            Check your spam folder if you don't see the code. Need help?{' '}
+          <p style={{
+            textAlign: 'center',
+            fontSize: '12px',
+            color: '#64748b',
+            margin: '0',
+            lineHeight: '1.5',
+          }}>
+            Check spam folder if needed. {' '}
             <button
               type="button"
               onClick={onShowContactSupport}
-              className="text-primary hover:underline font-medium"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#0891b2',
+                cursor: 'pointer',
+                fontWeight: '500',
+                textDecoration: 'underline',
+                font: 'inherit',
+              }}
             >
-              Contact support
+              Get help
             </button>
           </p>
         </motion.div>

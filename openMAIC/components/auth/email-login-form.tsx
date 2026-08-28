@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Mail, LoaderCircle } from 'lucide-react';
+import { Mail, ArrowRight, LoaderCircle } from 'lucide-react';
 
 interface EmailLoginFormProps {
   onEmailSubmitted: (email: string) => void;
@@ -64,85 +64,145 @@ export function EmailLoginForm({ onEmailSubmitted, isLoading = false }: EmailLog
   return (
     <motion.form
       onSubmit={handleSubmit}
-      className="space-y-5 w-full"
-      initial={{ opacity: 0, y: 8 }}
+      style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '20px' }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2, duration: 0.4 }}
     >
-      {/* Email Input Label */}
+      {/* Email Input */}
       <div>
-        <label className="block text-sm font-medium text-foreground mb-2">
+        <label style={{
+          display: 'block',
+          fontSize: '14px',
+          fontWeight: '600',
+          color: '#1e293b',
+          marginBottom: '8px',
+        }}>
           Enter Your Instructor Email
         </label>
-        <div className="relative">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-            <Mail className="h-5 w-5" />
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            position: 'absolute',
+            left: '12px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            color: '#94a3b8',
+            display: 'flex',
+            alignItems: 'center',
+          }}>
+            <Mail size={18} />
           </div>
           <input
             ref={inputRef}
             type="email"
-            placeholder="instructor@example.com"
+            placeholder="you@example.com"
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
               if (error) setError('');
             }}
-            className={`
-              w-full rounded-xl border bg-background/60 px-4 py-3 pl-10 pr-12 text-sm
-              outline-none transition-all duration-200
-              placeholder:text-muted-foreground/50
-              focus:border-primary/40 focus:ring-2 focus:ring-primary/10
-              ${error ? 'border-destructive/50 focus:border-destructive/50 focus:ring-destructive/10' : 'border-border/60'}
-            `}
+            style={{
+              width: '100%',
+              padding: '12px 16px 12px 40px',
+              border: error ? '2px solid #ef4444' : '2px solid #e2e8f0',
+              borderRadius: '10px',
+              fontSize: '15px',
+              fontFamily: 'inherit',
+              outline: 'none',
+              background: error ? 'rgba(239, 68, 68, 0.05)' : '#f8fafc',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box',
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = error ? '#ef4444' : '#0891b2';
+              e.target.style.boxShadow = error ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : '0 0 0 3px rgba(8, 145, 178, 0.1)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = error ? '#ef4444' : '#e2e8f0';
+              e.target.style.boxShadow = 'none';
+            }}
             disabled={isSubmitting || isLoading}
             autoComplete="email"
           />
           <button
             type="submit"
             disabled={!email || isSubmitting || isLoading}
-            className={`
-              absolute right-2 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center
-              justify-center rounded-lg transition-all duration-200
-              ${email && !isSubmitting && !isLoading ? 'bg-primary text-primary-foreground hover:opacity-90 cursor-pointer' : 'text-muted-foreground/30 cursor-default'}
-            `}
+            style={{
+              position: 'absolute',
+              right: '8px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '32px',
+              height: '32px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: 'none',
+              borderRadius: '8px',
+              background: email && !isSubmitting && !isLoading ? '#0891b2' : '#cbd5e1',
+              color: '#ffffff',
+              cursor: email && !isSubmitting && !isLoading ? 'pointer' : 'not-allowed',
+              transition: 'all 0.2s ease',
+              padding: '0',
+            }}
           >
             {isSubmitting || isLoading ? (
-              <LoaderCircle className="h-4 w-4 animate-spin" />
+              <LoaderCircle size={16} style={{ animation: 'spin 1s linear infinite' }} />
             ) : (
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight size={16} />
             )}
           </button>
         </div>
       </div>
 
+      {/* Error Message */}
       <AnimatePresence mode="wait">
         {error && (
-          <motion.p
-            className="text-center text-sm text-destructive bg-destructive/10 p-2 rounded-lg"
-            initial={{ opacity: 0, y: -4, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: -4, height: 0 }}
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
+            style={{
+              background: '#fee2e2',
+              border: '1px solid #fecaca',
+              borderRadius: '8px',
+              padding: '10px 12px',
+            }}
           >
-            {error}
-          </motion.p>
+            <p style={{ margin: '0', fontSize: '13px', color: '#dc2626' }}>{error}</p>
+          </motion.div>
         )}
       </AnimatePresence>
 
-      <p className="text-center text-xs text-muted-foreground">
-        We'll send a verification code to your email inbox
-      </p>
-
-      {/* Forgot Email Recovery Link */}
-      <p className="text-center text-xs">
-        <span className="text-muted-foreground">Don't have access to your email? </span>
-        <button
-          type="button"
-          className="text-primary hover:underline font-medium transition-colors"
-        >
-          Recover your account
-        </button>
-      </p>
+      {/* Help Text */}
+      <div style={{
+        textAlign: 'center',
+        fontSize: '13px',
+        color: '#64748b',
+        lineHeight: '1.5',
+      }}>
+        <p style={{ margin: '0 0 12px 0' }}>
+          We'll send a 6-digit verification code to your email
+        </p>
+        <p style={{ margin: '0' }}>
+          <span>Don't have access to your email? </span>
+          <button
+            type="button"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#0891b2',
+              cursor: 'pointer',
+              fontWeight: '500',
+              textDecoration: 'underline',
+              font: 'inherit',
+            }}
+          >
+            Recover your account
+          </button>
+        </p>
+      </div>
     </motion.form>
   );
 }

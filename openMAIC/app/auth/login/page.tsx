@@ -176,7 +176,7 @@ export default function LoginPage() {
             <OTPVerifyForm
               email={submittedEmail}
               onSuccess={() => {
-                router.replace('/classroom');
+                router.replace(isInstructorLogin ? '/teach/quiz/management' : '/classroom');
               }}
               onBackClick={() => {
                 setAuthStep('email');

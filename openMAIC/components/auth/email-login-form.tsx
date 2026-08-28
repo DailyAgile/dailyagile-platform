@@ -183,10 +183,10 @@ export function EmailLoginForm({ onEmailSubmitted, isLoading = false }: EmailLog
         lineHeight: '1.5',
       }}>
         <p style={{ margin: '0 0 12px 0' }}>
-          We'll send a 6-digit verification code to your email
+          We&apos;ll send a 6-digit verification code to your email
         </p>
         <p style={{ margin: '0' }}>
-          <span>Don't have access to your email? </span>
+          <span>Don&apos;t have access to your email? </span>
           <button
             type="button"
             style={{

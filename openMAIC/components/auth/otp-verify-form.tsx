@@ -305,7 +305,7 @@ export function OTPVerifyForm({ email, onSuccess, onBackClick, onShowContactSupp
                   transition: 'opacity 0.2s',
                 }}
               >
-                Didn't receive code?
+                Didn&apos;t receive code?
               </button>
             )}
             <button

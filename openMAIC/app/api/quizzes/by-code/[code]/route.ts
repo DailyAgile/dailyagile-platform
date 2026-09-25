@@ -2,11 +2,13 @@
  * GET /api/quizzes/by-code/:code
  * Returns all published quizzes created by an instructor with the given code
  * Code is derived from instructor ID (e.g., first 8 digits of UUID)
+ * RATE LIMITED: 20 lookups per minute per code
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/server/rate-limiter';
 
 const log = createLogger('QuizzesByCodeAPI');
 
@@ -93,6 +95,23 @@ export async function GET(
           error: { message: 'Invalid code format', code: 'INVALID_CODE' },
         },
         { status: 400 }
+      );
+    }
+
+    // 🔒 RATE LIMITING: Prevent brute-force attacks on quiz codes
+    const rateLimitResult = await checkRateLimit(
+      `quiz-code-lookup:${code}`,
+      RATE_LIMITS.QUIZ_CODE_LOOKUP.limit,
+      RATE_LIMITS.QUIZ_CODE_LOOKUP.window
+    );
+    if (!rateLimitResult.allowed) {
+      log.warn(`Rate limit exceeded for code lookup: ${code}`);
+      return NextResponse.json(
+        {
+          success: false,
+          error: { message: RATE_LIMITS.QUIZ_CODE_LOOKUP.message, code: 'RATE_LIMITED' },
+        },
+        { status: 429 }
       );
     }
 
@@ -192,14 +211,13 @@ export async function GET(
         created_at: string;
       }) => ({
         id: q.id,
-        code: q.quiz_code,
+        quiz_code: q.quiz_code,
         title: q.title,
         description: q.description,
-        questionCount: q.total_questions,
-        createdBy: q.created_by || 'instructor',
-        isPublished: q.is_published,
-        status: q.is_published ? ('published' as const) : ('draft' as const),
-        createdAt: q.created_at,
+        total_questions: q.total_questions,
+        created_by: q.created_by || 'instructor',
+        is_published: q.is_published,
+        created_at: q.created_at,
       })
     );
 

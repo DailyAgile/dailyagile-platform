@@ -154,4 +154,11 @@ export const RATE_LIMITS = {
     window: 86400, // 24 hours
     message: 'Daily export limit reached. You can export your data 3 times per day. Please try again tomorrow.',
   },
+
+  // Quiz code lookup: 20 per minute (prevents brute-force attacks on 8-digit codes)
+  QUIZ_CODE_LOOKUP: {
+    limit: 20,
+    window: 60, // 1 minute
+    message: 'Too many code lookups. Please try again in a moment.',
+  },
 } as const;

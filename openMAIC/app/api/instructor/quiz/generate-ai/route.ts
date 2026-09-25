@@ -246,9 +246,9 @@ Return ONLY the JSON array, no other text.`,
     log.error('Error generating quiz:', error);
     const message = error instanceof Error ? error.message : 'Failed to generate quiz';
 
-    // Handle timeout specifically
+    // Handle timeout specifically (AbortError is thrown when timeout triggers)
     if (message.includes('AbortError') || message.includes('timeout')) {
-      return apiError('REQUEST_TIMEOUT', 504, 'AI generation took too long. Please try again.');
+      return apiError('INTERNAL_ERROR', 504, 'AI generation took too long. Please try again with a smaller question count.');
     }
 
     return apiError('INTERNAL_ERROR', 500, message);

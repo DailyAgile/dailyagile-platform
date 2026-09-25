@@ -3,11 +3,14 @@
  * POST /api/instructor/quiz/update-quiz
  * Updates quiz title and all question details
  * 🚩 Feature Flag: quiz_editing
+ * REQUIRES: Instructor authentication (verified) + quiz ownership
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
+import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
 
 const log = createLogger('UpdateQuiz');
 
@@ -35,34 +38,64 @@ interface UpdateQuizRequest {
   }>;
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let authenticatedInstructor;
+    try {
+      authenticatedInstructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
     const body = (await req.json()) as UpdateQuizRequest;
 
     if (!body.id) {
-      return NextResponse.json(
-        { error: { message: 'Missing quiz ID' } },
-        { status: 400 }
+      return apiError(
+        'MISSING_REQUIRED_FIELD',
+        400,
+        'Missing quiz ID'
       );
     }
 
+    const supabase = getSupabaseClient();
+
+    // 🔒 AUTHORIZATION: Verify quiz exists AND instructor owns it
+    const { data: quiz, error: quizError } = await supabase
+      .from('quizzes')
+      .select('id, instructor_id, title')
+      .eq('id', body.id)
+      .single();
+
+    if (quizError || !quiz) {
+      log.warn(
+        `FORBIDDEN: Instructor ${authenticatedInstructor.email} attempted to update non-existent quiz ${body.id}`
+      );
+      return apiError('NOT_FOUND', 404, 'Quiz not found');
+    }
+
+    if (quiz.instructor_id !== authenticatedInstructor.id) {
+      log.warn(
+        `FORBIDDEN: Instructor ${authenticatedInstructor.email} attempted to update quiz ${body.id} owned by ${quiz.instructor_id}`
+      );
+      return apiError('FORBIDDEN', 403, 'You do not have permission to edit this quiz');
+    }
+
     // Update quiz title
-    const { error: updateError } = await getSupabaseClient()
+    const { error: updateError } = await supabase
       .from('quizzes')
       .update({ title: body.title })
       .eq('id', body.id);
 
     if (updateError) {
       log.error('Error updating quiz title:', updateError);
-      return NextResponse.json(
-        { error: { message: 'Failed to update quiz title' } },
-        { status: 500 }
-      );
+      return apiError('INTERNAL_ERROR', 500, 'Failed to update quiz title');
     }
 
     // Update all questions
     for (const question of body.questions) {
-      const { error: questionError } = await getSupabaseClient()
+      const { error: questionError } = await supabase
         .from('quiz_questions')
         .update({
           question: question.question,
@@ -81,16 +114,13 @@ export async function POST(req: NextRequest) {
 
       if (questionError) {
         log.error(`Error updating question ${question.id}:`, questionError);
-        return NextResponse.json(
-          { error: { message: `Failed to update question ${question.question_number}` } },
-          { status: 500 }
-        );
+        return apiError('INTERNAL_ERROR', 500, `Failed to update question ${question.question_number}`);
       }
     }
 
-    log.info(`Quiz ${body.id} updated successfully`);
+    log.info(`Quiz ${body.id} updated successfully by instructor ${authenticatedInstructor.email}`);
 
-    return NextResponse.json({
+    return apiSuccess({
       success: true,
       data: {
         quiz_id: body.id,
@@ -100,9 +130,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     log.error('Unexpected error:', error);
-    return NextResponse.json(
-      { error: { message: 'Internal server error' } },
-      { status: 500 }
-    );
+    return apiError('INTERNAL_ERROR', 500, 'Internal server error');
   }
 }

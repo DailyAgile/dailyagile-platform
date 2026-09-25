@@ -57,8 +57,10 @@ export async function DELETE(
     const supabase = getSupabaseClient();
 
     // 🔒 AUTHORIZATION: Verify quiz exists AND instructor owns it
-    // In development: test instructors can delete any quiz for testing purposes
-    const isTestInstructor = authenticatedInstructor.email === 'test.instructor@example.com';
+    // In development only: test instructors can delete any quiz for testing purposes
+    // Gated by explicit environment variable to prevent production bypass
+    const allowTestBypass = process.env.ALLOW_TEST_INSTRUCTOR_BYPASS === 'true' && process.env.NODE_ENV !== 'production';
+    const isTestInstructor = allowTestBypass && authenticatedInstructor.email === 'test.instructor@example.com';
 
     let quizQuery = supabase
       .from('quizzes')

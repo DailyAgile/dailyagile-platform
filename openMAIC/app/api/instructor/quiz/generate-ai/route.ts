@@ -5,7 +5,7 @@
  * REQUIRES: Instructor authentication (verified)
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createLogger } from '@/lib/logger';
 import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
 import { apiError, apiSuccess } from '@/lib/server/api-response';

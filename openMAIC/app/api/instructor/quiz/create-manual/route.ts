@@ -13,21 +13,23 @@ import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware
 const log = createLogger('CreateManual');
 
 
+interface ManualQuestion {
+  question_number: number;
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d: string;
+  option_e: string;
+  correct_answer: string;
+  explanation: string;
+  source_link: string;
+  timer_seconds: string;
+}
+
 interface ManualQuizRequest {
   title: string;
-  questions: Array<{
-    question_number: number;
-    question: string;
-    option_a: string;
-    option_b: string;
-    option_c: string;
-    option_d: string;
-    option_e: string;
-    correct_answer: string;
-    explanation: string;
-    source_link: string;
-    timer_seconds: string;
-  }>;
+  questions: ManualQuestion[];
 }
 
 export async function POST(req: NextRequest) {
@@ -94,7 +96,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert questions
-    const questionsToInsert = questions.map((q: any) => ({
+    const questionsToInsert = questions.map((q: ManualQuestion) => ({
       quiz_id: quiz.id,
       question_number: q.question_number,
       question: q.question,

@@ -16,23 +16,32 @@ const log = createLogger('API:SubmitSimple');
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { quizCode, answers } = body;
+    const { quizId, quizCode, answers } = body;
 
-    if (!quizCode || !answers) {
-      return apiError('MISSING_PARAM', 400, 'quizCode and answers required');
+    if (!answers) {
+      return apiError('MISSING_PARAM', 400, 'answers required');
+    }
+
+    if (!quizId && !quizCode) {
+      return apiError('MISSING_PARAM', 400, 'quizId or quizCode required');
     }
 
     const supabase = getSupabaseClient();
 
-    // Find quiz by code
-    const { data: quiz, error: quizError } = await supabase
-      .from('quizzes')
-      .select('id, title')
-      .ilike('quiz_code', quizCode)
-      .single();
+    // Find quiz by ID or code
+    let quizQuery = supabase.from('quizzes').select('id, title');
+
+    if (quizId) {
+      quizQuery = quizQuery.eq('id', quizId);
+    } else {
+      quizQuery = quizQuery.ilike('quiz_code', quizCode);
+    }
+
+    const { data: quiz, error: quizError } = await quizQuery.single();
 
     if (quizError || !quiz) {
-      log.warn(`Quiz not found: ${quizCode}`);
+      const identifier = quizId || quizCode;
+      log.warn(`Quiz not found: ${identifier}`);
       return apiError('NOT_FOUND', 404, 'Quiz not found');
     }
 

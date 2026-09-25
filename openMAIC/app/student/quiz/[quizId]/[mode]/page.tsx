@@ -47,6 +47,7 @@ export default function QuizPlayerPage() {
   const mode = (params.mode as string) || 'practice'; // practice | mock-test | game-mode
 
   const [quizData, setQuizData] = useState<QuizData | null>(null);
+  const [quizCode, setQuizCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -75,6 +76,10 @@ export default function QuizPlayerPage() {
         }
 
         setQuizData(data);
+        // Store the quiz code for submission
+        if (data.quiz_code) {
+          setQuizCode(data.quiz_code);
+        }
       } catch (err) {
         console.error('Error loading quiz:', err);
         setError(err instanceof Error ? err.message : 'Failed to load quiz');
@@ -145,7 +150,8 @@ export default function QuizPlayerPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          quizCode: quizData!.quiz_code,
+          quizId: quizId,
+          quizCode: quizCode,
           answers: answersArray,
         }),
       });

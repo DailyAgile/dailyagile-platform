@@ -2,16 +2,32 @@
  * Generate Quiz with AI
  * POST /api/instructor/quiz/generate-ai
  * 🚩 Feature Flag: ai_quiz_generation
+ * REQUIRES: Instructor authentication (verified)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/logger';
+import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
+import { apiError, apiSuccess } from '@/lib/server/api-response';
 
 const log = createLogger('GenerateAI');
 
 interface GenerateRequest {
   topic: string;
   count?: number;
+}
+
+interface GeneratedQuestion {
+  question?: string;
+  option_a?: string;
+  option_b?: string;
+  option_c?: string;
+  option_d?: string;
+  option_e?: string;
+  correct_answer?: string;
+  explanation?: string;
+  source_link?: string;
+  timer_seconds?: string | number;
 }
 
 // Demo questions for when API key is not available
@@ -82,19 +98,29 @@ const generateDemoQuestions = (topic: string, count: number) => {
   return demoQuestions.slice(0, Math.min(count, demoQuestions.length));
 };
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let authenticatedInstructor;
+    try {
+      authenticatedInstructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return apiError('UNAUTHORIZED', status, message);
+    }
+
     const body = (await req.json()) as GenerateRequest;
     const { topic, count = 5 } = body;
 
     if (!topic || topic.trim().length === 0) {
-      return NextResponse.json(
-        { error: { message: 'Topic is required' } },
-        { status: 400 }
+      return apiError(
+        'INVALID_REQUEST',
+        400,
+        'Topic is required'
       );
     }
 
-    log.info(`Generating ${count} quiz questions for topic: "${topic}"`);
+    log.info(`Instructor ${authenticatedInstructor.email} generating ${count} quiz questions for topic: "${topic}"`);
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -102,7 +128,7 @@ export async function POST(req: NextRequest) {
     if (!apiKey) {
       log.warn('ANTHROPIC_API_KEY not configured, using demo questions');
       const demoQuestions = generateDemoQuestions(topic, count);
-      return NextResponse.json({
+      return apiSuccess({
         success: true,
         data: {
           questions: demoQuestions,
@@ -111,21 +137,26 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Call Anthropic Claude API
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2000,
-        messages: [
-          {
-            role: 'user',
-            content: `Generate exactly ${count} multiple-choice quiz questions about: ${topic}
+    // Call Anthropic Claude API with 30-second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+    let response: Response;
+    try {
+      response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 2000,
+          messages: [
+            {
+              role: 'user',
+              content: `Generate exactly ${count} multiple-choice quiz questions about: ${topic}
 
 For each question, provide:
 - A clear question
@@ -150,17 +181,21 @@ Format as JSON array:
 ]
 
 Return ONLY the JSON array, no other text.`,
-          },
-        ],
-      }),
-    });
+            },
+          ],
+        }),
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!response.ok) {
       const error = await response.text();
       log.error('Claude API error:', error);
       // Fallback to demo questions on API error
       const demoQuestions = generateDemoQuestions(topic, count);
-      return NextResponse.json({
+      return apiSuccess({
         success: true,
         data: {
           questions: demoQuestions,
@@ -186,7 +221,7 @@ Return ONLY the JSON array, no other text.`,
     }
 
     // Ensure all questions have required fields
-    const validatedQuestions = questions.map((q: any) => ({
+    const validatedQuestions = questions.map((q: GeneratedQuestion) => ({
       question: q.question || '',
       option_a: q.option_a || '',
       option_b: q.option_b || '',
@@ -199,9 +234,9 @@ Return ONLY the JSON array, no other text.`,
       timer_seconds: q.timer_seconds || '60',
     }));
 
-    log.info(`Successfully generated ${validatedQuestions.length} questions`);
+    log.info(`Successfully generated ${validatedQuestions.length} questions for instructor ${authenticatedInstructor.email}`);
 
-    return NextResponse.json({
+    return apiSuccess({
       success: true,
       data: {
         questions: validatedQuestions,
@@ -209,9 +244,13 @@ Return ONLY the JSON array, no other text.`,
     });
   } catch (error) {
     log.error('Error generating quiz:', error);
-    return NextResponse.json(
-      { error: { message: error instanceof Error ? error.message : 'Failed to generate quiz' } },
-      { status: 500 }
-    );
+    const message = error instanceof Error ? error.message : 'Failed to generate quiz';
+
+    // Handle timeout specifically
+    if (message.includes('AbortError') || message.includes('timeout')) {
+      return apiError('REQUEST_TIMEOUT', 504, 'AI generation took too long. Please try again.');
+    }
+
+    return apiError('INTERNAL_ERROR', 500, message);
   }
 }

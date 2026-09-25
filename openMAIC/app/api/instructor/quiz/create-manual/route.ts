@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
+import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
 
 const log = createLogger('CreateManual');
 
@@ -31,6 +32,15 @@ interface ManualQuizRequest {
 
 export async function POST(req: NextRequest) {
   try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let authenticatedInstructor;
+    try {
+      authenticatedInstructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return NextResponse.json({ error: { message } }, { status });
+    }
+
     const body = (await req.json()) as ManualQuizRequest;
 
     const { title, questions } = body;
@@ -47,9 +57,9 @@ export async function POST(req: NextRequest) {
     // Database will auto-generate unique 8-digit numeric quiz code
     // No need to generate here - let the DB function handle it
 
-    // Default instructor/classroom
-    const instructorClassroomId = 'a0000000-0000-0000-0000-000000000001';
-    const instructorId = 'a0000000-0000-0000-0000-000000000001';
+    // Use authenticated instructor's ID
+    const instructorId = authenticatedInstructor.id;
+    const instructorClassroomId = authenticatedInstructor.id;
 
     // Ensure classroom exists
     await getSupabaseClient()
@@ -84,7 +94,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert questions
-    const questionsToInsert = questions.map((q) => ({
+    const questionsToInsert = questions.map((q: any) => ({
       quiz_id: quiz.id,
       question_number: q.question_number,
       question: q.question,

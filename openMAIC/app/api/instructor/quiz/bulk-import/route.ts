@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
+import { requireInstructor, handleAuthError } from '@/lib/server/auth-middleware';
 
 const log = createLogger('BulkImport');
 
@@ -22,6 +23,20 @@ interface CSVRow {
   correct_answer: string;
   explanation: string;
   source_link: string;
+}
+
+interface ValidatedQuestion {
+  error?: string;
+  question?: string;
+  option_a?: string;
+  option_b?: string;
+  option_c?: string;
+  option_d?: string;
+  option_e?: string;
+  correct_answer?: string;
+  explanation?: string;
+  source_link?: string;
+  timer_seconds?: number;
 }
 
 // Simple CSV parser without external dependencies
@@ -53,13 +68,13 @@ function parseCSV(content: string): CSVRow[] {
   const records: CSVRow[] = [];
   for (let i = 1; i < lines.length; i++) {
     const values = parseCSVLine(lines[i]);
-    const record: any = {};
+    const record: Record<string, string> = {};
 
     for (let j = 0; j < headers.length; j++) {
       record[headers[j]] = values[j] || '';
     }
 
-    records.push(record);
+    records.push(record as unknown as CSVRow);
   }
 
   return records;
@@ -98,6 +113,15 @@ function parseCSVLine(line: string): string[] {
 
 export async function POST(req: NextRequest) {
   try {
+    // 🔒 AUTHENTICATION: Verify instructor is logged in
+    let authenticatedInstructor;
+    try {
+      authenticatedInstructor = await requireInstructor(req);
+    } catch (authError) {
+      const { status, message } = handleAuthError(authError);
+      return NextResponse.json({ error: { message } }, { status });
+    }
+
     let formData;
     try {
       formData = await req.formData();
@@ -179,9 +203,9 @@ export async function POST(req: NextRequest) {
       });
 
     // Check for validation errors
-    const validationErrors = validatedQuestions.filter((q: any) => q.error);
+    const validationErrors = validatedQuestions.filter((q: ValidatedQuestion) => q.error);
     if (validationErrors.length > 0) {
-      const errorMessages = validationErrors.map((q: any) => q.error).join('; ');
+      const errorMessages = validationErrors.map((q: ValidatedQuestion) => q.error).join('; ');
       return NextResponse.json(
         { error: { message: `Validation errors: ${errorMessages}` } },
         { status: 400 }
@@ -189,14 +213,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract questions with valid data
-    const questions = validatedQuestions.filter((q: any) => !q.error);
+    const questions = validatedQuestions.filter((q: ValidatedQuestion) => !q.error);
 
     // Generate unique 8-digit numeric quiz code (e.g., 51402382)
     const quizCode = Math.floor(10000000 + Math.random() * 90000000);
 
-    // Default instructor/classroom
-    const instructorClassroomId = 'a0000000-0000-0000-0000-000000000001';
-    const instructorId = 'a0000000-0000-0000-0000-000000000001';
+    // Use authenticated instructor's ID
+    const instructorId = authenticatedInstructor.id;
+    const instructorClassroomId = authenticatedInstructor.id;
 
     // Ensure classroom exists
     await getSupabaseClient()
@@ -231,7 +255,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert questions
-    const questionsToInsert = questions.map((q: any, idx: number) => ({
+    const questionsToInsert = questions.map((q: ValidatedQuestion, idx: number) => ({
       quiz_id: quiz.id,
       question_number: idx + 1,
       question: q.question,

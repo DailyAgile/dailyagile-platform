@@ -8,6 +8,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createLogger } from '@/lib/logger';
+import CompletionStatsCard from '@/components/instructor/completion-stats-card';
 
 const log = createLogger('QuizManagement');
 
@@ -33,9 +34,22 @@ interface Quiz {
   created_at: string;
 }
 
+interface CompletionStat {
+  quiz_id: string;
+  quiz_code: string;
+  title: string;
+  assigned_count: number;
+  completed_count: number;
+  completion_percentage: number;
+  avg_score: number | null;
+  last_completion_date: string | null;
+}
+
 export default function QuizManagementPage() {
   const router = useRouter();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [completionStats, setCompletionStats] = useState<CompletionStat[]>([]);
+  const [loadingStats, setLoadingStats] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
@@ -51,6 +65,7 @@ export default function QuizManagementPage() {
 
   useEffect(() => {
     loadQuizzes();
+    loadCompletionStats();
   }, []);
 
   const loadQuizzes = async () => {
@@ -75,6 +90,30 @@ export default function QuizManagementPage() {
       setError(err instanceof Error ? err.message : 'Failed to load quizzes');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadCompletionStats = async () => {
+    try {
+      setLoadingStats(true);
+
+      const response = await fetch('/api/instructor/quizzes/completion-stats');
+
+      if (!response.ok) {
+        setError('Failed to load completion stats');
+        return;
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        setError(data.error?.message || 'Failed to load completion stats');
+        return;
+      }
+      setCompletionStats(data.data.stats || []);
+    } catch (err) {
+      log.warn('Failed to load completion stats:', err);
+    } finally {
+      setLoadingStats(false);
     }
   };
 
@@ -195,7 +234,7 @@ export default function QuizManagementPage() {
       setDeleteModal({ open: false });
       setSelectedQuizzes(new Set());
       setError(null);
-      loadQuizzes();
+      await loadQuizzes();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete quizzes';
       log.error('Error deleting quizzes:', errorMessage);
@@ -936,6 +975,39 @@ export default function QuizManagementPage() {
             }}
           >
             {successMessage.text}
+          </div>
+        )}
+
+        {/* Completion Stats Dashboard */}
+        {!loadingStats && completionStats.length > 0 && (
+          <div style={{ marginBottom: '32px' }}>
+            <h2
+              style={{
+                margin: '0 0 16px 0',
+                color: BRAND_COLORS.navy,
+                fontSize: '18px',
+                fontWeight: '600',
+              }}
+            >
+              📊 Quiz Performance Summary
+            </h2>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+                gap: '16px',
+              }}
+            >
+              {completionStats.map((stat) => (
+                <div
+                  key={stat.quiz_id}
+                  onClick={() => router.push(`/teach/quiz/management/${stat.quiz_id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <CompletionStatsCard stat={stat} showDetails={true} />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

@@ -56,10 +56,11 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
   const [feedbackCorrect, setFeedbackCorrect] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
   const [autoAdvance, setAutoAdvance] = useState(true);
-  const [isInstructor, setIsInstructor] = useState(true); // Set to true for testing
+  const [isInstructor, setIsInstructor] = useState(false); // Verify via auth middleware
   const [showInstructorPanel, setShowInstructorPanel] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [summaryTab, setSummaryTab] = useState<'summary' | 'review' | 'leaderboard'>('summary');
+  const [musicEnabled, setMusicEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
@@ -126,6 +127,7 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
   }, [currentQuestionIdx, gameState]);
 
   const playBackgroundMusic = () => {
+    if (!musicEnabled) return;
     const musicUrl = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
     if (audioRef.current) {
       audioRef.current.src = musicUrl;
@@ -133,6 +135,18 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
       audioRef.current.loop = true;
       audioRef.current.play().catch(err => log.info('Audio autoplay prevented:', err));
     }
+  };
+
+  const toggleMusic = () => {
+    setMusicEnabled(prev => {
+      const newState = !prev;
+      if (!newState && audioRef.current) {
+        audioRef.current.pause();
+      } else if (newState) {
+        playBackgroundMusic();
+      }
+      return newState;
+    });
   };
 
   const playSound = (type: 'correct' | 'incorrect' | 'next') => {
@@ -309,7 +323,7 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
     const totalPlayers = leaderboard.length;
     const correctAnswersCount = Object.values(correctAnswers).filter(v => v).length;
     const totalQuestions = questions.length;
-    const passPercentage = ((correctAnswersCount / totalQuestions) * 100).toFixed(0);
+    const passPercentage = totalQuestions > 0 ? ((correctAnswersCount / totalQuestions) * 100).toFixed(0) : '0';
 
     return (
       <div style={styles.summaryContainer}>
@@ -383,7 +397,7 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
 
           <div style={styles.leaderboardSummary}>
             <h2 style={styles.summaryLeaderboardTitle}>Final Standings</h2>
-            {leaderboard.sort((a, b) => b.score - a.score).map((student, idx) => (
+            {[...leaderboard].sort((a, b) => b.score - a.score).map((student, idx) => (
               <div key={student.id} style={styles.summaryLeaderboardItem}>
                 <span style={styles.summaryRank}>#{idx + 1}</span>
                 <span style={styles.summaryName}>{student.name}</span>
@@ -488,7 +502,7 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
               <h2 style={styles.summaryTitle}>🏆 Final Leaderboard</h2>
 
               <div style={styles.leaderboardSummary}>
-                {leaderboard.sort((a, b) => b.score - a.score).map((student, idx) => (
+                {[...leaderboard].sort((a, b) => b.score - a.score).map((student, idx) => (
                   <div
                     key={student.id}
                     style={{
@@ -562,12 +576,20 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
   }
 
   const currentQuestion = questions[currentQuestionIdx];
+  const colorMap = {
+    'A': '#3B82F6',     // Blue
+    'B': '#06B6D4',     // Cyan/Teal
+    'C': '#F59E0B',     // Amber/Orange
+    'D': '#EC4899',     // Pink
+    'E': '#8B5CF6',     // Purple
+  };
+
   const options = [
-    { key: 'a', label: 'A', text: currentQuestion.option_a },
-    { key: 'b', label: 'B', text: currentQuestion.option_b },
-    { key: 'c', label: 'C', text: currentQuestion.option_c },
-    { key: 'd', label: 'D', text: currentQuestion.option_d },
-    { key: 'e', label: 'E', text: currentQuestion.option_e },
+    { key: 'a', label: 'A', text: currentQuestion.option_a, color: colorMap['A'] },
+    { key: 'b', label: 'B', text: currentQuestion.option_b, color: colorMap['B'] },
+    { key: 'c', label: 'C', text: currentQuestion.option_c, color: colorMap['C'] },
+    { key: 'd', label: 'D', text: currentQuestion.option_d, color: colorMap['D'] },
+    { key: 'e', label: 'E', text: currentQuestion.option_e, color: colorMap['E'] },
   ];
 
   const selectedAnswer = answers[currentQuestionIdx];
@@ -627,10 +649,22 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
             <p style={styles.quizCodeHeaderDisplay}>Code: {quizCode}</p>
           </div>
         </div>
-        <div style={{ ...styles.timerBox, borderColor: timerColor }}>
-          <div style={{ ...styles.timerCircle, borderColor: timerColor }}>
-            <div style={{ fontSize: '48px', fontWeight: 'bold', color: timerColor }}>{timeLeft}</div>
-            <div style={{ fontSize: '11px', color: '#fff', marginTop: '5px' }}>secs</div>
+        <div style={styles.headerRight}>
+          <button
+            onClick={toggleMusic}
+            style={{
+              ...styles.musicToggleButton,
+              backgroundColor: musicEnabled ? '#10B981' : '#EF4444',
+            }}
+            title={musicEnabled ? 'Music: ON' : 'Music: OFF'}
+          >
+            {musicEnabled ? '🔊' : '🔇'} {musicEnabled ? 'Music ON' : 'Music OFF'}
+          </button>
+          <div style={{ ...styles.timerBox, borderColor: timerColor }}>
+            <div style={{ ...styles.timerCircle, borderColor: timerColor }}>
+              <div style={{ fontSize: '48px', fontWeight: 'bold', color: timerColor }}>{timeLeft}</div>
+              <div style={{ fontSize: '11px', color: '#fff', marginTop: '5px' }}>secs</div>
+            </div>
           </div>
         </div>
       </div>
@@ -646,7 +680,7 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
           <div style={styles.leaderboardCard}>
             <h3 style={styles.leaderboardTitle}>🏆 Top Scores</h3>
             <div style={styles.leaderboardList}>
-              {leaderboard.sort((a, b) => b.score - a.score).map((student, idx) => (
+              {[...leaderboard].sort((a, b) => b.score - a.score).map((student, idx) => (
                 <div
                   key={student.id}
                   style={{
@@ -689,38 +723,47 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
           <div style={styles.questionCard}>
             <h2 style={styles.questionText}>{currentQuestion.question}</h2>
 
-            {/* Answer Options */}
-            <div style={styles.optionsGrid}>
-              {options.map((option) => (
-                <button
-                  key={option.key}
-                  onClick={() => handleAnswerSelect(option.key.toUpperCase())}
-                  disabled={showFeedback}
-                  style={{
-                    ...styles.optionButton,
-                    backgroundColor:
-                      selectedAnswer === option.key.toUpperCase()
-                        ? feedbackCorrect
-                          ? THEME.success
-                          : THEME.error
-                        : selectedAnswer && option.key.toUpperCase() === currentQuestion.correct_answer
-                        ? THEME.success
-                        : THEME.white,
-                    color: selectedAnswer === option.key.toUpperCase() || (selectedAnswer && option.key.toUpperCase() === currentQuestion.correct_answer) ? THEME.white : THEME.dark,
-                    border: `2px solid ${
-                      selectedAnswer === option.key.toUpperCase()
-                        ? feedbackCorrect
-                          ? THEME.success
-                          : THEME.error
-                        : THEME.teal
-                    }`,
-                    opacity: showFeedback && selectedAnswer !== option.key.toUpperCase() && option.key.toUpperCase() !== currentQuestion.correct_answer ? 0.5 : 1,
-                  }}
-                >
-                  <span style={styles.optionLabel}>{option.label}</span>
-                  <span style={styles.optionText}>{option.text}</span>
-                </button>
-              ))}
+            {/* Answer Options - Colorful Cards */}
+            <div style={{
+              ...styles.optionsGrid,
+              gridTemplateColumns: options.length === 5 ? 'repeat(auto-fit, minmax(140px, 1fr))' : 'repeat(2, 1fr)',
+            }}>
+              {options.map((option) => {
+                const isSelected = selectedAnswer === option.key.toUpperCase();
+                const isCorrectAnswer = option.key.toUpperCase() === currentQuestion.correct_answer;
+                const isWrongAnswer = isSelected && !feedbackCorrect;
+
+                let bgColor = option.color;
+                if (isSelected && feedbackCorrect) {
+                  bgColor = THEME.success; // Green for correct
+                } else if (isWrongAnswer) {
+                  bgColor = THEME.error; // Red for incorrect
+                } else if (isSelected) {
+                  bgColor = option.color;
+                } else if (showFeedback && !isCorrectAnswer && !isSelected) {
+                  bgColor = option.color;
+                }
+
+                return (
+                  <button
+                    key={option.key}
+                    onClick={() => handleAnswerSelect(option.key.toUpperCase())}
+                    disabled={showFeedback}
+                    style={{
+                      ...styles.coloredOptionButton,
+                      backgroundColor: bgColor,
+                      opacity: showFeedback && !isSelected && !isCorrectAnswer ? 0.4 : 1,
+                      transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+                      boxShadow: isSelected ? `0 8px 25px ${bgColor}40` : '0 4px 15px rgba(0,0,0,0.15)',
+                    }}
+                  >
+                    <span style={styles.coloredOptionLabel}>{option.label}</span>
+                    <span style={styles.coloredOptionText}>{option.text}</span>
+                    {isSelected && feedbackCorrect && <span style={styles.feedbackIcon}>✓</span>}
+                    {isSelected && !feedbackCorrect && <span style={styles.feedbackIcon}>✗</span>}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Feedback Message */}
@@ -1276,9 +1319,11 @@ const styles: Record<string, React.CSSProperties> = {
   header: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    gap: '20px',
     marginBottom: '30px',
     marginTop: '20px',
+    flexWrap: 'wrap',
   },
   title: {
     fontSize: '36px',
@@ -1791,5 +1836,69 @@ const styles: Record<string, React.CSSProperties> = {
     fontStyle: 'italic',
     paddingTop: '8px',
     borderTop: '1px solid rgba(255,255,255,0.2)',
+  },
+  headerRight: {
+    display: 'flex',
+    gap: '20px',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  musicToggleButton: {
+    padding: '12px 20px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '10px',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    whiteSpace: 'nowrap',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+  },
+  coloredOptionButton: {
+    padding: '20px 16px',
+    borderRadius: '14px',
+    border: 'none',
+    backgroundColor: '#3B82F6',
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '12px',
+    minHeight: '140px',
+    transition: 'all 0.2s ease',
+    position: 'relative',
+    color: '#fff',
+    fontWeight: '600',
+  },
+  coloredOptionLabel: {
+    fontSize: '28px',
+    fontWeight: 'bold',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '50px',
+    height: '50px',
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    borderRadius: '50%',
+    color: '#fff',
+  },
+  coloredOptionText: {
+    fontSize: '14px',
+    fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: '1.4',
+    color: '#fff',
+  },
+  feedbackIcon: {
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    fontSize: '24px',
+    fontWeight: 'bold',
   },
 };

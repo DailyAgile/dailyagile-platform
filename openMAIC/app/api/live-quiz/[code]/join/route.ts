@@ -34,6 +34,7 @@ const log = createLogger('LiveQuizJoin');
 
 interface JoinLiveQuizRequest {
   studentId: string;
+  name?: string;
 }
 
 export async function POST(
@@ -107,6 +108,7 @@ export async function POST(
         {
           session_id: session.id,
           student_id: studentId,
+          student_name: body.name || 'Anonymous',
           current_score: 0,
           questions_answered: 0,
           created_at: new Date().toISOString(),

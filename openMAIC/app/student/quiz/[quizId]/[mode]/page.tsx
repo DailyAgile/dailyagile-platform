@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
 import { QuestionDisplay } from '@/components/student/quiz/QuestionDisplay';
 import { createLogger } from '@/lib/logger';
 
@@ -43,8 +44,14 @@ interface FeedbackData {
 export default function QuizPlayerPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  const subscriptionRef = useRef<any>(null);
+
   const quizId = params.quizId as string;
   const mode = (params.mode as string) || 'practice'; // practice | mock-test | game-mode
+  const sessionId = searchParams.get('session');
+  const joinCode = searchParams.get('code');
 
   const [quizData, setQuizData] = useState<QuizData | null>(null);
   const [quizCode, setQuizCode] = useState<string | null>(null);
@@ -57,6 +64,44 @@ export default function QuizPlayerPage() {
   const [feedbackData, setFeedbackData] = useState<FeedbackData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [quizStartTime] = useState<number>(Date.now());
+  const [instructorRevealed, setInstructorRevealed] = useState(false);
+
+  // Initialize Supabase for live quiz
+  useEffect(() => {
+    if (sessionId && joinCode) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      if (supabaseUrl && supabaseAnonKey) {
+        supabaseRef.current = createClient(supabaseUrl, supabaseAnonKey);
+
+        // Subscribe to show_answer flag changes
+        subscriptionRef.current = supabaseRef.current
+          .channel(`live-quiz-${sessionId}`)
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'live_quiz_sessions',
+              filter: `id=eq.${sessionId}`,
+            },
+            (payload: any) => {
+              if (payload.new.show_answer && !instructorRevealed) {
+                setInstructorRevealed(true);
+              }
+            }
+          )
+          .subscribe();
+      }
+    }
+
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+      }
+    };
+  }, [sessionId, instructorRevealed]);
 
   useEffect(() => {
     const loadQuiz = async () => {
@@ -354,8 +399,8 @@ export default function QuizPlayerPage() {
           </button>
         </div>
 
-        {/* Feedback Overlay */}
-        {showingFeedback && feedbackData && (
+        {/* Feedback Overlay or Instructor Revealed Answer */}
+        {(showingFeedback || instructorRevealed) && feedbackData && (
           <div
             style={{
               position: 'fixed',
@@ -390,19 +435,19 @@ export default function QuizPlayerPage() {
                     marginBottom: '16px',
                   }}
                 >
-                  {feedbackData.isCorrect ? '✅' : '❌'}
+                  {instructorRevealed && !showingFeedback ? '📢' : feedbackData.isCorrect ? '✅' : '❌'}
                 </div>
                 <h2
                   style={{
                     fontSize: '24px',
                     fontWeight: 'bold',
-                    color: feedbackData.isCorrect ? '#059669' : '#dc2626',
+                    color: instructorRevealed && !showingFeedback ? '#0891b2' : feedbackData.isCorrect ? '#059669' : '#dc2626',
                     margin: '0 0 8px 0',
                   }}
                 >
-                  {feedbackData.isCorrect ? 'Correct!' : 'Incorrect'}
+                  {instructorRevealed && !showingFeedback ? 'Answer Revealed' : feedbackData.isCorrect ? 'Correct!' : 'Incorrect'}
                 </h2>
-                {feedbackData.isCorrect && (
+                {feedbackData.isCorrect && !instructorRevealed && (
                   <p style={{ fontSize: '16px', color: '#6b7280', margin: '0' }}>
                     +{feedbackData.points} points
                   </p>

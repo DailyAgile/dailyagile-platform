@@ -40,6 +40,7 @@ export default function JoinLiveQuizPage() {
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
   const realtimeManagerRef = useRef<LiveQuizRealtimeManager | null>(null);
 
+  const [studentName, setStudentName] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -140,6 +141,13 @@ export default function JoinLiveQuizPage() {
     setIsLoading(true);
 
     try {
+      // Validate name
+      if (!studentName || studentName.trim().length === 0) {
+        setError('Please enter your name');
+        setIsLoading(false);
+        return;
+      }
+
       // Validate code format
       if (!joinCode || joinCode.length !== 8) {
         setError('Code must be 8 characters (e.g., AB12CD34)');
@@ -155,13 +163,16 @@ export default function JoinLiveQuizPage() {
         return;
       }
 
-      log.info(`Attempting to join with code ${joinCode}, studentId: ${studentId}`);
+      log.info(`Attempting to join with code ${joinCode}, studentId: ${studentId}, name: ${studentName}`);
 
       // Call join endpoint
       const response = await fetch(`/api/live-quiz/${joinCode}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ studentId }),
+        body: JSON.stringify({
+          studentId,
+          name: studentName.trim()
+        }),
       });
 
       if (!response.ok) {
@@ -492,6 +503,38 @@ export default function JoinLiveQuizPage() {
 
         {/* Form */}
         <form onSubmit={handleJoin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          {/* Name Input */}
+          <div>
+            <label
+              style={{
+                display: 'block',
+                color: '#1E293B',
+                fontSize: '14px',
+                fontWeight: '500',
+                marginBottom: '8px',
+              }}
+            >
+              Your Name
+            </label>
+            <input
+              type="text"
+              value={studentName}
+              onChange={(e) => setStudentName(e.target.value)}
+              placeholder="Enter your name"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: '2px solid #E2E8F0',
+                borderRadius: '8px',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                transition: 'all 0.2s',
+              }}
+              disabled={isLoading}
+              autoFocus
+            />
+          </div>
+
           {/* Code Input */}
           <div>
             <label

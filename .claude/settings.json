@@ -27,7 +27,14 @@
       "Bash(pkill -9 -f \"next-server\")",
       "Bash(PORT=3000 pnpm dev)",
       "Bash(rm -rf '/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/\\\\[code\\\\]' *)",
-      "Bash(rm -rf '/Users/apgo21/dailyagile-platform/openMAIC/app/api/instructor/quiz/\\\\[quizId\\\\]' *)"
+      "Bash(rm -rf '/Users/apgo21/dailyagile-platform/openMAIC/app/api/instructor/quiz/\\\\[quizId\\\\]' *)",
+      "Bash(/tmp/verify_fixes.sh)",
+      "Bash(/tmp/instructor-flow-test.sh)",
+      "Bash(/tmp/create-test-quiz.sh)",
+      "Bash(/tmp/test-instructor-flow.sh)",
+      "Bash(/tmp/test-instructor-flow-v2.sh)",
+      "Bash(/tmp/test-instructor-flow-v3.sh)",
+      "Bash(/tmp/final-instructor-test.sh)"
     ],
     "additionalDirectories": [
       "/Users/apgo21/dailyagile-platform/.git",

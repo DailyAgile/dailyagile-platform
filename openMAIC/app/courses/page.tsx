@@ -218,6 +218,15 @@ export default function CoursesPage() {
                     fontSize: '14px',
                     textDecoration: 'none',
                     display: 'inline-block',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#D94903';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = BRAND_COLORS.orange;
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
                   Explore

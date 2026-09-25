@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMP Boot Camp - DailyAgile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0891B2;
+            --orange: #EA580C;
+            --light: #F0F7FA;
+            --gray: #64748B;
+            --border: #E2E8F0;
+            --white: #FFFFFF;
+            --dark: #1E293B;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark);
+            background: var(--light);
+        }
+
+        /* Header Navigation */
+        header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 16px;
+        }
+
+        .breadcrumb a {
+            color: var(--teal);
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: var(--white);
+            padding: 48px 24px;
+            margin-bottom: 32px;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .hero-tagline {
+            font-size: 18px;
+            opacity: 0.95;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .hero-badges {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-icon {
+            font-size: 16px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #D94C00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--navy);
+            border: 2px solid var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: transparent;
+            color: var(--white);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .hero-right {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .price-box {
+            background: var(--white);
+            color: var(--navy);
+            padding: 32px 24px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .price-original {
+            font-size: 14px;
+            text-decoration: line-through;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+
+        .price-current {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--teal);
+            margin-bottom: 8px;
+        }
+
+        .price-savings {
+            font-size: 13px;
+            color: var(--orange);
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .stars {
+            color: #FFC107;
+            font-size: 16px;
+        }
+
+        .rating-text {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 24px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 32px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 12px 0;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab.active {
+            color: var(--teal);
+            border-bottom-color: var(--teal);
+        }
+
+        .tab:hover {
+            color: var(--navy);
+        }
+
+        /* Content Sections */
+        .section {
+            margin-bottom: 48px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            font-size: 28px;
+        }
+
+        /* Learning Objectives Grid */
+        .objectives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .objective-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--teal);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .objective-card strong {
+            color: var(--navy);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .objective-card span {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        /* What's Included */
+        .included-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .included-item {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .included-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .included-label {
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .included-value {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Value Breakdown */
+        .value-breakdown {
+            background: var(--light);
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .value-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .value-row:last-child {
+            border-bottom: none;
+        }
+
+        .value-label {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .value-amount {
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .value-row.total {
+            padding-top: 16px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .value-row.total .value-label {
+            color: var(--navy);
+        }
+
+        .value-row.total .value-amount {
+            color: var(--teal);
+            font-size: 18px;
+        }
+
+        .value-row.savings {
+            color: var(--orange);
+            font-weight: 600;
+        }
+
+        /* Prerequisites */
+        .prerequisites {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+
+        .prereq-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 12px;
+        }
+
+        .prereq-list {
+            list-style: none;
+        }
+
+        .prereq-list li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prereq-list li:before {
+            content: "✓";
+            color: var(--teal);
+            font-weight: bold;
+        }
+
+        .not-required li:before {
+            content: "✗";
+            color: var(--gray);
+            opacity: 0.5;
+        }
+
+        /* Syllabus */
+        .syllabus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .week-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .week-header {
+            background: var(--teal);
+            color: var(--white);
+            padding: 12px;
+            margin: -20px -20px 16px -20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+        }
+
+        .week-topics {
+            list-style: none;
+        }
+
+        .week-topics li {
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--gray);
+            display: flex;
+            gap: 6px;
+        }
+
+        .week-topics li:before {
+            content: "→";
+            color: var(--teal);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Schedule Section */
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .schedule-filter {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: var(--teal);
+            color: var(--white);
+            border-color: var(--teal);
+        }
+
+        /* Event Cards */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .event-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+        }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-color: var(--teal);
+        }
+
+        .event-badge {
+            background: var(--orange);
+            color: var(--white);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 12px;
+            border-radius: 4px;
+        }
+
+        .event-badge.intensive-2 {
+            background: #FF6B35;
+        }
+
+        .event-badge.intensive-3 {
+            background: #D94C00;
+        }
+
+        .event-badge.weekly {
+            background: var(--teal);
+        }
+
+        .event-content {
+            padding: 12px;
+        }
+
+        .event-dates {
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .event-time {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+
+        .event-timezone {
+            font-size: 12px;
+            color: var(--teal);
+            background: rgba(8, 145, 178, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .event-instructor {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .event-seats {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        .seats-bar {
+            background: var(--light);
+            border-radius: 4px;
+            height: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .seats-filled {
+            background: var(--orange);
+            height: 100%;
+            width: 75%;
+        }
+
+        .event-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--teal);
+            margin-bottom: 12px;
+        }
+
+        .event-price-original {
+            font-size: 12px;
+            text-decoration: line-through;
+            color: var(--gray);
+            margin-right: 8px;
+        }
+
+        .event-cta {
+            display: flex;
+            gap: 8px;
+        }
+
+        .event-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .event-enroll {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .event-enroll:hover {
+            background: #0667A0;
+        }
+
+        .event-full {
+            background: var(--border);
+            color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .testimonial {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .testimonial-stars {
+            color: #FFC107;
+            margin-bottom: 8px;
+        }
+
+        .testimonial-text {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 14px;
+        }
+
+        .testimonial-title {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        /* FAQ */
+        .faq-item {
+            background: var(--white);
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--navy);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--light);
+            transition: all 0.3s;
+        }
+
+        .faq-question:hover {
+            background: rgba(8, 145, 178, 0.05);
+        }
+
+        .faq-icon {
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+
+        .faq-answer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: none;
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        /* Guarantees */
+        .guarantees-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .guarantee {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .guarantee:hover {
+            border-color: var(--teal);
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.1);
+        }
+
+        .guarantee-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .guarantee-title {
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .guarantee-desc {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        /* Instructor Section */
+        .instructor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .instructor-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .instructor-avatar {
+            width: 100%;
+            height: 200px;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+
+        .instructor-info {
+            padding: 20px;
+        }
+
+        .instructor-name {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .instructor-title {
+            font-size: 13px;
+            color: var(--teal);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .instructor-bio {
+            font-size: 13px;
+            color: var(--gray);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .instructor-stats {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .instructor-stat {
+            text-align: center;
+        }
+
+        .instructor-stat-number {
+            font-weight: 700;
+            color: var(--navy);
+        }
+
+        .instructor-stat-label {
+            color: var(--gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .prerequisites {
+                grid-template-columns: 1fr;
+            }
+
+            .objectives-grid,
+            .included-grid,
+            .events-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .hero-content h1 {
+                font-size: 28px;
+            }
+
+            .price-current {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="breadcrumb">
+            <a href="#">Home</a> / <a href="#">Courses</a> / <a href="#">Project Management</a> / PMP Boot Camp
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>🎯 PMP Boot Camp</h1>
+                <p class="hero-tagline">Industry-leading 4-week intensive preparation for your PMP exam with live instructors</p>
+
+                <div class="hero-badges">
+                    <div class="badge">
+                        <span class="badge-icon">✓</span>
+                        <span>95% First-Attempt Pass Rate</span>
+                    </div>
+                    <div class="badge">
+                        <span class="badge-icon">👥</span>
+                        <span>2,400+ Professionals Trained</span>
+                    </div>
+                    <div class="badge">
+                        <span class="badge-icon">⭐</span>
+                        <span>4.9/5 Rating (800+ reviews)</span>
+                    </div>
+                </div>
+
+                <div class="hero-cta">
+                    <button class="btn btn-primary">Enroll Now</button>
+                    <button class="btn btn-secondary">View Schedule</button>
+                </div>
+
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">4 weeks</span>
+                        <span class="stat-label">Intensive Bootcamp</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">32 hours</span>
+                        <span class="stat-label">Live Training</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Practice Questions</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Full Mock Exams</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <div class="price-box">
+                    <div class="price-original">USD $799.00</div>
+                    <div class="price-current">$499 USD</div>
+                    <div class="price-savings">💰 Save $300 (38% off)</div>
+
+                    <div class="rating">
+                        <span class="stars">⭐⭐⭐⭐⭐</span>
+                        <span class="rating-text">4.9 out of 5</span>
+                    </div>
+
+                    <div style="font-size: 12px; color: var(--gray); margin-bottom: 16px;">
+                        Based on 800+ Google reviews
+                    </div>
+
+                    <div style="background: rgba(8, 145, 178, 0.1); padding: 8px; border-radius: 6px; font-size: 12px; color: var(--teal); font-weight: 500;">
+                        ✓ 30-day money-back guarantee<br>
+                        ✓ Lifetime materials access<br>
+                        ✓ Includes £350 exam voucher
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <div class="tab active">📌 Overview</div>
+            <div class="tab">🎯 What You'll Learn</div>
+            <div class="tab">📚 Syllabus</div>
+            <div class="tab">📅 Schedule & Enroll</div>
+            <div class="tab">👥 Instructors</div>
+            <div class="tab">❓ FAQ</div>
+        </div>
+
+        <!-- Course Description -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📖</span>
+                Course Overview
+            </div>
+            <p style="font-size: 15px; line-height: 1.8; color: var(--gray); margin-bottom: 16px;">
+                Pass your PMP exam on the first attempt with our proven 4-week intensive boot camp. Our instructors have guided over 2,400 project managers to certification with a 95% first-attempt pass rate. You'll master PMBOK processes, practice with 500+ exam-style questions, and take 3 full-length mock exams to ensure exam readiness.
+            </p>
+            <p style="font-size: 15px; line-height: 1.8; color: var(--gray);">
+                The PMP Boot Camp equips you with the skills to apply Artificial Intelligence responsibly and effectively in project management. Aligned with PMBOK 6th Edition standards, this course focuses on how AI can enhance project facilitation, sprint planning, delivery insights, risk visibility, and team performance.
+            </p>
+        </div>
+
+        <!-- Learning Objectives -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">🎯</span>
+                Learning Objectives
+            </div>
+            <p style="color: var(--gray); margin-bottom: 16px;">By the end of this course, you'll be able to:</p>
+            <div class="objectives-grid">
+                <div class="objective-card">
+                    <strong>Master PMBOK Processes</strong>
+                    <span>All 49 processes across 5 knowledge areas</span>
+                </div>
+                <div class="objective-card">
+                    <strong>Answer Exam Questions</strong>
+                    <span>80% accuracy on exam-style questions</span>
+                </div>
+                <div class="objective-card">
+                    <strong>Apply Real-World Scenarios</strong>
+                    <span>Situational project management decisions</span>
+                </div>
+                <div class="objective-card">
+                    <strong>Score 700+ on Mock Exams</strong>
+                    <span>Equivalent to PMP passing score</span>
+                </div>
+                <div class="objective-card">
+                    <strong>Understand PMBOK 6 Updates</strong>
+                    <span>Latest edition rule changes</span>
+                </div>
+                <div class="objective-card">
+                    <strong>Manage Exam Anxiety</strong>
+                    <span>Time management & stress techniques</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prerequisites -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📋</span>
+                Prerequisites & Requirements
+            </div>
+            <div class="prerequisites">
+                <div class="prereq-section">
+                    <h3>✓ You'll Need</h3>
+                    <ul class="prereq-list">
+                        <li>3+ years project management experience</li>
+                        <li>Familiarity with PM fundamentals</li>
+                        <li>Commitment to 14-19 hours/week</li>
+                        <li>Internet connection & computer</li>
+                    </ul>
+                </div>
+                <div class="prereq-section">
+                    <h3>✗ You Don't Need</h3>
+                    <ul class="prereq-list not-required">
+                        <li>Programming or technical skills</li>
+                        <li>Prior certification</li>
+                        <li>Advanced degree</li>
+                        <li>Any specific software experience</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- What's Included -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📦</span>
+                What's Included in This Course
+            </div>
+            <div class="included-grid">
+                <div class="included-item">
+                    <div class="included-icon">📹</div>
+                    <div class="included-label">Live Sessions</div>
+                    <div class="included-value">8 sessions • 32 hours</div>
+                </div>
+                <div class="included-item">
+                    <div class="included-icon">❓</div>
+                    <div class="included-label">Practice Questions</div>
+                    <div class="included-value">500+ exam-style</div>
+                </div>
+                <div class="included-item">
+                    <div class="included-icon">✅</div>
+                    <div class="included-label">Mock Exams</div>
+                    <div class="included-value">3 full-length timed</div>
+                </div>
+                <div class="included-item">
+                    <div class="included-icon">🎫</div>
+                    <div class="included-label">Exam Voucher</div>
+                    <div class="included-value">£350 value included</div>
+                </div>
+                <div class="included-item">
+                    <div class="included-icon">📚</div>
+                    <div class="included-label">Study Materials</div>
+                    <div class="included-value">PMBOK PDF guide</div>
+                </div>
+                <div class="included-item">
+                    <div class="included-icon">👨‍💼</div>
+                    <div class="included-label">1-on-1 Coaching</div>
+                    <div class="included-value">30 min with instructor</div>
+                </div>
+                <div class="included-item">
+                    <div class="included-icon">⏱️</div>
+                    <div class="included-label">Recording Access</div>
+                    <div class="included-value">6 months full access</div>
+                </div>
+                <div class="included-item">
+                    <div class="included-icon">🎓</div>
+                    <div class="included-label">Certificate</div>
+                    <div class="included-value">After passing exam</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 32px; border-top: 2px solid var(--border); padding-top: 24px;">
+                <h3 style="margin-bottom: 16px; color: var(--navy); font-size: 18px;">💰 Value Breakdown</h3>
+                <div class="value-breakdown">
+                    <div class="value-row">
+                        <span class="value-label">Live sessions (32 hours)</span>
+                        <span class="value-amount">$150</span>
+                    </div>
+                    <div class="value-row">
+                        <span class="value-label">PMP exam voucher</span>
+                        <span class="value-amount">$350</span>
+                    </div>
+                    <div class="value-row">
+                        <span class="value-label">Practice question bank</span>
+                        <span class="value-amount">$50</span>
+                    </div>
+                    <div class="value-row">
+                        <span class="value-label">Mock exams (3)</span>
+                        <span class="value-amount">$30</span>
+                    </div>
+                    <div class="value-row">
+                        <span class="value-label">1-on-1 coaching session</span>
+                        <span class="value-amount">$150</span>
+                    </div>
+                    <div class="value-row">
+                        <span class="value-label">Study materials & guides</span>
+                        <span class="value-amount">$50</span>
+                    </div>
+                    <div class="value-row">
+                        <span class="value-label">Community support & channel</span>
+                        <span class="value-amount">$25</span>
+                    </div>
+                    <div class="value-row total">
+                        <span class="value-label">Total Value</span>
+                        <span class="value-amount">$805</span>
+                    </div>
+                    <div class="value-row savings">
+                        <span class="value-label">Your Price Today</span>
+                        <span class="value-amount">$499</span>
+                    </div>
+                    <div class="value-row" style="color: var(--orange); font-weight: 700; border-top: 2px solid var(--border);">
+                        <span class="value-label">💰 You Save</span>
+                        <span class="value-amount">$306 (38%)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Syllabus -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">📚</span>
+                4-Week Syllabus
+            </div>
+            <div class="syllabus-grid">
+                <div class="week-card">
+                    <div class="week-header">Week 1: Foundations</div>
+                    <ul class="week-topics">
+                        <li>PMBOK 6th Edition Overview</li>
+                        <li>10 Knowledge Areas</li>
+                        <li>5 Process Groups</li>
+                        <li>Project Initiation</li>
+                        <li>Stakeholder Management</li>
+                    </ul>
+                </div>
+                <div class="week-card">
+                    <div class="week-header">Week 2: Planning</div>
+                    <ul class="week-topics">
+                        <li>Scope Management</li>
+                        <li>Schedule Management</li>
+                        <li>Cost Management</li>
+                        <li>Quality Planning</li>
+                        <li>Resource Planning</li>
+                    </ul>
+                </div>
+                <div class="week-card">
+                    <div class="week-header">Week 3: Execution</div>
+                    <ul class="week-topics">
+                        <li>Direct & Manage Work</li>
+                        <li>Monitoring & Controlling</li>
+                        <li>Communication</li>
+                        <li>Risk Management</li>
+                        <li>Procurement</li>
+                    </ul>
+                </div>
+                <div class="week-card">
+                    <div class="week-header">Week 4: Exam Prep</div>
+                    <ul class="week-topics">
+                        <li>Exam Strategy</li>
+                        <li>Time Management</li>
+                        <li>Weak Area Review</li>
+                        <li>Mock Exam 1 & 2</li>
+                        <li>Final Review</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule & Events -->
+        <div class="section">
+            <div class="schedule-header">
+                <div class="section-title" style="margin-bottom: 0;">
+                    <span class="section-icon">📅</span>
+                    Upcoming Cohorts
+                </div>
+                <div class="schedule-filter">
+                    <button class="filter-btn active">All Events</button>
+                    <button class="filter-btn">2-Day Intensive</button>
+                    <button class="filter-btn">Weekly</button>
+                </div>
+            </div>
+
+            <div class="events-grid">
+                <!-- Event 1 -->
+                <div class="event-card">
+                    <div style="padding: 12px;">
+                        <span class="event-badge intensive-2">⚡ 2-DAY INTENSIVE</span>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-dates">Sep 15-16, 2026</div>
+                        <div class="event-time">⏰ 9:00 AM - 2:00 PM EDT</div>
+                        <div class="event-timezone">
+                            🕐 Your timezone: 3:30 AM - 8:30 AM IST (Next day)
+                        </div>
+                        <div class="event-instructor">
+                            👨‍🏫 Instructor: John Smith, PMP<br>
+                            <span style="font-size: 11px;">15+ years | 500+ students | 94% pass rate</span>
+                        </div>
+                        <div class="event-seats">
+                            👥 3 seats left (9 enrolled)
+                            <div class="seats-bar">
+                                <div class="seats-filled"></div>
+                            </div>
+                        </div>
+                        <div class="event-price">
+                            <span class="event-price-original">$799</span>$499
+                        </div>
+                        <div class="event-cta">
+                            <button class="event-btn event-enroll">Enroll</button>
+                            <button class="event-btn event-enroll">Schedule</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event 2 -->
+                <div class="event-card">
+                    <div style="padding: 12px;">
+                        <span class="event-badge intensive-3">🔥 3-DAY INTENSIVE</span>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-dates">Oct 15-17, 2026</div>
+                        <div class="event-time">⏰ 9:00 AM - 2:00 PM BST</div>
+                        <div class="event-timezone">
+                            🕐 Your timezone: 1:30 PM - 6:30 PM IST
+                        </div>
+                        <div class="event-instructor">
+                            👨‍🏫 Instructor: Sarah Chen, PMP<br>
+                            <span style="font-size: 11px;">18+ years | 600+ students | 96% pass rate</span>
+                        </div>
+                        <div class="event-seats">
+                            👥 12 seats available (0 enrolled)
+                            <div class="seats-bar">
+                                <div class="seats-filled" style="width: 0;"></div>
+                            </div>
+                        </div>
+                        <div class="event-price">
+                            <span class="event-price-original">$799</span>$499
+                        </div>
+                        <div class="event-cta">
+                            <button class="event-btn event-enroll">Enroll</button>
+                            <button class="event-btn event-enroll">Schedule</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event 3 -->
+                <div class="event-card">
+                    <div style="padding: 12px;">
+                        <span class="event-badge weekly">📅 WEEKLY</span>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-dates">Nov 10 - Dec 29, 2026</div>
+                        <div class="event-time">⏰ Tue & Thu, 6:00 PM - 8:00 PM PST</div>
+                        <div class="event-timezone">
+                            🕐 Your timezone: 7:30 AM - 9:30 AM IST (Next day)
+                        </div>
+                        <div class="event-instructor">
+                            👨‍🏫 Instructor: Michael Kumar, PMP<br>
+                            <span style="font-size: 11px;">12+ years | 400+ students | 92% pass rate</span>
+                        </div>
+                        <div class="event-seats">
+                            👥 15 seats available (0 enrolled)
+                            <div class="seats-bar">
+                                <div class="seats-filled" style="width: 0;"></div>
+                            </div>
+                        </div>
+                        <div class="event-price">
+                            <span class="event-price-original">$799</span>$499
+                        </div>
+                        <div class="event-cta">
+                            <button class="event-btn event-enroll">Enroll</button>
+                            <button class="event-btn event-enroll">Schedule</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guarantees -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">✅</span>
+                Our Guarantees
+            </div>
+            <div class="guarantees-grid">
+                <div class="guarantee">
+                    <div class="guarantee-icon">🔄</div>
+                    <div class="guarantee-title">30-Day Money Back</div>
+                    <div class="guarantee-desc">Full refund if not satisfied</div>
+                </div>
+                <div class="guarantee">
+                    <div class="guarantee-icon">🎓</div>
+                    <div class="guarantee-title">Fail Guarantee</div>
+                    <div class="guarantee-desc">Free retake course if you don't pass</div>
+                </div>
+                <div class="guarantee">
+                    <div class="guarantee-icon">♾️</div>
+                    <div class="guarantee-title">Lifetime Access</div>
+                    <div class="guarantee-desc">Materials available forever</div>
+                </div>
+                <div class="guarantee">
+                    <div class="guarantee-icon">🏅</div>
+                    <div class="guarantee-title">Alumni Perks</div>
+                    <div class="guarantee-desc">10% off future courses</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructors -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">👥</span>
+                Meet Your Instructors
+            </div>
+            <div class="instructor-grid">
+                <div class="instructor-card">
+                    <div class="instructor-avatar">👨‍💼</div>
+                    <div class="instructor-info">
+                        <div class="instructor-name">John Smith</div>
+                        <div class="instructor-title">PMP Certified Trainer</div>
+                        <div class="instructor-bio">
+                            15+ years of project management experience leading $50M+ projects across tech, finance, and healthcare sectors.
+                        </div>
+                        <div class="instructor-stats">
+                            <div class="instructor-stat">
+                                <div class="instructor-stat-number">500+</div>
+                                <div class="instructor-stat-label">Students</div>
+                            </div>
+                            <div class="instructor-stat">
+                                <div class="instructor-stat-number">94%</div>
+                                <div class="instructor-stat-label">Pass Rate</div>
+                            </div>
+                            <div class="instructor-stat">
+                                <div class="instructor-stat-number">4.9★</div>
+                                <div class="instructor-stat-label">Rating</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="instructor-card">
+                    <div class="instructor-avatar">👩‍💼</div>
+                    <div class="instructor-info">
+                        <div class="instructor-name">Sarah Chen</div>
+                        <div class="instructor-title">PMI Fellow</div>
+                        <div class="instructor-bio">
+                            18+ years in enterprise project delivery. Specialized in agile transformation and digital innovation projects.
+                        </div>
+                        <div class="instructor-stats">
+                            <div class="instructor-stat">
+                                <div class="instructor-stat-number">600+</div>
+                                <div class="instructor-stat-label">Students</div>
+                            </div>
+                            <div class="instructor-stat">
+                                <div class="instructor-stat-number">96%</div>
+                                <div class="instructor-stat-label">Pass Rate</div>
+                            </div>
+                            <div class="instructor-stat">
+                                <div class="instructor-stat-number">4.95★</div>
+                                <div class="instructor-stat-label">Rating</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testimonials -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">💬</span>
+                Student Success Stories
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="testimonial-text">
+                        "Passed on my first attempt! John's real-world examples made PMBOK concepts actually click. The mock exams were incredibly helpful."
+                    </div>
+                    <div class="testimonial-author">Sarah T.</div>
+                    <div class="testimonial-title">Account Manager, Tech Corp</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="testimonial-text">
+                        "Best investment I made for my career. The course is thorough, the instructors are passionate, and the support is outstanding."
+                    </div>
+                    <div class="testimonial-author">James W.</div>
+                    <div class="testimonial-title">Project Manager, Finance</div>
+                </div>
+                <div class="testimonial">
+                    <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+                    <div class="testimonial-text">
+                        "I was nervous about the exam, but Sarah's coaching session gave me exactly what I needed. Scored 742!"
+                    </div>
+                    <div class="testimonial-author">Linda M.</div>
+                    <div class="testimonial-title">Operations Director, Healthcare</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="section-icon">❓</span>
+                Frequently Asked Questions
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="this.nextElementSibling.classList.toggle('active'); this.querySelector('.faq-icon').style.transform = this.nextElementSibling.classList.contains('active') ? 'rotate(180deg)' : ''">
+                    Can I attend sessions asynchronously?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">Yes! All sessions are recorded and available for 6 months. You can attend live for interaction or watch the recording anytime.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="this.nextElementSibling.classList.toggle('active'); this.querySelector('.faq-icon').style.transform = this.nextElementSibling.classList.contains('active') ? 'rotate(180deg)' : ''">
+                    What if I don't pass the exam?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">We offer a fail guarantee! You get free access to a 2-week retake course plus an additional 1-on-1 coaching session at no additional cost.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="this.nextElementSibling.classList.toggle('active'); this.querySelector('.faq-icon').style.transform = this.nextElementSibling.classList.contains('active') ? 'rotate(180deg)' : ''">
+                    Is there a payment plan option?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">Yes! Pay in 3 installments of $199 each (for US customers). Regional payment plans available in other countries.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="this.nextElementSibling.classList.toggle('active'); this.querySelector('.faq-icon').style.transform = this.nextElementSibling.classList.contains('active') ? 'rotate(180deg)' : ''">
+                    Can I switch cohorts after enrollment?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">Absolutely! Within 7 days of enrollment, you can switch to another cohort at no extra cost if seats are available.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question" onclick="this.nextElementSibling.classList.toggle('active'); this.querySelector('.faq-icon').style.transform = this.nextElementSibling.classList.contains('active') ? 'rotate(180deg)' : ''">
+                    What's included in the exam voucher?
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">You get a £350 PMI exam voucher code, which covers the official PMP exam fee ($555 value). This is separate from the course fee.</div>
+            </div>
+        </div>
+
+        <div style="height: 60px;"></div>
+    </div>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

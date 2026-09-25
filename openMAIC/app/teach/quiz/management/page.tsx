@@ -100,18 +100,21 @@ export default function QuizManagementPage() {
       const response = await fetch('/api/instructor/quizzes/completion-stats');
 
       if (!response.ok) {
-        setError('Failed to load completion stats');
+        // Silently fail - completion stats are optional
+        log.debug('Could not load completion stats');
         return;
       }
 
       const data = await response.json();
       if (!data.success) {
-        setError(data.error?.message || 'Failed to load completion stats');
+        // Silently fail - completion stats are optional
+        log.debug('Completion stats returned error');
         return;
       }
       setCompletionStats(data.data.stats || []);
     } catch (err) {
-      log.warn('Failed to load completion stats:', err);
+      // Silently fail - completion stats are optional
+      log.debug('Failed to load completion stats:', err);
     } finally {
       setLoadingStats(false);
     }

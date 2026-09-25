@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Product — Audit Snapshot</title>
+    <style>
+        :root {
+            --navy: #1E3A5F;
+            --teal: #0891B2;
+            --critical: #DC2626;
+            --high: #F59E0B;
+            --medium: #F97316;
+            --healthy: #10B981;
+            --gray-dark: #1E293B;
+            --gray: #64748B;
+            --gray-light: #F1F5F9;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--white);
+            color: var(--gray-dark);
+            line-height: 1.6;
+            padding: 40px 24px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 24px 16px;
+            }
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: Cambria, Georgia, serif;
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--navy);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 32px;
+        }
+
+        /* TOP READINESS STRIP */
+        .readiness-strip {
+            background: linear-gradient(135deg, var(--navy) 0%, #0a5f7e 100%);
+            color: var(--white);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            border-left: 4px solid var(--teal);
+        }
+
+        .readiness-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .readiness-statement {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .readiness-blockers {
+            font-size: 13px;
+            margin-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 12px;
+        }
+
+        .blocker-item {
+            margin-bottom: 6px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .blocker-item strong {
+            color: var(--teal);
+            min-width: 30px;
+        }
+
+        /* SECTION */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .severity-icon {
+            font-size: 20px;
+        }
+
+        /* FINDING */
+        .finding {
+            background: var(--gray-light);
+            border-left: 4px solid var(--gray);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .finding.critical {
+            border-left-color: var(--critical);
+            background: rgba(220, 38, 38, 0.04);
+        }
+
+        .finding.high {
+            border-left-color: var(--high);
+            background: rgba(245, 158, 11, 0.04);
+        }
+
+        .finding.medium {
+            border-left-color: var(--medium);
+            background: rgba(249, 115, 22, 0.04);
+        }
+
+        .finding.healthy {
+            border-left-color: var(--healthy);
+            background: rgba(16, 185, 129, 0.04);
+        }
+
+        .finding-title {
+            font-weight: 600;
+            color: var(--gray-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .finding-severity {
+            min-width: 24px;
+            font-weight: bold;
+        }
+
+        .finding-text {
+            flex: 1;
+        }
+
+        .finding-files {
+            color: var(--gray);
+            font-size: 12px;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            background: var(--white);
+            padding: 8px 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .finding-files strong {
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        /* STAT CARDS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+            margin-top: 24px;
+        }
+
+        .stat-card {
+            background: var(--gray-light);
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 3px solid var(--navy);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--gray-light);
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .footer-link {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #0f172a;
+                color: #e2e8f0;
+            }
+
+            h1 {
+                color: #e0f2fe;
+            }
+
+            .readiness-strip {
+                background: linear-gradient(135deg, #1e3a5f 0%, #0a5f7e 100%);
+            }
+
+            .section-title {
+                color: #0891b2;
+            }
+
+            .finding {
+                background: rgba(30, 41, 59, 0.6);
+                color: #e2e8f0;
+            }
+
+            .finding.critical {
+                background: rgba(220, 38, 38, 0.1);
+            }
+
+            .finding.high {
+                background: rgba(245, 158, 11, 0.1);
+            }
+
+            .finding.medium {
+                background: rgba(249, 115, 22, 0.1);
+            }
+
+            .finding.healthy {
+                background: rgba(16, 185, 129, 0.1);
+            }
+
+            .finding-files {
+                background: #1e293b;
+                color: #94a3b8;
+            }
+
+            .finding-files strong {
+                color: #e0f2fe;
+            }
+
+            .stat-card {
+                background: rgba(30, 41, 59, 0.6);
+            }
+
+            .stat-value {
+                color: #0891b2;
+            }
+
+            .subtitle, .finding-severity, .gray {
+                color: #94a3b8;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Quiz Product — Audit Snapshot</h1>
+        <p class="subtitle">Production Readiness Assessment • August 16, 2026</p>
+
+        <div class="readiness-strip">
+            <div class="readiness-title">⚠️ Overall Status: CONDITIONAL GO</div>
+            <div class="readiness-statement">
+                <strong>88% feature-complete</strong> with <strong>6 critical issues that must be fixed before production launch</strong>. Core quiz player, auth, and persistence are production-ready. Critical blockers: migration naming collisions (data-integrity risk), API endpoint sprawl (4-5 overlapping submit paths), missing rate limiting on AI grading endpoint (cost exposure), localStorage-only quiz results (data loss risk), no error tracking in production, and feature flags implementation unclear.
+            </div>
+            <div class="readiness-blockers">
+                <strong style="color: #fbbf24;">Top 3 Blockers:</strong>
+                <div class="blocker-item">
+                    <strong>1.</strong>
+                    <span>Supabase migration numbers 002, 004, 006, 023 duplicated — apply order ambiguous (data-integrity risk)</span>
+                </div>
+                <div class="blocker-item">
+                    <strong>2.</strong>
+                    <span>5 overlapping quiz submit endpoints — unclear which is live, 4 are dead code</span>
+                </div>
+                <div class="blocker-item">
+                    <strong>3.</strong>
+                    <span>Quiz results persist to localStorage only — data loss if storage cleared mid-attempt</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">88%</div>
+                <div class="stat-label">Features Live</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Critical Issues</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">80+</div>
+                <div class="stat-label">API Routes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">16</div>
+                <div class="stat-label">Stack Dimensions</div>
+            </div>
+        </div>
+
+        <!-- CRITICAL FINDINGS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="severity-icon">🔴</span>
+                Critical Issues (Fix Before Launch)
+            </div>
+
+            <div class="finding critical">
+                <div class="finding-title">
+                    <span class="finding-severity">🔴</span>
+                    <span class="finding-text">Supabase migration number collisions — ambiguous apply order risks data integrity</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> supabase/migrations/002_*.sql (×2), 004_*.sql (×2), 006_*.sql (×2), 023_*.sql (×3)
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--critical);">
+                    <strong>Action:</strong> Rename all duplicates to sequential numbers (025–028) before production deploy. Test migration apply order in staging.
+                </div>
+            </div>
+
+            <div class="finding critical">
+                <div class="finding-title">
+                    <span class="finding-severity">🔴</span>
+                    <span class="finding-text">5 overlapping quiz submit endpoints — unclear which is live, others are dead code</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> app/api/quiz/submit, app/api/quiz/submit-answer, app/api/student/quiz/[id]/submit, app/api/student/quiz/[id]/answer, app/api/student/quiz/submit-answer
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--critical);">
+                    <strong>Action:</strong> Audit lib/ilt/db/submissions.ts and components/scene-renderers/quiz-view.tsx to confirm which path is called. Delete 4 unused endpoints. Consolidate synonyms.
+                </div>
+            </div>
+
+            <div class="finding critical">
+                <div class="finding-title">
+                    <span class="finding-severity">🔴</span>
+                    <span class="finding-text">Quiz results persist to localStorage only — data loss if browser cache cleared or mid-attempt crash</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> components/scene-renderers/quiz-view.tsx, components/quiz/QuizResults.tsx, app/learn/quizzes/[quizCode]/page.tsx
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--critical);">
+                    <strong>Action:</strong> Migrate self-paced quiz submissions to Supabase before launch (Phase 2 work needed for MVP). Or document risk clearly to students.
+                </div>
+            </div>
+
+            <div class="finding critical">
+                <div class="finding-title">
+                    <span class="finding-severity">🔴</span>
+                    <span class="finding-text">Quiz grading endpoint has no rate limiting — open to API abuse ($200+/hour spend)</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> app/api/quiz-grade/route.ts
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--critical);">
+                    <strong>Action:</strong> Add rate limiting: 10 requests/min per student. Add instructor quota: 5 quiz generations per day.
+                </div>
+            </div>
+
+            <div class="finding critical">
+                <div class="finding-title">
+                    <span class="finding-severity">🔴</span>
+                    <span class="finding-text">No error tracking in production — can't see or alert on failures in production</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> lib/logger.ts (stdout-only), no Sentry integration
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--critical);">
+                    <strong>Action:</strong> Integrate Sentry for production error tracking (30 min setup). Add Prometheus metrics for response time, error rate, API costs.
+                </div>
+            </div>
+
+            <div class="finding critical">
+                <div class="finding-title">
+                    <span class="finding-severity">🔴</span>
+                    <span class="finding-text">Feature flags infrastructure exists but calls removed from quiz endpoints — unclear status</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> lib/server/feature-flags.ts, lib/config/feature-flags.ts, supabase/migrations/015_feature_flags.sql (table exists, calls removed)
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--critical);">
+                    <strong>Action:</strong> Either rebuild feature flag system properly or remove table & files entirely. Current state is confusing dead code.
+                </div>
+            </div>
+        </div>
+
+        <!-- HIGH PRIORITY FINDINGS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="severity-icon">🟡</span>
+                High Priority (Should Fix Before Launch)
+            </div>
+
+            <div class="finding high">
+                <div class="finding-title">
+                    <span class="finding-severity">🟡</span>
+                    <span class="finding-text">Quiz submit endpoints missing auth verification — needs audit of 5 paths</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> app/api/quiz/submit-answer/route.ts, app/api/student/quiz/[quizId]/submit/route.ts (need verification)
+                </div>
+            </div>
+
+            <div class="finding high">
+                <div class="finding-title">
+                    <span class="finding-severity">🟡</span>
+                    <span class="finding-text">No load testing completed — concurrency baseline unknown before launch</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Recommended:</strong> Load test /api/quiz-submissions and /api/quiz-grade with 100–1000 concurrent requests
+                </div>
+            </div>
+
+            <div class="finding high">
+                <div class="finding-title">
+                    <span class="finding-severity">🟡</span>
+                    <span class="finding-text">GDPR compliance scaffold exists but UI integration not verified</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> supabase/migrations/023_student_consent_management.sql, app/api/student/data-export/route.ts
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--high);">
+                    <strong>Action:</strong> Verify student signup displays consent prompt. Test data-export endpoint end-to-end.
+                </div>
+            </div>
+
+            <div class="finding high">
+                <div class="finding-title">
+                    <span class="finding-severity">🟡</span>
+                    <span class="finding-text">Duplicate rate-limiter files — confusing code organization</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> lib/server/rate-limiter.ts, lib/server/rate-limit.ts (consolidate into one)
+                </div>
+            </div>
+
+            <div class="finding high">
+                <div class="finding-title">
+                    <span class="finding-severity">🟡</span>
+                    <span class="finding-text">Dead code not cleaned up — 16 .bak API route files and 2 .bak component files</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> components/quiz/QuizPlayerMobile.tsx.bak, components/scene-renderers/quiz-renderer.tsx, app/api/**/*.bak
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--high);">
+                    <strong>Action:</strong> Delete all .bak files and unused quiz-renderer.tsx before code freeze.
+                </div>
+            </div>
+        </div>
+
+        <!-- MEDIUM PRIORITY FINDINGS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="severity-icon">🟠</span>
+                Medium Priority (Nice-to-Have Pre-Launch)
+            </div>
+
+            <div class="finding medium">
+                <div class="finding-title">
+                    <span class="finding-severity">🟠</span>
+                    <span class="finding-text">Quiz-specific strings not localized — i18n framework exists but coverage is 0%</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> lib/i18n/, components/scene-renderers/quiz-view.tsx, components/quiz/QuizResults.tsx
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--medium);">
+                    <strong>Action:</strong> English-only launch OK. Add quiz namespace (quiz.en.json, quiz.es.json, etc.) for Phase 2.
+                </div>
+            </div>
+
+            <div class="finding medium">
+                <div class="finding-title">
+                    <span class="finding-severity">🟠</span>
+                    <span class="finding-text">Unit and E2E tests not running in CI — must be run locally</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> .github/workflows/ci.yml (Prettier, ESLint, tsc only; no vitest/playwright)
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--medium);">
+                    <strong>Action:</strong> Add test jobs to CI if tests are launch-blocking. Currently optional.
+                </div>
+            </div>
+
+            <div class="finding medium">
+                <div class="finding-title">
+                    <span class="finding-severity">🟠</span>
+                    <span class="finding-text">No disaster recovery plan documented or tested</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Action:</strong> Draft RTO/RPO targets (e.g., "restore within 1 hour"). Test Supabase PITR quarterly.
+                </div>
+            </div>
+
+            <div class="finding medium">
+                <div class="finding-title">
+                    <span class="finding-severity">🟠</span>
+                    <span class="finding-text">No offline support — quiz fails if network drops mid-attempt</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Action:</strong> Low priority for MVP. Consider Service Workers + sync queue for Phase 2.
+                </div>
+            </div>
+        </div>
+
+        <!-- HEALTHY FINDINGS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="severity-icon">✅</span>
+                Production-Ready (No Issues)
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">Auth middleware comprehensive — JWT verification, role checks, email verification working end-to-end</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> lib/server/auth-middleware.ts (requireAuth, requireInstructor, requireStudent, requireAdmin)
+                </div>
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">Quiz player core features complete — 3 modes (Practice, Mock Test, Game Mode), 60s timer, local grading</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> components/scene-renderers/quiz-view.tsx, components/quiz/QuizPlayer.tsx
+                </div>
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">Instructor dashboard fully functional — quiz management, bulk ops, analytics (5 reports), student results</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> app/teach/dashboard/page.tsx, components/analytics/AnalyticsDashboard.tsx
+                </div>
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">CSV import and AI generation working end-to-end</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> app/api/instructor/quiz/create-from-csv/route.ts, app/api/instructor/quiz/generate-with-ai/route.ts
+                </div>
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">RLS policies implemented and working — students see own data only, instructors see classroom data only</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> supabase/migrations/001_create_ilt_tables.sql (RLS policies enforced)
+                </div>
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">Critical security fix applied (2026-08-16) — delete-quiz endpoint now checks instructor ownership</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> app/api/instructor/quiz/delete-quiz/route.ts (requireInstructor + ownership verification)
+                </div>
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">CI/CD pipeline configured — Prettier, ESLint, TypeScript checks on every PR</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> .github/workflows/ci.yml, .github/workflows/deploy.yml
+                </div>
+            </div>
+
+            <div class="finding healthy">
+                <div class="finding-title">
+                    <span class="finding-severity">✅</span>
+                    <span class="finding-text">Email verification and 2FA working — bcryptjs migration complete, no password-hashing errors</span>
+                </div>
+                <div class="finding-files">
+                    <strong>Files:</strong> app/api/instructor/verify-email/route.ts, app/api/instructor/otp/send/route.ts (fixed 2026-08-16)
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Full Inventory:</strong> <code>QUIZ_STACK_INVENTORY.md</code> in repository root — comprehensive tables, dependencies, and refactoring roadmap.</p>
+            <p style="margin-top: 12px;"><strong>Last Updated:</strong> August 16, 2026 | <strong>Scope:</strong> DailyAgile quiz product (instructor + student flows in openMAIC/)</p>
+        </div>
+    </div>
+</body>
+</html>

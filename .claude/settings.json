@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f /Users/apgo21/dailyagile-platform/.git/index.lock && sleep 1)",
+      "Bash(bash /private/tmp/claude-501/-Users-apgo21-dailyagile-platform/4c234d58-5a4d-4e01-b0f4-118e0f4b888e/scratchpad/quiz_workflow_tests.sh)",
+      "Bash(tee /tmp/test_output.log)",
+      "Bash(npx ts-node *)",
+      "Bash(ls -la /Users/apgo21/.claude/projects/-Users-apgo21-dailyagile-platform/memory/ 2>/dev/null | head -20)",
+      "Read(//Users/apgo21/.claude/projects/-Users-apgo21-dailyagile-platform/memory/**)",
+      "Bash(pkill -f quiz_tests.sh)",
+      "Bash(pkill -f \"quiz_tests\")",
+      "Bash(pkill -f \"curl\")",
+      "Bash(xargs -I {} basename {})",
+      "Bash(mkdir -p \"/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/[code]/join\")",
+      "Bash(kill %1)",
+      "Bash(bash /tmp/verify_endpoints.sh)",
+      "Bash(pnpm lint *)",
+      "Bash(sleep 5 && rm -f /Users/apgo21/dailyagile-platform/.git/index.lock && cd /Users/apgo21/dailyagile-platform/openMAIC && git log --oneline -1)",
+      "Bash(/tmp/test-wave1.sh)",
+      "Bash(/tmp/realtime-verify.sh)",
+      "Bash(pkill -f \"next\\\\|pnpm\")",
+      "Bash(pkill -f \"vitest\\\\|jest\")",
+      "Bash(grep -E 'hbci|4689' /etc/services 2>/dev/null || echo \"hbci maps to port 4689\")",
+      "Read(//private/etc/**)",
+      "Bash(tee /tmp/playwright-test-output.log)",
+      "Bash(pkill -f \"playwright test\")",
+      "Bash(pkill -9 -f \"next-server\")",
+      "Bash(PORT=3000 pnpm dev)",
+      "Bash(rm -rf '/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/\\\\[code\\\\]' *)",
+      "Bash(rm -rf '/Users/apgo21/dailyagile-platform/openMAIC/app/api/instructor/quiz/\\\\[quizId\\\\]' *)"
+    ],
+    "additionalDirectories": [
+      "/Users/apgo21/dailyagile-platform/.git",
+      "/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/[code]",
+      "/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/\\[code\\]",
+      "/Users/apgo21/dailyagile-platform/openMAIC/app/api/instructor/quiz/\\[quizId\\]"
+    ]
+  }
+}

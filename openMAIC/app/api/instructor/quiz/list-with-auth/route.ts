@@ -76,10 +76,21 @@ export async function GET(req: NextRequest): Promise<Response> {
       return apiError('INTERNAL_ERROR', 500, 'Failed to fetch quizzes');
     }
 
+    interface Quiz {
+      id: string;
+      title: string;
+      quiz_code: string;
+      total_questions: number;
+      total_points: number;
+      is_published: boolean;
+      created_at: string;
+      instructor_id: string;
+    }
+
     // For each quiz, get assignment count using separate query
     // (to avoid N+1 queries, could be optimized with RPC in production)
     const enrichedQuizzes = await Promise.all(
-      (quizzes || []).map(async (quiz: any) => {
+      (quizzes || []).map(async (quiz: Quiz) => {
         const { count: assignmentCount } = await supabase
           .from('quiz_assignments')
           .select('id', { count: 'exact', head: true })

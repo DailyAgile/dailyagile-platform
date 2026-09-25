@@ -45,6 +45,26 @@ import { apiError, apiSuccess } from '@/lib/server/api-response';
 
 const log = createLogger('GetQuizResults');
 
+interface StudentInfo {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface QuizAttempt {
+  id: string;
+  assignment_id: string;
+  status: string;
+  score: number | null;
+  attempted_at: string;
+  duration_seconds: number | null;
+  quiz_assignments: {
+    id: string;
+    students: StudentInfo;
+  };
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ quizId: string }> },
@@ -113,7 +133,7 @@ export async function GET(
     }
 
     // Transform results
-    const results = (attempts || []).map((attempt: any) => {
+    const results = (attempts || []).map((attempt: QuizAttempt) => {
       const percentage =
         attempt.score !== null && quiz.total_points > 0
           ? Math.round((attempt.score / quiz.total_points) * 100)
@@ -132,10 +152,10 @@ export async function GET(
     });
 
     // Calculate stats
-    const completedAttempts = (attempts || []).filter((a: any) => a.status === 'completed');
+    const completedAttempts = (attempts || []).filter((a: QuizAttempt) => a.status === 'completed');
     const scores = completedAttempts
-      .filter((a: any) => a.score !== null)
-      .map((a: any) => a.score as number);
+      .filter((a: QuizAttempt) => a.score !== null)
+      .map((a: QuizAttempt) => a.score as number);
 
     const stats = {
       total_attempts: attempts?.length || 0,
@@ -147,7 +167,7 @@ export async function GET(
       pass_rate:
         completedAttempts.length > 0
           ? Math.round(
-              (completedAttempts.filter((a: any) => (a.score || 0) >= (quiz.total_points || 0) * 0.6)
+              (completedAttempts.filter((a: QuizAttempt) => (a.score || 0) >= (quiz.total_points || 0) * 0.6)
                 .length /
                 completedAttempts.length) *
                 100,

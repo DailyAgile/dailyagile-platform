@@ -1,6 +1,5 @@
 'use client';
 
-import { useI18n } from '@/lib/hooks/use-i18n';
 import { BRAND_COLORS } from '@/lib/design/brand-colors';
 
 interface Question {
@@ -39,7 +38,6 @@ export function QuestionDisplay({
   showFeedback = false,
   feedback,
 }: QuestionDisplayProps) {
-  const { t } = useI18n();
 
   const handleSingleSelect = (optionId: string) => {
     onAnswerChange(optionId);
@@ -63,11 +61,11 @@ export function QuestionDisplay({
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium" style={{ color: BRAND_COLORS.gray }}>
-            {t('quiz.question')} {questionNumber} {t('common.of')} {totalQuestions}
+            Question {questionNumber} of {totalQuestions}
           </span>
           {question.type === 'multiple' && (
             <span className="text-xs px-2 py-1 rounded" style={{ backgroundColor: '#DBEAFE', color: '#1E40AF' }}>
-              {t('quiz.multipleAnswers')}
+              Multiple answers
             </span>
           )}
         </div>
@@ -169,7 +167,7 @@ export function QuestionDisplay({
             value={typeof selectedAnswers === 'string' ? selectedAnswers : ''}
             onChange={e => handleShortAnswerChange(e.target.value)}
             disabled={disabled}
-            placeholder={t('quiz.enterYourAnswer')}
+            placeholder="Enter your answer here..."
             rows={4}
             className="w-full px-4 py-3 rounded-lg border-2 focus-visible:outline-none resize-none"
             style={{
@@ -180,7 +178,7 @@ export function QuestionDisplay({
             }}
             onFocus={(e) => !disabled && (e.currentTarget.style.borderColor = BRAND_COLORS.teal)}
             onBlur={(e) => !disabled && (e.currentTarget.style.borderColor = BRAND_COLORS.gray)}
-            aria-label={t('quiz.answerField')}
+            aria-label="Answer field"
           />
         )}
 
@@ -201,9 +199,7 @@ export function QuestionDisplay({
               </span>
               <div className="flex-1">
                 <p className="font-semibold mb-1">
-                  {feedback.isCorrect
-                    ? t('quiz.correct')
-                    : t('quiz.incorrect')}
+                  {feedback.isCorrect ? 'Correct!' : 'Incorrect'}
                 </p>
                 <p className="text-sm">{feedback.explanation}</p>
               </div>

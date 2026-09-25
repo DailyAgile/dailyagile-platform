@@ -40,6 +40,34 @@ import { apiError, apiSuccess } from '@/lib/server/api-response';
 
 const log = createLogger('GetQuizAssignments');
 
+interface StudentData {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface AssignmentData {
+  id: string;
+  assignment_code: string;
+  expires_at: string;
+  status: string;
+  created_at: string;
+  students: StudentData;
+}
+
+interface EnrichedAssignment {
+  id: string;
+  assignment_code: string;
+  student: StudentData;
+  expires_at: string;
+  status: string;
+  attempts: number;
+  completed: boolean;
+  score?: number;
+  created_at: string;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ quizId: string }> },
@@ -113,7 +141,7 @@ export async function GET(
 
     // For each assignment, get attempt count and completion status
     const enrichedAssignments = await Promise.all(
-      (assignments || []).map(async (assignment: any) => {
+      (assignments || []).map(async (assignment: AssignmentData) => {
         const { count: attemptCount } = await supabase
           .from('quiz_attempts')
           .select('id', { count: 'exact', head: true })

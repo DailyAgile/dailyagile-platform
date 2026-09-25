@@ -307,8 +307,8 @@ export default function AcademyPage() {
         >
           {/* ILT Card */}
           <ProductCard
-            title="👥 ILT Cohorts"
-            description="Instructor-led training with live instructors and scheduled cohorts. Browse courses and enroll without login."
+            title="👥 Instructor-Led Training"
+            description="Live training with instructors and scheduled sessions. Browse courses and enroll without login."
             href="/academy/ilt"
             color={BRAND_COLORS.navy}
             icon="📅"

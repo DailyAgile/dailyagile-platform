@@ -25,6 +25,16 @@ interface ExportRequest {
   quiz_id?: string;
 }
 
+interface QuizQuestion {
+  question_number: number;
+  correct_answer: string;
+  option_a?: string;
+  option_b?: string;
+  option_c?: string;
+  option_d?: string;
+  option_e?: string;
+}
+
 const PASS_THRESHOLD = 70;
 
 /**
@@ -218,7 +228,7 @@ export async function POST(req: NextRequest): Promise<Response> {
             let selectedText = selected;
             if (selected !== '—' && response.quiz_questions) {
               const optionKey = `option_${selected.toLowerCase()}`;
-              selectedText = (response.quiz_questions as any)[optionKey] || selected;
+              selectedText = (response.quiz_questions as Record<string, string>)[optionKey] || selected;
             }
 
             answerDetails.push(`Q${qNum}: ${selected} "${selectedText}" (${status})`);

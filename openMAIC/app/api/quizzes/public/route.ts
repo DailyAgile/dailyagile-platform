@@ -5,7 +5,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('PublicQuizzesAPI');
@@ -84,17 +83,15 @@ export async function GET(_request: NextRequest): Promise<NextResponse<PublicQui
       },
     ];
 
-    // Transform to match Quiz interface (code not quiz_code, questionCount not total_questions)
     const transformedQuizzes = mockPublicQuizzes.map((q) => ({
       id: q.id,
-      code: q.quiz_code,
+      quiz_code: q.quiz_code,
       title: q.title,
       description: q.description,
-      questionCount: q.total_questions,
-      createdBy: 'system',
-      isPublished: q.is_published,
-      status: q.is_published ? ('published' as const) : ('draft' as const),
-      createdAt: q.created_at,
+      total_questions: q.total_questions,
+      created_by: 'system',
+      is_published: q.is_published,
+      created_at: q.created_at,
       topic: q.topic,
       difficulty: q.difficulty,
     }));

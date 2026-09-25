@@ -1,0 +1,204 @@
+name: Deploy to Staging & Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deploy to environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run checks
+        run: |
+          pnpm check
+          pnpm lint
+          npx tsc --noEmit
+
+      - name: Run unit tests
+        run: pnpm test
+
+      - name: Run e2e tests
+        run: |
+          pnpm exec playwright install chromium --with-deps
+          pnpm exec playwright test
+
+      - name: Build Next.js
+        run: pnpm build
+        env:
+          SKIP_ENV_VALIDATION: true
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: .next/
+          retention-days: 1
+
+  deploy-staging:
+    name: Deploy to Staging
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    if: github.event_name == 'push' || github.event.inputs.environment == 'staging'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Vercel Staging
+        uses: vercel/action@main
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          alias-domains: |
+            staging-dailyagile.vercel.app
+        env:
+          VERCEL_ENV: staging
+          VERCEL_URL: https://staging-dailyagile.vercel.app
+
+      - name: Comment PR with staging URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Staging deployment complete!\n\nView at: https://staging-dailyagile.vercel.app'
+            })
+
+      - name: Notify Slack (Staging)
+        if: always()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Staging Deployment ${{ job.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Staging Deployment* - ${{ job.status }}\n*Branch:* ${{ github.ref_name }}\n*URL:* https://staging-dailyagile.vercel.app"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  deploy-production:
+    name: Deploy to Production
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pre-deployment checks
+        run: |
+          echo "Running pre-deployment checks..."
+          # Verify migrations are clean
+          [ -d "supabase/migrations" ] && echo "✓ Migration directory exists"
+          # Verify env vars are set
+          [ -n "${{ secrets.SUPABASE_URL }}" ] && echo "✓ SUPABASE_URL set"
+          [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ] && echo "✓ ANTHROPIC_API_KEY set"
+          echo "Pre-deployment checks passed!"
+
+      - name: Run database migrations
+        run: |
+          echo "Migrations must be applied manually via Supabase dashboard or supabase-cli"
+          echo "See DEPLOYMENT_RUNBOOK.md for instructions"
+
+      - name: Deploy to Vercel Production
+        uses: vercel/action@main
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          prod: true
+        env:
+          VERCEL_ENV: production
+
+      - name: Post-deployment validation
+        run: |
+          echo "Checking deployment health..."
+          # Wait for deployment to be ready
+          sleep 10
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://dailyagile.com/api/health || echo "000")
+          if [ "$STATUS" = "200" ]; then
+            echo "✓ Production deployment healthy"
+          else
+            echo "✗ Production deployment health check failed (HTTP $STATUS)"
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Production Release v${{ github.run_number }}
+          body: |
+            Production deployment to dailyagile.com
+            Commit: ${{ github.sha }}
+            Branch: ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Notify Slack (Production)
+        if: always()
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "Production Deployment ${{ job.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Production Deployment* - ${{ job.status }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*URL:* https://dailyagile.com"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

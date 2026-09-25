@@ -13,6 +13,15 @@ import { apiError, apiSuccess } from '@/lib/server/api-response';
 
 const log = createLogger('QuizResults');
 
+interface QuizSession {
+  id: string;
+  quiz_id: string;
+  student_email: string;
+  score: number;
+  percentage: number;
+  created_at: string;
+}
+
 interface QuizResult {
   id: string;
   first_name: string;
@@ -67,7 +76,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     }
 
     // Transform results to match frontend expectations
-    const results: QuizResult[] = (sessions || []).map((session: any) => ({
+    const results: QuizResult[] = (sessions || []).map((session: QuizSession) => ({
       id: session.id,
       first_name: 'Student', // TODO: Store in student_emails table
       last_name: session.student_email?.split('@')[0] || 'Unknown', // Placeholder

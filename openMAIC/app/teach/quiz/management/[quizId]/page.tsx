@@ -995,7 +995,7 @@ export default function QuizDetailsPage() {
               </tbody>
             </table>
           </div>
-        ) : (
+        ) : activeTab === 'results' ? (
           <div
             style={{
               backgroundColor: BRAND_COLORS.white,

@@ -206,7 +206,7 @@ export default function JoinLiveQuizPage() {
       if (realtimeManagerRef.current) {
         realtimeManagerRef.current.subscribeToSessionUpdates(
           data.data.sessionId,
-          (sessionData: SessionUpdateData) => {
+          (sessionData: any) => {
             // Update session info with quiz_id from realtime subscription
             setSessionInfo(prev => prev ? { ...prev, quizId: sessionData.quiz_id } : null);
             handleSessionUpdate(sessionData);
@@ -337,7 +337,7 @@ export default function JoinLiveQuizPage() {
                 margin: '0 0 10px 0',
               }}
             >
-              {waitingMessage}
+              Waiting for instructor to start the quiz...
             </p>
             <div
               style={{

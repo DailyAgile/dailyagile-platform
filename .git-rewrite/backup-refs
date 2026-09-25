@@ -1,0 +1,7 @@
+998c63726656592a0c8c909dd033b9c5f26f40b8 commit	refs/heads/feature/academy-launch
+afee5756a248f974e2c13e92504dc22b5534dabc commit	refs/heads/feature/comprehensive-api-tests
+3961577416f25360a6995814b254eeb9c4c2a0fc commit	refs/heads/main
+cffd11822710089f5218d91c2a1680a51079a1cb commit	refs/heads/worktree-fix-landing-page
+62d51c9ad7d11ee6edb0cf6ddac1e137d9cfcd8e commit	refs/remotes/origin/main
+aba5cf51768ad21ac9ec13c3eb3cb0d6b3cbfd0b commit	refs/remotes/origin/worktree-fix-landing-page
+985890c5a92fa64ef1ef0d55eaa86eee4697fb63 commit	refs/stash

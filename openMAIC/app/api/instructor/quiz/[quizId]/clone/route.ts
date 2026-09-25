@@ -24,6 +24,22 @@ import { apiError, apiSuccess } from '@/lib/server/api-response';
 
 const log = createLogger('CloneQuiz');
 
+interface QuizQuestion {
+  quiz_id?: string;
+  question_number: number;
+  question: string;
+  option_a: string;
+  option_b: string;
+  option_c: string;
+  option_d?: string;
+  option_e?: string;
+  correct_answer: string;
+  explanation?: string;
+  source_link?: string;
+  timer_seconds?: number;
+  points?: number;
+}
+
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ quizId: string }> },
@@ -104,7 +120,7 @@ export async function POST(
 
     // Clone all questions if any exist
     if (questions && questions.length > 0) {
-      const clonedQuestions = questions.map((q: any) => ({
+      const clonedQuestions = questions.map((q: QuizQuestion) => ({
         quiz_id: clonedQuiz.id,
         question_number: q.question_number,
         question: q.question,

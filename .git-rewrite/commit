@@ -1,0 +1,15 @@
+tree d03730482903fa8e09d1742478be154e88bc2334
+parent e699306140d68660a0570ac36a3550ce5ba4f688
+author DailyAgile <tkiran204@gmail.com> 1783555286 -0400
+committer DailyAgile <tkiran204@gmail.com> 1783555286 -0400
+
+Replace landing page: Homepage now serves React landing page, OpenMAIC at /classroom
+
+- Created new app/page.tsx with professional React landing page
+- Added Tailwind config with DailyAgile brand colors (navy, teal, orange)
+- Moved original OpenMAIC interface to app/classroom/page.tsx
+- Landing page includes hero, features, testimonials, pricing, and 'Test Platform' button
+- Asset paths updated for Vercel deployment (/assets/ URLs)
+- Responsive design with mobile optimization
+
+Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>

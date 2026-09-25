@@ -12,6 +12,17 @@ import { apiError, apiSuccess } from '@/lib/server/api-response';
 
 const log = createLogger('AvailableStudents');
 
+interface Student {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+interface AssignmentRecord {
+  student_id: string;
+}
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ quizId: string }> },
@@ -63,11 +74,11 @@ export async function GET(
       return apiError('INTERNAL_ERROR', 500, 'Failed to fetch assignments');
     }
 
-    const assignedIds = new Set((assignedStudents || []).map((a: any) => a.student_id));
+    const assignedIds = new Set((assignedStudents || []).map((a: AssignmentRecord) => a.student_id));
 
     // Filter out already-assigned students
     const availableStudents = (allStudents || []).filter(
-      (student: any) => !assignedIds.has(student.id),
+      (student: Student) => !assignedIds.has(student.id),
     );
 
     log.info(

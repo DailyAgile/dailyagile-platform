@@ -34,16 +34,15 @@ export default function QuizHub() {
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [instructorCode, setInstructorCode] = useState<string | null>(null);
 
-  // Check for code in query params on mount (passed from home page)
+  // Check for code in query params on mount (for backwards compatibility)
+  // Redirect to new path-based URL
   useEffect(() => {
     const codeFromParams = searchParams.get('code');
     if (codeFromParams) {
-      // Auto-validate and load the code
-      handleCodeSubmit(codeFromParams).catch((err) => {
-        log.error('Failed to auto-load code from params:', err);
-      });
+      // Redirect to SEO-friendly path-based URL
+      window.location.href = `/quizzes/code/${codeFromParams}`;
     }
-  }, []);
+  }, [searchParams]);
 
   const handleNavigateToAuth = (redirect: string) => {
     window.location.href = `/auth/login?redirect=${encodeURIComponent(redirect)}`;

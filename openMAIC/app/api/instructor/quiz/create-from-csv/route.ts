@@ -142,7 +142,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     const quizId = quiz.id;
 
     // Insert questions
-    const questionRows = questions.map((q) => ({
+    const questionRows = questions.map((q: any) => ({
       quiz_id: quizId,
       question_number: q.question_number,
       question: q.question,

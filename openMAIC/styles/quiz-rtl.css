@@ -1,0 +1,201 @@
+/**
+ * RTL (Right-to-Left) styles for quiz components
+ * Applies to Arabic, Hebrew, and other RTL languages
+ * Uses CSS attribute selector [dir="rtl"] for language-aware styling
+ */
+
+/* Main quiz container */
+[dir="rtl"] .quiz-player {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Quiz header */
+[dir="rtl"] [data-quiz-header] {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] [data-quiz-header] h1 {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* Timer positioning for RTL */
+[dir="rtl"] [data-timer] {
+  float: left;
+  margin-right: 0;
+  margin-left: auto;
+}
+
+/* Navigation buttons */
+[dir="rtl"] [data-nav-buttons] {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] [data-nav-bottom] {
+  flex-direction: row-reverse;
+}
+
+/* Answer options in RTL */
+[dir="rtl"] [data-answer-options] {
+  text-align: right;
+}
+
+[dir="rtl"] [data-answer-btn] {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] [data-answer-btn] > div:last-child {
+  text-align: right;
+}
+
+/* Question navigator */
+[dir="rtl"] [role="toolbar"] {
+  flex-direction: row-reverse;
+}
+
+/* Progress bar alignment */
+[dir="rtl"] [data-progress-bar] {
+  direction: ltr;
+  /* Keep progress bar LTR even in RTL context for visual consistency */
+}
+
+/* Explanation boxes */
+[dir="rtl"] [role="status"],
+[dir="rtl"] [role="alert"] {
+  text-align: right;
+  direction: rtl;
+  border-left: none;
+  border-right: 4px solid;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+/* Text alignment for RTL */
+[dir="rtl"] p,
+[dir="rtl"] span,
+[dir="rtl"] button {
+  text-align: right;
+}
+
+/* Button text alignment - keep centered for consistency */
+[dir="rtl"] button {
+  text-align: center;
+}
+
+/* Fieldset/Legend for RTL */
+[dir="rtl"] fieldset {
+  text-align: right;
+}
+
+[dir="rtl"] legend {
+  text-align: right;
+}
+
+/* Mobile responsive RTL */
+@media (max-width: 640px) {
+  [dir="rtl"] [data-nav-buttons] {
+    flex-direction: column-reverse;
+  }
+
+  [dir="rtl"] [data-nav-buttons] button {
+    text-align: center;
+  }
+
+  [dir="rtl"] [data-nav-bottom] {
+    flex-direction: column-reverse;
+  }
+
+  [dir="rtl"] [data-quiz-header] {
+    flex-direction: column-reverse;
+  }
+
+  [dir="rtl"] [data-timer] {
+    margin-left: 0;
+    margin-right: 0;
+    align-self: flex-end;
+    width: 100%;
+  }
+}
+
+/* Quiz results RTL - Main region */
+[dir="rtl"] [role="region"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Score card in results */
+[dir="rtl"] [role="status"] {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] [role="status"] .flex {
+  flex-direction: row-reverse;
+}
+
+/* Score breakdown stats */
+[dir="rtl"] .score-breakdown {
+  text-align: right;
+}
+
+[dir="rtl"] .score-breakdown > div {
+  text-align: center;
+  direction: ltr;
+}
+
+/* Question review section */
+[dir="rtl"] .question-review {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .question-review button {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .question-review [role="status"],
+[dir="rtl"] .question-review [role="alert"] {
+  border-left: none;
+  border-right: 4px solid;
+  text-align: right;
+  direction: rtl;
+}
+
+/* Answer option display in results */
+[dir="rtl"] .question-review [role="region"] {
+  text-align: right;
+  direction: rtl;
+}
+
+[dir="rtl"] .answer-display {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Utility: hide extra space for RTL aria labels */
+[dir="rtl"] [role="status"][style*="left: -10000px"],
+[dir="rtl"] [role="alert"][style*="left: -10000px"],
+[dir="rtl"] legend[style*="left: -10000px"] {
+  left: auto !important;
+  right: -10000px !important;
+}
+
+/* Ensure legend uses right positioning in RTL */
+[dir="rtl"] legend {
+  right: auto;
+  left: -10000px;
+}
+
+[dir="rtl"] legend[style*="right: -10000px"] {
+  right: -10000px;
+  left: auto;
+}
+
+/* Focus visible for accessibility */
+[dir="rtl"] button:focus-visible {
+  outline: 2px solid #0891B2;
+  outline-offset: 2px;
+}

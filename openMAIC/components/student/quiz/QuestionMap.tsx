@@ -1,6 +1,5 @@
 'use client';
 
-import { useI18n } from '@/lib/hooks/use-i18n';
 import { BRAND_COLORS } from '@/lib/design/brand-colors';
 
 interface QuestionMapProps {
@@ -20,8 +19,6 @@ export function QuestionMap({
   onSelectQuestion,
   disabled = false,
 }: QuestionMapProps) {
-  const { t } = useI18n();
-
   const flaggedCount = flaggedQuestions.size;
   const answeredCount = answeredQuestions.size;
 
@@ -30,21 +27,21 @@ export function QuestionMap({
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div>
-          <p className="text-xs mb-1" style={{ color: BRAND_COLORS.gray }}>{t('quiz.answered')}</p>
+          <p className="text-xs mb-1" style={{ color: BRAND_COLORS.gray }}>Answered</p>
           <p className="text-2xl font-bold" style={{ color: BRAND_COLORS.teal }}>
             {answeredCount}
             <span className="text-sm" style={{ color: '#6B7280' }}>/{totalQuestions}</span>
           </p>
         </div>
         <div>
-          <p className="text-xs mb-1" style={{ color: BRAND_COLORS.gray }}>{t('quiz.flagged')}</p>
+          <p className="text-xs mb-1" style={{ color: BRAND_COLORS.gray }}>Flagged</p>
           <p className="text-2xl font-bold" style={{ color: BRAND_COLORS.orange }}>
             {flaggedCount}
             {flaggedCount > 0 && <span className="text-sm">🚩</span>}
           </p>
         </div>
         <div>
-          <p className="text-xs mb-1" style={{ color: BRAND_COLORS.gray }}>{t('quiz.progress')}</p>
+          <p className="text-xs mb-1" style={{ color: BRAND_COLORS.gray }}>Progress</p>
           <p className="text-2xl font-bold" style={{ color: BRAND_COLORS.navy }}>
             {Math.round((answeredCount / totalQuestions) * 100)}%
           </p>
@@ -54,7 +51,7 @@ export function QuestionMap({
       {/* Question Grid */}
       <div className="space-y-4">
         <h3 className="text-sm font-semibold" style={{ color: BRAND_COLORS.navy }}>
-          {t('quiz.questionMap')}
+          Question Map
         </h3>
         <div className="grid grid-cols-6 md:grid-cols-8 gap-2">
           {Array.from({ length: totalQuestions }).map((_, index) => {
@@ -86,7 +83,7 @@ export function QuestionMap({
                 {isFlagged && (
                   <span
                     className="absolute top-0 right-0 text-xs"
-                    title={t('quiz.flagged')}
+                    title="Flagged for review"
                   >
                     🚩
                   </span>
@@ -101,17 +98,17 @@ export function QuestionMap({
       <div className="mt-6 pt-4 space-y-2" style={{ borderTopColor: BRAND_COLORS.gray, borderTopWidth: '1px' }}>
         <div className="flex items-center gap-2 text-sm">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: BRAND_COLORS.teal }}></div>
-          <span style={{ color: '#374151' }}>{t('quiz.answered')}</span>
+          <span style={{ color: '#374151' }}>Answered</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <div className="w-6 h-6 rounded" style={{ backgroundColor: '#F3F4F6', borderColor: '#D1D5DB', borderWidth: '1px' }}></div>
-          <span style={{ color: '#374151' }}>{t('quiz.notAnswered')}</span>
+          <span style={{ color: '#374151' }}>Not Answered</span>
         </div>
         <div className="flex items-center gap-2 text-sm">
           <div className="w-6 h-6 rounded flex items-center justify-center" style={{ backgroundColor: '#F3F4F6' }}>
             <span className="text-xs">🚩</span>
           </div>
-          <span style={{ color: '#374151' }}>{t('quiz.flaggedForReview')}</span>
+          <span style={{ color: '#374151' }}>Flagged for Review</span>
         </div>
       </div>
     </div>

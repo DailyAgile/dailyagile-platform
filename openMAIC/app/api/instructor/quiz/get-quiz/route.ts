@@ -10,6 +10,22 @@ import { createLogger } from '@/lib/logger';
 
 const log = createLogger('GetQuiz');
 
+interface QuizQuestion {
+  id: string;
+  question_number: number;
+  question: string;
+  option_a?: string;
+  option_b?: string;
+  option_c?: string;
+  option_d?: string;
+  option_e?: string;
+  correct_answer?: string;
+  explanation?: string;
+  source_link?: string;
+  timer_seconds?: number;
+  points?: number;
+}
+
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,7 +70,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Transform questions to match frontend format
-    const transformedQuestions = (questions || []).map((q: any) => ({
+    const transformedQuestions = (questions || []).map((q: QuizQuestion) => ({
       id: q.id,
       question_number: q.question_number,
       question: q.question,
@@ -79,7 +95,7 @@ export async function GET(req: NextRequest) {
         quiz_code: quiz.quiz_code,
         title: quiz.title,
         total_questions: questions?.length || 0,
-        total_points: (questions || []).reduce((sum: number, q: any) => sum + (q.points || 10), 0),
+        total_points: (questions || []).reduce((sum: number, q: QuizQuestion) => sum + (q.points || 10), 0),
         questions: transformedQuestions,
       },
     });

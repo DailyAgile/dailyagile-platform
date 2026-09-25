@@ -352,7 +352,7 @@ export default function SchedulePage() {
               '@media (min-width: 768px)': {
                 display: 'block',
               },
-            }}
+            } as any}
           >
             <style>
               {`

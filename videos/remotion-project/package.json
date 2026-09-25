@@ -1,0 +1,25 @@
+{
+  "name": "dailyagile-videos",
+  "version": "1.0.0",
+  "description": "DailyAgile tutorial video production using Remotion",
+  "type": "module",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion render src/Root.tsx",
+    "render:quiz-create": "remotion render src/Root.tsx QuizCreateTutorial --output-format=mp4 dist/quiz-create.mp4",
+    "render:quiz-take": "remotion render src/Root.tsx QuizTakeTutorial --output-format=mp4 dist/quiz-take.mp4",
+    "render:quiz-extend": "remotion render src/Root.tsx QuizExtensionTutorial --output-format=mp4 dist/quiz-extend.mp4",
+    "render:all": "npm run render:quiz-create && npm run render:quiz-take && npm run render:quiz-extend"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remotion": "^4.0.0",
+    "elevenlabs": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

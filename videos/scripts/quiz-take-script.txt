@@ -1,0 +1,3 @@
+VIDEO 2: "How to Take a Quiz" (61 words, ~30 seconds)
+
+Taking a quiz is easy. When you receive an assignment, open the link or enter the access code. Read each question carefully. Choose your answers or write your response. For code challenges, write clean code that demonstrates the concept. Submit when ready. You'll immediately see your score and feedback. If you need more time, request an extension from your instructor.

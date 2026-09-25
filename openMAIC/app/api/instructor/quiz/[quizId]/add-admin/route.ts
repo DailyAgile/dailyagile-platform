@@ -157,7 +157,7 @@ export async function POST(
         operation: existingRole ? 'update' : 'insert',
       });
       return apiError(
-        'DATABASE_ERROR',
+        'INTERNAL_ERROR',
         500,
         'Failed to assign role to instructor'
       );
@@ -166,7 +166,7 @@ export async function POST(
     if (!roleResponse) {
       log.error('Role operation succeeded but returned no data');
       return apiError(
-        'DATABASE_ERROR',
+        'INTERNAL_ERROR',
         500,
         'Role assignment did not return data'
       );

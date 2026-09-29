@@ -75,6 +75,12 @@ export default function QuizManagementPage() {
 
       const response = await fetch('/api/instructor/quiz/list');
 
+      if (response.status === 401) {
+        setError('❌ You are not logged in. Please login as an instructor to access this page.');
+        setLoading(false);
+        return;
+      }
+
       if (!response.ok) {
         throw new Error('Failed to load quizzes');
       }
@@ -87,7 +93,8 @@ export default function QuizManagementPage() {
       setQuizzes(data.data.quizzes || []);
     } catch (err) {
       log.error('Failed to load quizzes:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load quizzes');
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load quizzes';
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

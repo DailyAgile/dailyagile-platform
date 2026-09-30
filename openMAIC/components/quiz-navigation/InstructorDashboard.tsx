@@ -130,7 +130,7 @@ export default function InstructorDashboard({ user }: InstructorDashboardProps) 
         }}
       >
         <button
-          onClick={() => router.push('/teach/quiz/create')}
+          onClick={() => router.push('/teach/quiz/new')}
           style={{
             backgroundColor: BRAND_COLORS.orange,
             color: BRAND_COLORS.white,
@@ -324,13 +324,8 @@ export default function InstructorDashboard({ user }: InstructorDashboardProps) 
                   variant: 'secondary',
                 },
                 {
-                  label: 'Share',
-                  onClick: () => router.push(`/teach/quiz/${quiz.id}/share`),
-                  variant: 'primary',
-                },
-                {
                   label: 'Analytics',
-                  onClick: () => router.push(`/teach/quiz/${quiz.id}/analytics`),
+                  onClick: () => router.push(`/teach/quiz/${quiz.id}/question-analytics`),
                   variant: 'secondary',
                 },
               ]}

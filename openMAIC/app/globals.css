@@ -1,5 +1,9 @@
 /* DailyAgile Global Styles */
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --color-navy: #1E3A5F;
   --color-teal: #0891B2;

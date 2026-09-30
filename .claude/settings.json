@@ -34,13 +34,19 @@
       "Bash(/tmp/test-instructor-flow.sh)",
       "Bash(/tmp/test-instructor-flow-v2.sh)",
       "Bash(/tmp/test-instructor-flow-v3.sh)",
-      "Bash(/tmp/final-instructor-test.sh)"
+      "Bash(/tmp/final-instructor-test.sh)",
+      "Bash(sed -i '' 's/localhost:3002/localhost:3000/g' /Users/apgo21/dailyagile-platform/openMAIC/playwright.config.ts)",
+      "Bash(sed -i '' \"s/PORT: '3002'/PORT: '3000'/g\" /Users/apgo21/dailyagile-platform/openMAIC/playwright.config.ts)",
+      "Bash(tee /tmp/pw-test.log)",
+      "Bash(mkdir -p /Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/sessions/\\\\[sessionId\\\\] *)",
+      "Bash(/tmp/full-integration-test.sh)"
     ],
     "additionalDirectories": [
       "/Users/apgo21/dailyagile-platform/.git",
       "/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/[code]",
       "/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/\\[code\\]",
-      "/Users/apgo21/dailyagile-platform/openMAIC/app/api/instructor/quiz/\\[quizId\\]"
+      "/Users/apgo21/dailyagile-platform/openMAIC/app/api/instructor/quiz/\\[quizId\\]",
+      "/Users/apgo21/dailyagile-platform/openMAIC/app/api/live-quiz/sessions/[sessionId]"
     ]
   }
 }

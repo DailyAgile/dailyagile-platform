@@ -27,7 +27,7 @@ export async function POST(req: NextRequest): Promise<Response> {
 
   const { data: questions } = await supabase
     .from('quiz_questions')
-    .select('correct_answer')
+    .select('correct_answer, explanation')
     .eq('quiz_id', quiz.id)
     .order('question_number', { ascending: true });
   const question = questions?.[questionIndex];
@@ -36,6 +36,10 @@ export async function POST(req: NextRequest): Promise<Response> {
   const isCorrect = answer === question.correct_answer;
   return NextResponse.json({
     success: true,
-    data: { isCorrect, correct_answer: isCorrect ? answer : question.correct_answer },
+    data: {
+      isCorrect,
+      correct_answer: isCorrect ? answer : question.correct_answer,
+      explanation: question.explanation ?? null,
+    },
   });
 }

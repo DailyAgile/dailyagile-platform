@@ -12,6 +12,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { authorize, canManage, requireStudentOrStaff } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('QuizSubmissionFetch');
@@ -45,6 +47,9 @@ export async function GET(
   { params }: { params: Promise<{ submissionId: string }> }
 ): Promise<Response> {
   try {
+    const caller = await authorize(req, requireStudentOrStaff);
+    if (caller instanceof NextResponse) return caller;
+
     const { submissionId } = await params;
 
     if (!submissionId) {
@@ -59,7 +64,7 @@ export async function GET(
     // Fetch submission record
     const { data: submission, error: submissionError } = await supabase
       .from('quiz_submissions')
-      .select('id, score, max_score, percentage, submitted_at, student_id')
+      .select('id, score, max_score, percentage, submitted_at, student_id, classroom_id')
       .eq('id', submissionId)
       .single();
 
@@ -72,6 +77,19 @@ export async function GET(
     }
 
     // Fetch individual answers for this submission
+    let allowed = caller.role === 'admin' || caller.id === submission?.student_id;
+    if (!allowed && caller.role === 'instructor' && submission?.classroom_id) {
+      const { data: classroom } = await supabase
+        .from('classrooms')
+        .select('instructor_id')
+        .eq('id', submission.classroom_id)
+        .single();
+      allowed = classroom?.instructor_id === caller.id;
+    }
+    if (!allowed) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+
     const { data: answers, error: answersError } = await supabase
       .from('quiz_answers')
       .select('id, question_id, user_answer, correct_answer, is_correct, points_earned, max_points')

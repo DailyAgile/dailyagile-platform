@@ -60,7 +60,7 @@ export function extractToken(req: NextRequest): string | null {
 export async function verifyToken(token: string): Promise<AuthenticatedUser> {
   try {
     // Handle test instructor session (development only)
-    if (token.startsWith('TEST_SESSION:')) {
+    if (process.env.NODE_ENV === 'development' && token.startsWith('TEST_SESSION:')) {
       const sessionStr = token.slice('TEST_SESSION:'.length);
       try {
         const sessionData = JSON.parse(sessionStr);

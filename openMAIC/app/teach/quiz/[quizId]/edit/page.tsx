@@ -69,7 +69,9 @@ export default function QuizEditorPage() {
   const loadQuiz = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/instructor/quiz/get-quiz?quiz_id=${quizId}`);
+      const response = await fetch(`/api/instructor/quiz/get-quiz?quiz_id=${quizId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('instructor_token')}` },
+      });
       const result = await response.json();
 
       if (!response.ok) {

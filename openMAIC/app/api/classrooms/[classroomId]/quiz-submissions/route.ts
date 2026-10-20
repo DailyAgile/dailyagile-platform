@@ -3,7 +3,9 @@
  * GET: Fetch all submissions for a classroom with answer details
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorize, canManage, requireStudentOrStaff } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
@@ -46,6 +48,17 @@ export async function GET(
 ) {
   try {
     const { classroomId } = await params;
+
+    const caller = await authorize(req, requireInstructor);
+    if (caller instanceof NextResponse) return caller;
+    const { data: classroom } = await getSupabaseClient()
+      .from('classrooms')
+      .select('instructor_id')
+      .eq('id', classroomId)
+      .single();
+    if (!canManage(caller, classroom?.instructor_id)) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
 
     // Create Supabase client
     const supabase = createClient(

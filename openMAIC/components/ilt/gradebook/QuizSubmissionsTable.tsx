@@ -30,6 +30,7 @@ export function QuizSubmissionsTable({ classroomId, onOverrideClick }: QuizSubmi
       const response = await fetch(`/api/classrooms/${classroomId}/quiz-submissions`, {
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('instructor_token')}`,
         },
       });
 

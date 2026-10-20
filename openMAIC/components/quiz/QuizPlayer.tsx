@@ -850,7 +850,9 @@ function QuizResults({
 
     const fetchResults = async () => {
       try {
-        const response = await fetch(`/api/student/quiz/submission/${results.submissionId}`);
+        const response = await fetch(`/api/student/quiz/submission/${results.submissionId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('student_token')}` },
+        });
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data) {

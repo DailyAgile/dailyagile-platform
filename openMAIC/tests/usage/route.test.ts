@@ -11,6 +11,14 @@ vi.mock('@/lib/server/usage-storage', async (importOriginal) => {
   };
 });
 
+vi.mock('@/lib/server/auth-middleware', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/server/auth-middleware')>();
+  return {
+    ...actual,
+    requireAdmin: vi.fn().mockResolvedValue({ id: 'admin-test', email: 'admin@example.com', role: 'admin', verified: true, iat: 0, exp: 0 }),
+  };
+});
+
 describe('GET /api/usage', () => {
   it('does not add cache detail fields again to displayed token totals', async () => {
     const record: UsageRecord = {

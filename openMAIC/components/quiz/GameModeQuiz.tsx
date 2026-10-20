@@ -199,9 +199,25 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
     }
   };
 
-  const handleAnswerSelect = (answer: string) => {
-    const currentQuestion = questions[currentQuestionIdx];
-    const isCorrect = answer === currentQuestion.correct_answer;
+  const handleAnswerSelect = async (answer: string) => {
+    const questionIndex = currentQuestionIdx;
+    // The server checks the answer. Only this question's result comes back.
+    const checkResponse = await fetch('/api/quiz/check-answer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('student_token')}`,
+      },
+      body: JSON.stringify({ quizCode, questionIndex, answer }),
+    });
+    const checkData = await checkResponse.json();
+    const isCorrect = checkData.data?.isCorrect === true;
+    if (checkData.data?.correct_answer) {
+      const revealed = checkData.data.correct_answer;
+      setQuestions((prev) =>
+        prev.map((q, i) => (i === questionIndex ? { ...q, correct_answer: revealed } : q))
+      );
+    }
 
     setAnswers((prev) => ({ ...prev, [currentQuestionIdx]: answer }));
     setCorrectAnswers((prev) => ({ ...prev, [currentQuestionIdx]: isCorrect }));

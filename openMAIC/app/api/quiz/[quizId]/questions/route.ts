@@ -35,9 +35,15 @@ export async function GET(
 
     log.info(`Found ${questions?.length || 0} questions`);
 
+    // Answers and explanations are never sent to students; grading happens on the server.
+    const safeQuestions = (questions || []).map((q: Record<string, unknown>) => {
+      const { correct_answer: _answer, explanation: _explanation, ...rest } = q;
+      return rest;
+    });
+
     return apiSuccess({
       success: true,
-      data: questions || [],
+      data: safeQuestions,
     });
   } catch (error) {
     log.error('Unexpected error:', error);

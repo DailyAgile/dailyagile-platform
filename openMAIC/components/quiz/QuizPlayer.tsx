@@ -172,15 +172,11 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('student_token')}`,
           ...(csrfToken && { 'X-CSRF-Token': csrfToken }),
         },
-        body: JSON.stringify({
-          quizCode,
-          answers,
-          questions,
-          sceneId: quizCode, // Use quizCode as scene identifier
-          maxScore: questions.length * 10, // Calculate max score from question count
-        }),
+        // Only answers are sent. The server grades against its own answer key.
+        body: JSON.stringify({ quizCode, answers }),
       });
 
       if (!response.ok) {
@@ -198,6 +194,13 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
       // Step 3: Store submission tracking info
       if (data.data.submissionId) {
         localStorage.setItem(`quiz_submission_id_${quizCode}`, data.data.submissionId);
+      }
+
+      // Correct answers come back only after grading; attach them for the review screen.
+      if (Array.isArray(data.data.review)) {
+        setQuestions((prev) =>
+          prev.map((q, i) => ({ ...q, correct_answer: data.data.review[i]?.correct_answer ?? q.correct_answer }))
+        );
       }
 
       // Step 4: Show results (loaded from Supabase, not localStorage)

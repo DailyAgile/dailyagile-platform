@@ -39,6 +39,19 @@ interface Props {
 
 type GameState = 'name-entry' | 'quiz' | 'summary';
 
+/**
+ * Points for one correct answer.
+ * - 100 base points for a correct answer
+ * - up to 50 speed points: scaled by seconds left out of 60
+ * - rank points by order among correct answers on this question: 1st +50, 2nd +30, 3rd +20, others +10
+ */
+const RANK_POINTS = [50, 30, 20];
+export function gamePoints(correctBefore: number, secondsLeft: number): number {
+  const speed = Math.round((Math.max(0, Math.min(60, secondsLeft)) / 60) * 50);
+  const rank = RANK_POINTS[correctBefore] ?? 10;
+  return 100 + speed + rank;
+}
+
 export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, studentName: initialName = '', studentId }: Props) {
   const router = useRouter();
   const [gameState, setGameState] = useState<GameState>('name-entry');
@@ -63,6 +76,8 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
   const [musicEnabled, setMusicEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  // How many players have already answered the current question correctly.
+  const correctOrderRef = useRef(0);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -107,8 +122,9 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
   useEffect(() => {
     if (gameState !== 'quiz') return;
 
-    // Reset timer when question changes
+    // Reset timer and the per-question answer order when the question changes
     setTimeLeft(60);
+    correctOrderRef.current = 0;
     if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
 
     timerIntervalRef.current = setInterval(() => {
@@ -225,14 +241,17 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
 
     playSound(isCorrect ? 'correct' : 'incorrect');
 
-    // Update leaderboard if correct
+    // Update leaderboard if correct. Points depend on speed and on order among
+    // correct answers for this question (first correct earns the most).
     if (isCorrect) {
+      const points = gamePoints(correctOrderRef.current, timeLeft);
+      correctOrderRef.current += 1;
       setLeaderboard((prev) =>
         prev.map((student) =>
           student.isCurrentUser
             ? {
                 ...student,
-                score: student.score + 100,
+                score: student.score + points,
                 answeredCount: student.answeredCount + 1,
                 correctCount: (student.correctCount || 0) + 1
               }
@@ -660,6 +679,7 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
           <h1 style={styles.title}>{quizTitle}</h1>
           <div style={styles.headerSubInfo}>
             <p style={styles.studentNameDisplay}>Player: {studentName}</p>
+            <p style={styles.studentNameDisplay}>Your points: {leaderboard.find((s) => s.isCurrentUser)?.score ?? 0} pts</p>
             <p style={styles.quizCodeHeaderDisplay}>Code: {quizCode}</p>
           </div>
         </div>

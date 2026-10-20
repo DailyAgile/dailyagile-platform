@@ -44,7 +44,7 @@ export async function GET(req: NextRequest): Promise<Response> {
         status,
         instructor_response,
         new_expiry_date,
-        quiz_assignments!inner (
+        quiz_assignments!assignment_id!inner (
           id,
           quiz_id,
           student_id,
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest): Promise<Response> {
       `,
       )
       .eq('quiz_assignments.instructor_id', authenticatedInstructor.id)
-      .eq('assignment_extension_requests.status', status)
+      .eq('status', status)
       .order('requested_at', { ascending: false });
 
     if (error) {

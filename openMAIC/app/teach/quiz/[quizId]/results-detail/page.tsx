@@ -56,7 +56,7 @@ export default function ResultsDetailPage() {
 
         if (!response.ok) {
           if (response.status === 401) {
-            router.push('/teach/login');
+            router.push('/auth/instructors');
             return;
           }
           throw new Error('Failed to fetch results');

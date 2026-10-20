@@ -21,10 +21,7 @@ export default function StudentManagementPage() {
     const checkAuth = async () => {
       try {
         const token = localStorage.getItem('instructor_token');
-        if (!token) {
-          router.push('/teach-login');
-          return;
-        }
+        // Signed-in instructors are authenticated by their session cookie, so a token is optional.
 
         // Make a test API call to verify authentication
         const response = await fetch('/api/instructor/students?limit=1', {
@@ -34,14 +31,14 @@ export default function StudentManagementPage() {
         });
 
         if (response.status === 401) {
-          router.push('/teach-login');
+          router.push('/auth/instructors');
           return;
         }
 
         setAuthenticated(true);
       } catch (error) {
         console.error('Auth check failed:', error);
-        router.push('/teach-login');
+        router.push('/auth/instructors');
       } finally {
         setLoading(false);
       }

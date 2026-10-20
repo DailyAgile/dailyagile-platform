@@ -70,7 +70,7 @@ export async function PATCH(
       .select(
         `
         *,
-        quiz_assignments!inner(
+        quiz_assignments!assignment_id!inner(
           id,
           instructor_id,
           quiz_id

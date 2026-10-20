@@ -56,7 +56,7 @@ export default function AnalyticsPage() {
 
         if (!response.ok) {
           if (response.status === 401) {
-            router.push('/teach/login');
+            router.push('/auth/instructors');
             return;
           }
           if (response.status === 404) {

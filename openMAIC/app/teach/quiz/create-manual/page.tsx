@@ -830,7 +830,7 @@ export default function ManualCreatePage() {
           >
             ← Back
           </button>
-          <h1 className="text-4xl font-bold">Create Quiz Manually</h1>
+          <h1 className="text-4xl font-bold text-white">Create Quiz Manually</h1>
           <p style={{ color: BRAND_COLORS.gray }} className="mt-2">
             Build your quiz question by question
           </p>

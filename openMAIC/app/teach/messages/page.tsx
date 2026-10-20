@@ -50,10 +50,7 @@ export default function MessagesPage() {
       setLoading(true);
       const token = localStorage.getItem('auth_token');
 
-      if (!token) {
-        router.push('/teach/login');
-        return;
-      }
+      // Signed-in instructors are authenticated by their session cookie, so a token is optional.
 
       const response = await fetch('/api/instructor/messages', {
         headers: {
@@ -62,7 +59,7 @@ export default function MessagesPage() {
       });
 
       if (response.status === 401) {
-        router.push('/teach/login');
+        router.push('/auth/instructors');
         return;
       }
 
@@ -129,10 +126,7 @@ export default function MessagesPage() {
 
       const token = localStorage.getItem('auth_token');
 
-      if (!token) {
-        router.push('/teach/login');
-        return;
-      }
+      // Signed-in instructors are authenticated by their session cookie, so a token is optional.
 
       const response = await fetch('/api/instructor/send-bulk-message', {
         method: 'POST',

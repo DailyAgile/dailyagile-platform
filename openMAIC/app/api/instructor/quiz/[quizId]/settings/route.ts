@@ -11,6 +11,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { authorize, canManage } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
 
@@ -62,14 +64,8 @@ export async function GET(
     }
 
     // Get user from request (from auth header or session)
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      log.warn('Unauthorized: No auth header provided');
-      return NextResponse.json(
-        { error: { message: 'Unauthorized' } },
-        { status: 401 }
-      );
-    }
+    const caller = await authorize(req, requireInstructor);
+    if (caller instanceof NextResponse) return caller;
 
     // Fetch quiz with ownership verification
     const { data: quiz, error: queryError } = await getSupabaseClient()
@@ -96,8 +92,9 @@ export async function GET(
       );
     }
 
-    // Note: In a real app, verify instructor_id matches auth.uid()
-    // For now, we'll allow access but log it
+    if (!canManage(caller, quiz.instructor_id)) {
+      return NextResponse.json({ error: { message: 'Forbidden' } }, { status: 403 });
+    }
     log.info(`Settings retrieved for quiz: ${quizId}`);
 
     const settings: QuizSettings = {
@@ -143,14 +140,8 @@ export async function PATCH(
     }
 
     // Get user from request
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      log.warn('Unauthorized: No auth header provided');
-      return NextResponse.json(
-        { error: { message: 'Unauthorized' } },
-        { status: 401 }
-      );
-    }
+    const caller = await authorize(req, requireInstructor);
+    if (caller instanceof NextResponse) return caller;
 
     // Parse request body
     let body: UpdateSettingsRequest;
@@ -169,6 +160,10 @@ export async function PATCH(
       .select('id, instructor_id')
       .eq('id', quizId)
       .single();
+
+    if (!quiz || !canManage(caller, quiz.instructor_id)) {
+      return NextResponse.json({ error: { message: 'Forbidden' } }, { status: 403 });
+    }
 
     if (queryError) {
       log.error('Database error fetching quiz:', queryError);

@@ -85,38 +85,31 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     log.info(`Quiz graded: ${correct}/${graded.length} correct (${percentage}%)`);
 
-    // Store the attempt under the authenticated student's ID.
+    // Store the attempt under the authenticated student's ID, in the table the stats view reads.
     let submissionId: string | undefined;
-    const { data: submission, error: submitError } = await supabase
-      .from('quiz_submissions')
+    const { data: history, error: historyError } = await supabase
+      .from('student_quiz_history')
       .insert({
         student_id: caller.id,
-        scene_id: quizCode,
         quiz_id: quiz.id,
         score,
-        max_score: totalPoints,
-        submitted_at: new Date().toISOString(),
-        status: 'graded',
+        percentage: Number(percentage),
+        passed,
+        attempted_at: new Date().toISOString(),
+        answers: graded.map((g) => ({
+          question_id: g.question_id,
+          user_answer: g.user_answer,
+          correct_answer: g.correct_answer,
+          is_correct: g.is_correct,
+        })),
       })
       .select('id')
       .single();
 
-    if (submitError) {
-      log.warn('Failed to create submission record:', submitError);
-    } else if (submission) {
-      submissionId = submission.id;
-      const answerRows = graded.map((g: GradedAnswer) => ({
-        submission_id: submissionId,
-        question_id: g.question_id,
-        question_text: null,
-        user_answer: g.user_answer,
-        correct_answer: g.correct_answer,
-        is_correct: g.is_correct,
-        points_earned: g.is_correct ? POINTS_PER_QUESTION : 0,
-        max_points: POINTS_PER_QUESTION,
-      }));
-      const { error: answersError } = await supabase.from('quiz_answers').insert(answerRows);
-      if (answersError) log.warn('Failed to store individual answers:', answersError);
+    if (historyError) {
+      log.warn('Failed to store quiz attempt:', historyError);
+    } else if (history) {
+      submissionId = history.id;
     }
 
     return NextResponse.json({

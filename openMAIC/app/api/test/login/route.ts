@@ -7,6 +7,10 @@
 import { NextResponse } from 'next/server';
 
 export async function POST() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: { message: 'Not found' } }, { status: 404 });
+  }
+
   try {
     // Create a mock instructor identity
     const instructorData = {
@@ -44,6 +48,10 @@ export async function POST() {
 }
 
 export async function GET() {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: { message: 'Not found' } }, { status: 404 });
+  }
+
   return NextResponse.json({
     message: '🧪 TEST LOGIN ENDPOINT',
     description: 'This endpoint creates a test instructor session for development/testing',

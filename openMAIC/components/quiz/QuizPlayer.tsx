@@ -377,7 +377,7 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
           }
         }
       `}</style>
-      <div data-nav-buttons style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+      <div data-nav-buttons style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '20px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
         <button
           onClick={() => router.back()}
           aria-label={t('quiz.back')}

@@ -24,6 +24,7 @@ interface SubmissionResponse {
     id: string;
     score: number;
     max_score: number;
+    total_points: number;
     percentage: number;
     correct: number;
     incorrect: number;
@@ -107,6 +108,7 @@ export async function GET(
         id: attempt.id,
         score: parseFloat(attempt.score),
         max_score: maxScore,
+        total_points: maxScore,
         percentage: parseFloat(attempt.percentage),
         correct,
         incorrect,

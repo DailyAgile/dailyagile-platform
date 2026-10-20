@@ -174,10 +174,8 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
       const questionsData = await questionsResponse.json();
       setQuestions(questionsData.data || []);
 
-      // Initialize mock leaderboard
+      // Start with only the real player. Other players are not shown until they exist.
       setLeaderboard([
-        { id: '1', name: 'Alex Chen', score: 0, answeredCount: 0, isCurrentUser: false, correctCount: 0 },
-        { id: '2', name: 'Sarah Kim', score: 0, answeredCount: 0, isCurrentUser: false, correctCount: 0 },
         { id: 'current', name: studentName, score: 0, answeredCount: 0, isCurrentUser: true, correctCount: 0 },
       ]);
 
@@ -606,7 +604,7 @@ export default function GameModeQuiz({ quizCode, quizTitle, totalQuestions = 0, 
     { key: 'c', label: 'C', text: currentQuestion.option_c, color: colorMap['C'] },
     { key: 'd', label: 'D', text: currentQuestion.option_d, color: colorMap['D'] },
     { key: 'e', label: 'E', text: currentQuestion.option_e, color: colorMap['E'] },
-  ];
+  ].filter((option) => option.text !== null && option.text !== undefined && String(option.text).trim() !== '');
 
   const selectedAnswer = answers[currentQuestionIdx];
   const timerColor = timeLeft > 20 ? THEME.teal : timeLeft > 10 ? THEME.orange : THEME.error;

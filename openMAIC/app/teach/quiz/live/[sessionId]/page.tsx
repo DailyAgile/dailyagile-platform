@@ -100,11 +100,13 @@ export default function LiveQuizHostPage() {
   /**
    * Fetch current session state from API
    */
-  const fetchSessionState = async () => {
+  // Takes the join code explicitly: right after loading the session, the state
+  // in this closure is still empty.
+  const fetchSessionState = async (code: string | null = joinCode) => {
     try {
-      if (!joinCode) return;
+      if (!code) return;
 
-      const response = await fetch(`/api/live-quiz/${joinCode}/state`, {
+      const response = await fetch(`/api/live-quiz/${code}/state`, {
         method: 'GET',
       });
 
@@ -118,7 +120,8 @@ export default function LiveQuizHostPage() {
 
       const data = await response.json();
       if (data.success) {
-        setSession(data.data);
+        // The state endpoint returns its fields at the top level; accept either shape.
+        setSession(data.data ?? data);
         setConnectionStatus('connected');
       }
     } catch (err) {
@@ -214,7 +217,7 @@ export default function LiveQuizHostPage() {
           });
 
           // Now fetch the full session state
-          await fetchSessionState();
+          await fetchSessionState(sessionData.joinCode);
         } else {
           setError(data.error?.message || 'Failed to load session');
         }

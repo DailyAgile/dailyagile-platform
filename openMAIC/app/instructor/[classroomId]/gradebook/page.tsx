@@ -12,18 +12,13 @@ import { GradeOverrideModal, type GradeOverrideRequest } from '@/components/ilt/
 import { createLogger } from '@/lib/logger';
 import type { QuizAnswer, QuizSubmission } from '@/lib/ilt/types/models';
 import { toast } from '@/components/ilt/ui/Toast';
+import { useParams } from 'next/navigation';
 
 const log = createLogger('InstructorGradebook');
 
-interface InstructorGradebookPageProps {
-  params: {
-    classroomId: string;
-  };
-}
-
-export default function InstructorGradebookPage({
-  params: { classroomId },
-}: InstructorGradebookPageProps) {
+export default function InstructorGradebookPage() {
+  const params = useParams();
+  const classroomId = params?.classroomId as string;
   const [overrideModalOpen, setOverrideModalOpen] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState<QuizSubmission | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<QuizAnswer | null>(null);

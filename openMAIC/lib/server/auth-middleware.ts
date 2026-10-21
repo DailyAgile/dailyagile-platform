@@ -7,6 +7,7 @@
 import { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose';
 import { createLogger } from '@/lib/logger';
+import { parseInstructorSessionCookie } from '@/lib/instructor/auth-utils';
 
 const log = createLogger('AuthMiddleware');
 
@@ -98,24 +99,40 @@ export async function verifyToken(token: string): Promise<AuthenticatedUser> {
  * Returns authenticated user or throws 401
  */
 export async function requireAuth(req: NextRequest): Promise<AuthenticatedUser> {
+  // Instructors who sign in with a password or email code get a signed session cookie
+  // (httpOnly, SameSite=lax) instead of a bearer token. A missing or invalid bearer token
+  // (for example the literal string "null" from an empty localStorage read) falls back to it.
+  const session = parseInstructorSessionCookie(req.cookies.get('instructor_session')?.value ?? '');
   const token = extractToken(req);
-  if (!token) {
-    throw new Error('UNAUTHORIZED: Missing or invalid authorization header');
-  }
 
-  try {
-    const user = await verifyToken(token);
+  if (token && token !== 'null' && token !== 'undefined') {
+    try {
+      const user = await verifyToken(token);
 
-    // Verify email is verified (except for signup endpoints)
-    if (!user.verified && !req.nextUrl.pathname.includes('/auth/')) {
-      throw new Error('UNVERIFIED: Email not verified. Please verify your email first.');
+      // Verify email is verified (except for signup endpoints)
+      if (!user.verified && !req.nextUrl.pathname.includes('/auth/')) {
+        throw new Error('UNVERIFIED: Email not verified. Please verify your email first.');
+      }
+
+      log.debug(`✅ Authenticated user: ${user.email} (${user.role})`);
+      return user;
+    } catch (error) {
+      if (!session) throw error;
     }
-
-    log.debug(`✅ Authenticated user: ${user.email} (${user.role})`);
-    return user;
-  } catch (error) {
-    throw error;
   }
+
+  if (session) {
+    return {
+      id: session.instructorId,
+      email: session.email,
+      role: 'instructor',
+      verified: true,
+      iat: 0,
+      exp: 0,
+    };
+  }
+
+  throw new Error('UNAUTHORIZED: Missing or invalid authorization header');
 }
 
 /**

@@ -4,7 +4,7 @@
  * Used by quiz navigation page to route to correct dashboard
  */
 
-import { UserDetectionResult } from './types';
+import { Quiz, UserDetectionResult } from './types';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('UserTypeDetector');
@@ -214,17 +214,29 @@ export async function getStudentQuizzes(): Promise<any[]> {
  * Get public quizzes
  * Fetches all quizzes marked as public (no authentication required)
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function getPublicQuizzes(): Promise<any[]> {
+export async function getPublicQuizzes(): Promise<Quiz[]> {
   try {
-    const response = await fetch('/api/quizzes/public');
+    const response = await fetch('/api/student/quizzes/public');
 
     if (!response.ok) {
       throw new Error('Failed to fetch public quizzes');
     }
 
     const data = await response.json();
-    return data.data?.quizzes || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows: any[] = data.quizzes || data.data?.quizzes || [];
+    return rows.map((q) => ({
+      id: q.id,
+      code: q.quiz_code,
+      title: q.title,
+      description: q.description,
+      questionCount: q.total_questions || 0,
+      createdBy: q.created_by || 'DailyAgile',
+      isPublished: true,
+      status: 'published',
+      createdAt: q.created_at || '',
+      difficulty: q.difficulty_level || undefined,
+    }));
   } catch (error) {
     log.error('Error fetching public quizzes:', error);
     return [];

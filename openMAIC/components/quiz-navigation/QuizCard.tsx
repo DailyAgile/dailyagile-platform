@@ -168,6 +168,15 @@ export default function QuizCard({
           <div>{quiz.questionCount}</div>
         </div>
 
+        {variant === 'public' && (
+          <div>
+            <div style={{ fontWeight: 'bold', color: BRAND_COLORS.navy, marginBottom: '2px' }}>
+              Price
+            </div>
+            <div style={{ color: BRAND_COLORS.success, fontWeight: 'bold' }}>Free</div>
+          </div>
+        )}
+
         {quiz.topic && (
           <div>
             <div style={{ fontWeight: 'bold', color: BRAND_COLORS.navy, marginBottom: '2px' }}>

@@ -132,23 +132,11 @@ export async function GET(req: NextRequest): Promise<Response> {
 
     const supabase = getSupabaseClient();
 
-    // Get cohorts with member counts using the view
-    const { data: cohorts, error: queryError } = await supabase
-      .from('cohort_summary')
-      .select(
-        `
-        id,
-        instructor_id,
-        name,
-        description,
-        is_active,
-        member_count,
-        created_at,
-        updated_at
-      `,
-      )
-      .eq('instructor_id', authenticatedInstructor.email)
-      .eq('is_active', true)
+    // Cohorts for this instructor, with member counts from cohort_members.
+    const { data: cohortRows, error: queryError } = await supabase
+      .from('student_cohorts')
+      .select('id, name, description, created_at, updated_at')
+      .eq('instructor_id', authenticatedInstructor.id)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
@@ -157,12 +145,21 @@ export async function GET(req: NextRequest): Promise<Response> {
       return apiError('INTERNAL_ERROR', 500, 'Failed to fetch cohorts');
     }
 
+    const cohorts = await Promise.all(
+      (cohortRows || []).map(async (cohort: { id: string }) => {
+        const { count } = await supabase
+          .from('cohort_members')
+          .select('id', { count: 'exact', head: true })
+          .eq('cohort_id', cohort.id);
+        return { ...cohort, instructor_id: authenticatedInstructor.id, is_active: true, member_count: count ?? 0 };
+      }),
+    );
+
     // Get total count
     const { count: totalCount, error: countError } = await supabase
       .from('student_cohorts')
       .select('id', { count: 'exact', head: true })
-      .eq('instructor_id', authenticatedInstructor.email)
-      .eq('is_active', true);
+      .eq('instructor_id', authenticatedInstructor.id);
 
     if (countError) {
       log.error('Failed to count cohorts:', countError);

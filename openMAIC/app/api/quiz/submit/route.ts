@@ -1,49 +1,35 @@
 /**
  * POST /api/quiz/submit
- * Submit quiz answers and get results
+ * Grades a quiz attempt on the server and stores it for the signed-in student.
  *
- * ⚠️ CRITICAL: This endpoint now persists submission to Supabase
- * Data loss risk fixed: results no longer local-only
+ * Correct answers are loaded from the database here. The client only sends the
+ * student's selected answers, and the student's identity comes from their token.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireCSRFValidation } from '@/lib/server/csrf-token';
 import { createLogger } from '@/lib/logger';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { authorize, requireStudentOrStaff } from '@/lib/server/route-guards';
 
 const log = createLogger('QuizSubmit');
 
-interface QuizQuestion {
-  id: string;
+const POINTS_PER_QUESTION = 10;
+
+interface GradedAnswer {
+  question_id: string;
   correct_answer: string;
+  user_answer: string | null;
+  is_correct: boolean;
 }
 
 interface SubmitRequest {
   quizCode: string;
   answers: Record<number, string>;
-  questions: QuizQuestion[];
-  sceneId?: string;
-  studentId?: string;
-  maxScore?: number;
-}
-
-interface QuizSubmitResponse {
-  success: boolean;
-  data?: {
-    correct: number;
-    incorrect: number;
-    score: number;
-    total_points: number;
-    percentage: string;
-    passed: boolean;
-    submissionId?: string; // Now included for tracking
-  };
-  error?: { message: string };
 }
 
 export async function POST(req: NextRequest): Promise<Response> {
   try {
-    // 🛡️ CSRF PROTECTION: Validate CSRF token
     const csrfValidation = await requireCSRFValidation(req);
     if (!csrfValidation.valid) {
       log.warn('CSRF validation failed for quiz submission');
@@ -53,120 +39,95 @@ export async function POST(req: NextRequest): Promise<Response> {
       );
     }
 
+    const caller = await authorize(req, requireStudentOrStaff);
+    if (caller instanceof NextResponse) return caller;
+
     const body = (await req.json()) as SubmitRequest;
-    const { answers, questions, sceneId, studentId, maxScore } = body;
-
-    log.info(`Grading quiz with ${questions.length} questions`);
-
-    let correct = 0;
-    let totalPoints = maxScore || 0;
-
-    // Grade each answer
-    questions.forEach((question, index) => {
-      const studentAnswer = answers[index];
-      const isCorrect = studentAnswer === question.correct_answer;
-      const points = maxScore ? Math.round(maxScore / questions.length) : 10;
-
-      if (totalPoints === 0) {
-        totalPoints = points * questions.length;
-      }
-
-      if (isCorrect) {
-        correct += 1;
-      }
-    });
-
-    if (totalPoints === 0) {
-      totalPoints = questions.length * 10;
+    const { quizCode, answers } = body;
+    if (!quizCode || !answers || typeof answers !== 'object') {
+      return NextResponse.json({ error: { message: 'quizCode and answers are required' } }, { status: 400 });
     }
 
-    const incorrect = questions.length - correct;
-    const score = correct * (totalPoints / questions.length);
+    const supabase = getSupabaseClient();
+
+    const { data: quiz, error: quizError } = await supabase
+      .from('quizzes')
+      .select('id, quiz_code')
+      .eq('quiz_code', quizCode)
+      .single();
+    if (quizError || !quiz) {
+      return NextResponse.json({ error: { message: 'Quiz not found' } }, { status: 404 });
+    }
+
+    const { data: questions, error: questionsError } = await supabase
+      .from('quiz_questions')
+      .select('id, question_number, correct_answer')
+      .eq('quiz_id', quiz.id)
+      .order('question_number', { ascending: true });
+    if (questionsError || !questions || questions.length === 0) {
+      return NextResponse.json({ error: { message: 'Quiz has no questions' } }, { status: 500 });
+    }
+
+    // Grade every question against the stored answer key.
+    const graded: GradedAnswer[] = questions.map((question: { id: string; correct_answer: string }, index: number) => ({
+      question_id: question.id,
+      correct_answer: question.correct_answer,
+      user_answer: answers[index] ?? null,
+      is_correct: answers[index] === question.correct_answer,
+    }));
+
+    const correct = graded.filter((g: GradedAnswer) => g.is_correct).length;
+    const incorrect = graded.length - correct;
+    const totalPoints = graded.length * POINTS_PER_QUESTION;
+    const score = correct * POINTS_PER_QUESTION;
     const percentage = ((score / totalPoints) * 100).toFixed(1);
     const passed = score >= totalPoints * 0.7;
 
-    log.info(`Quiz graded: ${correct}/${questions.length} correct (${percentage}%)`);
+    log.info(`Quiz graded: ${correct}/${graded.length} correct (${percentage}%)`);
 
-    // 💾 CRITICAL: Persist submission to Supabase (if studentId provided)
+    // Store the attempt under the authenticated student's ID, in the table the stats view reads.
     let submissionId: string | undefined;
-    if (studentId && sceneId) {
-      try {
-        const supabase = getSupabaseClient();
+    const { data: history, error: historyError } = await supabase
+      .from('student_quiz_history')
+      .insert({
+        student_id: caller.id,
+        quiz_id: quiz.id,
+        score,
+        percentage: Number(percentage),
+        passed,
+        attempted_at: new Date().toISOString(),
+        answers: graded.map((g) => ({
+          question_id: g.question_id,
+          user_answer: g.user_answer,
+          correct_answer: g.correct_answer,
+          is_correct: g.is_correct,
+        })),
+      })
+      .select('id')
+      .single();
 
-        // Create submission record
-        const { data: submission, error: submitError } = await supabase
-          .from('quiz_submissions')
-          .insert({
-            student_id: studentId,
-            scene_id: sceneId,
-            quiz_id: sceneId, // Use scene_id as quiz_id if not provided
-            score: Math.round(score * 100) / 100,
-            max_score: totalPoints,
-            submitted_at: new Date().toISOString(),
-            status: 'graded',
-          })
-          .select('id')
-          .single();
-
-        if (submitError) {
-          log.warn('Failed to create submission record:', submitError);
-          // Continue anyway - quiz is graded locally, just missing Supabase persistence
-        } else if (submission) {
-          submissionId = submission.id;
-          log.info(`Submission persisted to Supabase: ${submissionId}`);
-
-          // Store individual answers
-          const answerRows = Object.entries(answers).map(([questionIdx, answer]) => {
-            const qIdx = parseInt(questionIdx);
-            const question = questions[qIdx];
-            return {
-              submission_id: submissionId,
-              question_id: question.id || `q${qIdx}`,
-              question_text: null,
-              user_answer: answer,
-              correct_answer: question.correct_answer,
-              is_correct: answer === question.correct_answer,
-              points_earned: answer === question.correct_answer ? Math.round((totalPoints / questions.length) * 100) / 100 : 0,
-              max_points: Math.round((totalPoints / questions.length) * 100) / 100,
-            };
-          });
-
-          if (answerRows.length > 0) {
-            const { error: answersError } = await supabase
-              .from('quiz_answers')
-              .insert(answerRows);
-
-            if (answersError) {
-              log.warn('Failed to store individual answers:', answersError);
-              // Continue - submission is created even if answers insert fails
-            }
-          }
-        }
-      } catch (dbError) {
-        log.error('Error persisting submission to Supabase:', dbError);
-        // Continue - quiz is graded locally, just log the persistence error
-      }
+    if (historyError) {
+      log.warn('Failed to store quiz attempt:', historyError);
+    } else if (history) {
+      submissionId = history.id;
     }
 
-    const response: QuizSubmitResponse = {
+    return NextResponse.json({
       success: true,
       data: {
         correct,
         incorrect,
-        score: Math.round(score * 100) / 100,
+        score,
         total_points: totalPoints,
         percentage,
         passed,
-        submissionId, // Include for frontend tracking
+        submissionId,
+        // Correct answers are returned only after the attempt is graded, for review.
+        review: graded.map((g: GradedAnswer) => ({ correct_answer: g.correct_answer, is_correct: g.is_correct })),
       },
-    };
-
-    return NextResponse.json(response);
+    });
   } catch (error) {
     log.error('Error submitting quiz:', error);
-    return NextResponse.json(
-      { error: { message: 'Failed to submit quiz' } },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: { message: 'Failed to submit quiz' } }, { status: 500 });
   }
 }

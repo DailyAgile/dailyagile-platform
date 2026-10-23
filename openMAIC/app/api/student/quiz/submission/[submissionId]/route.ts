@@ -12,6 +12,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { authorize, canManage, requireStudentOrStaff } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { createLogger } from '@/lib/logger';
 
 const log = createLogger('QuizSubmissionFetch');
@@ -22,6 +24,7 @@ interface SubmissionResponse {
     id: string;
     score: number;
     max_score: number;
+    total_points: number;
     percentage: number;
     correct: number;
     incorrect: number;
@@ -30,7 +33,7 @@ interface SubmissionResponse {
     answers: Array<{
       id: string;
       question_id: string;
-      user_answer: string;
+      user_answer: string | null;
       correct_answer: string;
       is_correct: boolean;
       points_earned: number;
@@ -45,6 +48,9 @@ export async function GET(
   { params }: { params: Promise<{ submissionId: string }> }
 ): Promise<Response> {
   try {
+    const caller = await authorize(req, requireStudentOrStaff);
+    if (caller instanceof NextResponse) return caller;
+
     const { submissionId } = await params;
 
     if (!submissionId) {
@@ -56,62 +62,71 @@ export async function GET(
 
     const supabase = getSupabaseClient();
 
-    // Fetch submission record
-    const { data: submission, error: submissionError } = await supabase
-      .from('quiz_submissions')
-      .select('id, score, max_score, percentage, submitted_at, student_id')
+    // Attempts are stored in student_quiz_history (see /api/quiz/submit).
+    const { data: attempt, error: attemptError } = await supabase
+      .from('student_quiz_history')
+      .select('id, score, percentage, passed, attempted_at, student_id, quiz_id, answers')
       .eq('id', submissionId)
       .single();
 
-    if (submissionError || !submission) {
-      log.warn(`Submission not found: ${submissionId}`, submissionError);
+    if (attemptError || !attempt) {
+      log.warn(`Submission not found: ${submissionId}`, attemptError);
       return NextResponse.json(
         { success: false, error: 'Submission not found' },
         { status: 404 }
       );
     }
 
-    // Fetch individual answers for this submission
-    const { data: answers, error: answersError } = await supabase
-      .from('quiz_answers')
-      .select('id, question_id, user_answer, correct_answer, is_correct, points_earned, max_points')
-      .eq('submission_id', submissionId)
-      .order('created_at', { ascending: true });
-
-    if (answersError) {
-      log.warn(`Failed to fetch answers for submission ${submissionId}:`, answersError);
+    // The student who took the quiz, the quiz's instructor, or an admin may view it.
+    let allowed = caller.role === 'admin' || caller.id === attempt.student_id;
+    if (!allowed && caller.role === 'instructor') {
+      const { data: quiz } = await supabase
+        .from('quizzes')
+        .select('instructor_id')
+        .eq('id', attempt.quiz_id)
+        .single();
+      allowed = quiz?.instructor_id === caller.id;
+    }
+    if (!allowed) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
-    // Calculate statistics
-    const answerList = answers || [];
-    const correct = answerList.filter((a: any) => a.is_correct).length;
+    const answerList: Array<{
+      question_id: string;
+      user_answer: string | null;
+      correct_answer: string;
+      is_correct: boolean;
+    }> = Array.isArray(attempt.answers) ? attempt.answers : [];
+    const POINTS_PER_QUESTION = 10;
+    const correct = answerList.filter((a) => a.is_correct).length;
     const incorrect = answerList.length - correct;
-    const passed = submission.percentage >= 70;
+    const maxScore = answerList.length * POINTS_PER_QUESTION;
 
     const response: SubmissionResponse = {
       success: true,
       data: {
-        id: submission.id,
-        score: parseFloat(submission.score),
-        max_score: parseFloat(submission.max_score),
-        percentage: parseFloat(submission.percentage),
+        id: attempt.id,
+        score: parseFloat(attempt.score),
+        max_score: maxScore,
+        total_points: maxScore,
+        percentage: parseFloat(attempt.percentage),
         correct,
         incorrect,
-        passed,
-        submitted_at: submission.submitted_at,
-        answers: answerList.map((a: any) => ({
-          id: a.id,
+        passed: Boolean(attempt.passed),
+        submitted_at: attempt.attempted_at,
+        answers: answerList.map((a, index) => ({
+          id: `${attempt.id}-${index}`,
           question_id: a.question_id,
           user_answer: a.user_answer,
           correct_answer: a.correct_answer,
           is_correct: a.is_correct,
-          points_earned: parseFloat(a.points_earned),
-          max_points: parseFloat(a.max_points),
+          points_earned: a.is_correct ? POINTS_PER_QUESTION : 0,
+          max_points: POINTS_PER_QUESTION,
         })),
       },
     };
 
-    log.info(`Submission fetched: ${submissionId}, score: ${submission.score}/${submission.max_score}`);
+    log.info(`Submission fetched: ${submissionId}, score: ${attempt.score}/${maxScore}`);
 
     return NextResponse.json(response);
   } catch (error) {

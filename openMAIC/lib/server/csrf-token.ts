@@ -160,6 +160,14 @@ export function isCSRFExempt(req: NextRequest): boolean {
     return true;
   }
 
+  // Bearer-token requests are not CSRF-exposed: browsers never attach an
+  // Authorization header automatically, so a cross-site form cannot send one.
+  // The route still verifies the token itself.
+  const authHeader = req.headers.get('authorization');
+  if (authHeader?.startsWith('Bearer ')) {
+    return true;
+  }
+
   // Public endpoints that don't require auth are typically exempt
   const exemptPaths = [
     '/api/health',

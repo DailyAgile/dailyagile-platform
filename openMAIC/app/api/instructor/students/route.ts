@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     // Call service function
     const result = await getStudentList(
       { page, limit, search, status },
-      instructor.email
+      instructor.id
     );
 
     if (!result.success) {

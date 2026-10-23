@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { z } from 'zod';
 import {
@@ -58,21 +59,9 @@ function successResponse<T>(data: T, status: number = 200) {
 // ============================================================================
 
 async function getAuthUser(request: NextRequest) {
-  const token = request.headers.get('authorization')?.split('Bearer ')[1];
-  if (!token) {
-    throw new Error('Missing authorization header');
-  }
-
-  const {
-    data: { user },
-    error,
-  } = await getSupabaseClient().auth.getUser(token);
-
-  if (error || !user) {
-    throw new Error('Invalid or expired token');
-  }
-
-  return user;
+  // Instructors sign in through the app (bearer token or session cookie), not Supabase Auth.
+  const caller = await requireInstructor(request);
+  return { id: caller.id, email: caller.email };
 }
 
 // ============================================================================

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorize } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_KEY || ''
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
 interface QuestionAnalytic {
@@ -35,24 +37,9 @@ interface QuestionAnalyticsResponse {
 
 export async function GET(request: NextRequest): Promise<NextResponse<QuestionAnalyticsResponse>> {
   try {
-    // Get instructor from auth header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid authentication' },
-        { status: 401 }
-      );
-    }
+    // Instructor identity from the session cookie or bearer token (see requireInstructor)
+    const caller = await authorize(request, requireInstructor);
+    if (caller instanceof NextResponse) return caller as NextResponse<QuestionAnalyticsResponse>;
 
     // Get quiz ID from URL
     const url = new URL(request.url);
@@ -70,7 +57,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<QuestionAn
       .from('quizzes')
       .select('id, title')
       .eq('id', quizId)
-      .eq('instructor_id', user.email)
+      .eq('instructor_id', caller.id)
       .single();
 
     if (quizError || !quizData) {
@@ -83,9 +70,9 @@ export async function GET(request: NextRequest): Promise<NextResponse<QuestionAn
     // Get all quiz questions
     const { data: questionsData, error: questionsError } = await supabase
       .from('quiz_questions')
-      .select('id, question_text, question_order')
+      .select('id, question, question_number')
       .eq('quiz_id', quizId)
-      .order('question_order', { ascending: true });
+      .order('question_number', { ascending: true });
 
     if (questionsError || !questionsData) {
       return NextResponse.json(
@@ -134,7 +121,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<QuestionAn
 
       questionAnalytics.push({
         question_id: question.id,
-        question_text: question.question_text,
+        question_text: question.question,
         total_attempts,
         correct_answers,
         incorrect_answers,

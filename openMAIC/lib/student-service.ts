@@ -107,7 +107,8 @@ export async function getStudentList(
         students!inner (
           id,
           email,
-          name
+          first_name,
+          last_name
         ),
         created_at
       `,
@@ -140,7 +141,7 @@ export async function getStudentList(
             studentMap.set(studentId, {
               id: assignment.students.id,
               email: assignment.students.email,
-              name: assignment.students.name || 'N/A',
+              name: [assignment.students.first_name, assignment.students.last_name].filter(Boolean).join(' ') || 'N/A',
               enrolled_at: assignment.created_at,
               assigned: 0,
               completed: 0,

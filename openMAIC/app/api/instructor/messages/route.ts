@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { authorize } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_KEY || ''
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
 );
 
 interface MessagesResponse {
@@ -32,24 +34,9 @@ interface MessagesResponse {
 
 export async function GET(request: NextRequest): Promise<NextResponse<MessagesResponse>> {
   try {
-    // Get instructor from auth header
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user?.email) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid authentication' },
-        { status: 401 }
-      );
-    }
+    // Instructor identity from the session cookie or bearer token (see requireInstructor)
+    const user = await authorize(request, requireInstructor);
+    if (user instanceof NextResponse) return user as NextResponse<MessagesResponse>;
 
     // Get pagination params
     const url = new URL(request.url);

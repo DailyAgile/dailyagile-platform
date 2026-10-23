@@ -187,8 +187,7 @@ export async function GET(
             text: q.question,
             description: null,
             options,
-            correctAnswer: q.correct_answer?.toLowerCase(),
-            explanation: q.explanation,
+              explanation: q.explanation,
             points: q.points,
           };
         }),
@@ -253,7 +252,6 @@ export async function GET(
           text: q.question,
           description: null,
           options,
-          correctAnswer: q.correct_answer?.toLowerCase(),
           explanation: q.explanation,
           points: q.points,
         };

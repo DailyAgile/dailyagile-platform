@@ -48,10 +48,7 @@ export default function QuestionAnalyticsPage() {
       setLoading(true);
       const token = localStorage.getItem('auth_token');
 
-      if (!token) {
-        router.push('/teach/login');
-        return;
-      }
+      // Signed-in instructors are authenticated by their session cookie, so a token is optional.
 
       const response = await fetch(
         `/api/instructor/quiz/question-analytics?quiz_id=${quizId}`,
@@ -63,7 +60,7 @@ export default function QuestionAnalyticsPage() {
       );
 
       if (response.status === 401) {
-        router.push('/teach/login');
+        router.push('/auth/instructors');
         return;
       }
 

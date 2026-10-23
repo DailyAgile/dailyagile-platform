@@ -447,8 +447,7 @@ export async function getStudentAssignments(studentId: string) {
           description,
           total_questions,
           total_points,
-          time_limit_minutes,
-          attempt_threshold
+          time_limit_minutes
         )
       `
       )

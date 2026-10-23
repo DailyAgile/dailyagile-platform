@@ -72,12 +72,14 @@ export default function StudentLoginPage() {
 
       log.info(`Student logged in: ${email}`);
 
-      // Store token and redirect to quizzes
+      // Store token and redirect to assignments
       localStorage.setItem('student_token', result.data?.token);
       localStorage.setItem('student_email', email);
       localStorage.setItem('student_id', result.data?.student_id);
+      // Most student pages read 'studentId'; store both spellings.
+      localStorage.setItem('studentId', result.data?.student_id);
 
-      router.push('/learn/quizzes');
+      router.push('/learn/assignments');
     } catch (err) {
       log.error('Login failed:', err);
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
@@ -132,8 +134,8 @@ export default function StudentLoginPage() {
       {/* Header */}
       <div data-login-header style={{ backgroundColor: BRAND_COLORS.navy }} className="text-white py-6 px-4">
         <div className="max-w-md mx-auto">
-          <h1 className="text-3xl font-bold">Student Login</h1>
-          <p style={{ color: BRAND_COLORS.gray }}>Access your quizzes and track progress</p>
+          <h1 className="text-3xl font-bold text-white">Student Login</h1>
+          <p className="text-white/80">Access your quizzes and track progress</p>
         </div>
       </div>
 

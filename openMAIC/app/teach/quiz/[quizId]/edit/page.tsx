@@ -69,7 +69,9 @@ export default function QuizEditorPage() {
   const loadQuiz = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/instructor/quiz/get-quiz?quiz_id=${quizId}`);
+      const response = await fetch(`/api/instructor/quiz/get-quiz?quiz_id=${quizId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('instructor_token')}` },
+      });
       const result = await response.json();
 
       if (!response.ok) {
@@ -192,7 +194,7 @@ export default function QuizEditorPage() {
           <button onClick={() => router.back()} className="text-sm text-blue-300 hover:text-white mb-4">
             ← Back to Dashboard
           </button>
-          <h1 className="text-4xl font-bold mb-2">Edit Quiz</h1>
+          <h1 className="text-4xl font-bold mb-2 text-white">Edit Quiz</h1>
           <p style={{ color: BRAND_COLORS.gray }}>
             {quiz.quiz_code} • {quiz.total_questions} questions • {quiz.total_points} points
           </p>

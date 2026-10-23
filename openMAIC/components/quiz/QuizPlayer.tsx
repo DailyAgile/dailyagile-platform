@@ -135,12 +135,33 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
   };
 
   const handleSelectAnswer = (letter: string) => {
-    if (!submitted) {
-      setAnswers({
-        ...answers,
-        [currentQuestionIdx]: letter,
-      });
-    }
+    if (submitted) return;
+    const questionIndex = currentQuestionIdx;
+    setAnswers({
+      ...answers,
+      [questionIndex]: letter,
+    });
+    if (!isPracticeMode) return;
+
+    // Practice mode gives feedback straight away. The server checks the answer and
+    // returns the key and explanation for this question only.
+    fetch('/api/quiz/check-answer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('student_token')}`,
+      },
+      body: JSON.stringify({ quizCode, questionIndex, answer: letter }),
+    })
+      .then((response) => response.json())
+      .then((payload) => {
+        if (!payload.data) return;
+        const { correct_answer, explanation } = payload.data;
+        setQuestions((prev) =>
+          prev.map((q, i) => (i === questionIndex ? { ...q, correct_answer, explanation } : q))
+        );
+      })
+      .catch((err) => log.error('Answer check failed:', err));
   };
 
   const handleNext = () => {
@@ -172,15 +193,11 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('student_token')}`,
           ...(csrfToken && { 'X-CSRF-Token': csrfToken }),
         },
-        body: JSON.stringify({
-          quizCode,
-          answers,
-          questions,
-          sceneId: quizCode, // Use quizCode as scene identifier
-          maxScore: questions.length * 10, // Calculate max score from question count
-        }),
+        // Only answers are sent. The server grades against its own answer key.
+        body: JSON.stringify({ quizCode, answers }),
       });
 
       if (!response.ok) {
@@ -198,6 +215,13 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
       // Step 3: Store submission tracking info
       if (data.data.submissionId) {
         localStorage.setItem(`quiz_submission_id_${quizCode}`, data.data.submissionId);
+      }
+
+      // Correct answers come back only after grading; attach them for the review screen.
+      if (Array.isArray(data.data.review)) {
+        setQuestions((prev) =>
+          prev.map((q, i) => ({ ...q, correct_answer: data.data.review[i]?.correct_answer ?? q.correct_answer }))
+        );
       }
 
       // Step 4: Show results (loaded from Supabase, not localStorage)
@@ -353,7 +377,7 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
           }
         }
       `}</style>
-      <div data-nav-buttons style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
+      <div data-nav-buttons style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '20px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
         <button
           onClick={() => router.back()}
           aria-label={t('quiz.back')}
@@ -521,7 +545,12 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
             {t('quiz.selectAnswer', { defaultValue: 'Select an answer' })}
           </legend>
           <div data-answer-options style={{ display: 'grid', gap: '10px', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-            {(['A', 'B', 'C', 'D', 'E'] as const).map((letter) => {
+            {(['A', 'B', 'C', 'D', 'E'] as const)
+              .filter((letter) => {
+                const value = current[`option_${letter.toLowerCase()}` as keyof typeof current];
+                return value !== null && value !== undefined && String(value).trim() !== '';
+              })
+              .map((letter) => {
               const key = `option_${letter.toLowerCase()}` as keyof typeof current;
               const option = String(current[key]);
               const isSelected = selectedAnswer === letter;
@@ -608,7 +637,7 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
         </fieldset>
 
         {/* EXPLANATION - Practice: immediate feedback, Mock: only after submission */}
-        {isPracticeMode && selectedAnswer === current.correct_answer && (
+        {isPracticeMode && current.correct_answer && selectedAnswer === current.correct_answer && (
           <div
             role="status"
             aria-live="polite"
@@ -620,7 +649,7 @@ export default function QuizPlayer({ quizCode, quizTitle, mode }: Props) {
           </div>
         )}
 
-        {isPracticeMode && selectedAnswer && selectedAnswer !== current.correct_answer && (
+        {isPracticeMode && current.correct_answer && selectedAnswer && selectedAnswer !== current.correct_answer && (
           <div
             role="alert"
             aria-live="assertive"
@@ -850,7 +879,9 @@ function QuizResults({
 
     const fetchResults = async () => {
       try {
-        const response = await fetch(`/api/student/quiz/submission/${results.submissionId}`);
+        const response = await fetch(`/api/student/quiz/submission/${results.submissionId}`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('student_token')}` },
+        });
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.data) {

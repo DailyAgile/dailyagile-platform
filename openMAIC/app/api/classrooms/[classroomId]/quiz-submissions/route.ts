@@ -3,7 +3,9 @@
  * GET: Fetch all submissions for a classroom with answer details
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { authorize, canManage, requireStudentOrStaff } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { createClient } from '@supabase/supabase-js';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
@@ -47,53 +49,74 @@ export async function GET(
   try {
     const { classroomId } = await params;
 
+    const caller = await authorize(req, requireInstructor);
+    if (caller instanceof NextResponse) return caller;
+    const { data: classroom } = await getSupabaseClient()
+      .from('classrooms')
+      .select('instructor_id')
+      .eq('id', classroomId)
+      .single();
+    if (!canManage(caller, classroom?.instructor_id)) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+
     // Create Supabase client
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-    );
 
     // Fetch submissions for classroom with answers
-    const { data: submissions, error: submissionsError } = await getSupabaseClient()
-      .from('quiz_submissions')
-      .select(
-        `
-        id,
-        classroom_id,
-        student_id,
-        scene_id,
-        submitted_at,
-        score,
-        percentage,
-        quiz_answers (
-          id,
-          question_id,
-          question_type,
-          user_answer,
-          points,
-          points_earned,
-          feedback,
-          ai_score,
-          ai_feedback,
-          ai_graded_at,
-          instructor_score,
-          instructor_feedback,
-          graded_by,
-          reviewed_at,
-          is_instructor_graded
-        )
-      `
-      )
-      .eq('classroom_id', classroomId)
-      .order('submitted_at', { ascending: false });
+    // Attempts live in student_quiz_history. A classroom's submissions are the attempts on its quizzes.
+    const supabase = getSupabaseClient();
+    const { data: classQuizzes } = await supabase
+      .from('quizzes')
+      .select('id, title')
+      .eq('classroom_id', classroomId);
+    const quizIds = (classQuizzes || []).map((q: { id: string }) => q.id);
+    const titleById = new Map((classQuizzes || []).map((q: { id: string; title: string }) => [q.id, q.title]));
+
+    const { data: attempts, error: submissionsError } = quizIds.length
+      ? await supabase
+          .from('student_quiz_history')
+          .select('id, student_id, quiz_id, score, percentage, attempted_at, answers')
+          .in('quiz_id', quizIds)
+          .order('attempted_at', { ascending: false })
+      : { data: [], error: null };
 
     if (submissionsError) {
       log.error('Failed to fetch submissions:', submissionsError);
       return apiError('INTERNAL_ERROR', 500, 'Failed to fetch submissions');
     }
 
+    const submissions = (attempts || []).map((a: {
+      id: string; student_id: string; quiz_id: string; score: number; percentage: number | null; attempted_at: string;
+      answers: Array<{ question_id: string; user_answer: string | null; is_correct: boolean }> | null;
+    }) => ({
+      id: a.id,
+      classroom_id: classroomId,
+      student_id: a.student_id,
+      scene_id: titleById.get(a.quiz_id) ?? a.quiz_id,
+      submitted_at: a.attempted_at,
+      score: a.score,
+      percentage: a.percentage,
+      quiz_answers: (Array.isArray(a.answers) ? a.answers : []).map((ans, index) => ({
+        id: `${a.id}-${index}`,
+        question_id: ans.question_id,
+        question_type: 'single',
+        user_answer: ans.user_answer,
+        points: 10,
+        points_earned: ans.is_correct ? 10 : 0,
+        feedback: null,
+        ai_score: null,
+        ai_feedback: null,
+        ai_graded_at: null,
+        instructor_score: null,
+        instructor_feedback: null,
+        graded_by: null,
+        reviewed_at: null,
+        is_instructor_graded: false,
+      })),
+    }));
+
     // Transform data to match expected interface
-    const formattedSubmissions: QuizSubmission[] = (submissions || []).map((sub: any) => ({
+    const formattedSubmissions: QuizSubmission[] = submissions.map((sub: any) => ({
       id: sub.id,
       classroom_id: sub.classroom_id,
       student_id: sub.student_id,

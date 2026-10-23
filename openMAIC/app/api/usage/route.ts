@@ -1,6 +1,8 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/logger';
 import { apiError, apiSuccess } from '@/lib/server/api-response';
+import { authorize } from '@/lib/server/route-guards';
+import { requireAdmin } from '@/lib/server/auth-middleware';
 import {
   readUsageRecords,
   type UsageRecord,
@@ -70,6 +72,9 @@ function dayKey(createdAt: number): string {
  */
 export async function GET(req: NextRequest) {
   try {
+    const caller = await authorize(req, requireAdmin);
+    if (caller instanceof NextResponse) return caller;
+
     const monthsParam = req.nextUrl.searchParams.get('months');
     const months = monthsParam ? monthsParam.split(',').map((s) => s.trim()) : undefined;
 

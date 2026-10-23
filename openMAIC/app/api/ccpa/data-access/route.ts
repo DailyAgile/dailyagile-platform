@@ -18,6 +18,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createLogger } from '@/lib/logger';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
+import { authorize } from '@/lib/server/route-guards';
+import { requireAuth } from '@/lib/server/auth-middleware';
 import { generateCCPADataReport } from '@/lib/ccpa/consumer-data-report';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/server/rate-limiter';
 
@@ -40,14 +42,25 @@ interface CCPADataAccessRequest {
 
 export async function POST(req: NextRequest) {
   try {
+    const caller = await authorize(req, requireAuth);
+    if (caller instanceof NextResponse) return caller;
+
     const body = (await req.json()) as CCPADataAccessRequest;
-    const { email, verification_token, format = 'json' } = body;
+    const { email, format = 'json' } = body;
 
     // Validate email
     if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       return NextResponse.json(
         { error: 'INVALID_EMAIL', message: 'Please provide a valid email address' },
         { status: 400 }
+      );
+    }
+
+    // Only the signed-in user may export their own data
+    if (caller.email.toLowerCase() !== email.toLowerCase()) {
+      return NextResponse.json(
+        { error: 'FORBIDDEN', message: 'You can only request your own data' },
+        { status: 403 }
       );
     }
 

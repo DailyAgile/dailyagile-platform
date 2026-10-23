@@ -89,7 +89,7 @@ export async function GET(
     // 🔒 AUTHORIZATION: Verify quiz belongs to this instructor
     const { data: quiz, error: quizError } = await supabase
       .from('quizzes')
-      .select('id, title, total_questions, total_points, instructor_id')
+      .select('id, title, total_questions, total_points, instructor_id, passing_score_percentage')
       .eq('id', quizId)
       .eq('instructor_id', authenticatedInstructor.id)
       .single();
@@ -101,31 +101,29 @@ export async function GET(
       return apiError('FORBIDDEN', 403, 'You do not have permission to view this quiz');
     }
 
-    // Get all attempts for this quiz with student info
-    const { data: attempts, error: attemptsError } = await supabase
-      .from('quiz_attempts')
-      .select(
-        `
-        id,
-        assignment_id,
-        status,
-        score,
-        attempted_at,
-        duration_seconds,
-        quiz_assignments!inner (
-          id,
-          students!inner (
-            id,
-            email,
-            first_name,
-            last_name
-          )
-        )
-      `,
-      )
+    // Attempts are stored in student_quiz_history (see /api/quiz/submit).
+    const { data: historyRows, error: attemptsError } = await supabase
+      .from('student_quiz_history')
+      .select('id, student_id, score, percentage, passed, attempted_at, time_taken_seconds')
       .eq('quiz_id', quizId)
       .order('attempted_at', { ascending: false })
       .range(offset, offset + limit - 1);
+
+    const studentIds = [...new Set((historyRows || []).map((r: { student_id: string }) => r.student_id))];
+    const { data: studentRows } = studentIds.length
+      ? await supabase.from('students').select('id, email, first_name, last_name').in('id', studentIds)
+      : { data: [] as Array<{ id: string }> };
+    const studentById = new Map((studentRows || []).map((st: { id: string }) => [st.id, st]));
+
+    const attempts = (historyRows || []).map((r: { id: string; student_id: string; score: number; attempted_at: string; time_taken_seconds: number | null }) => ({
+      id: r.id,
+      assignment_id: null,
+      status: 'completed',
+      score: r.score,
+      attempted_at: r.attempted_at,
+      duration_seconds: r.time_taken_seconds,
+      quiz_assignments: { id: null, students: studentById.get(r.student_id) ?? null },
+    })) as QuizAttempt[];
 
     if (attemptsError) {
       log.error('Failed to fetch attempts:', attemptsError);
@@ -153,31 +151,30 @@ export async function GET(
 
     // Calculate stats
     const completedAttempts = (attempts || []).filter((a: QuizAttempt) => a.status === 'completed');
-    const scores = completedAttempts
-      .filter((a: QuizAttempt) => a.score !== null)
-      .map((a: QuizAttempt) => a.score as number);
+    // Percentages, so the average and pass rate match the student's results screen.
+    const percentOf = (score: number | null) =>
+      score !== null && quiz.total_points > 0 ? (score / quiz.total_points) * 100 : null;
+    const passMark = quiz.passing_score_percentage ?? 70;
+    const percents = completedAttempts
+      .map((a: QuizAttempt) => percentOf(a.score))
+      .filter((p: number | null): p is number => p !== null);
 
     const stats = {
       total_attempts: attempts?.length || 0,
       completed_count: completedAttempts.length,
       average_score:
-        scores.length > 0
-          ? Math.round(scores.reduce((a: number, b: number) => a + b, 0) / scores.length)
+        percents.length > 0
+          ? Math.round(percents.reduce((a: number, b: number) => a + b, 0) / percents.length)
           : 0,
       pass_rate:
-        completedAttempts.length > 0
-          ? Math.round(
-              (completedAttempts.filter((a: QuizAttempt) => (a.score || 0) >= (quiz.total_points || 0) * 0.6)
-                .length /
-                completedAttempts.length) *
-                100,
-            )
+        percents.length > 0
+          ? Math.round((percents.filter((p: number) => p >= passMark).length / percents.length) * 100)
           : 0,
     };
 
     // Get total count for pagination
     const { count: totalCount } = await supabase
-      .from('quiz_attempts')
+      .from('student_quiz_history')
       .select('id', { count: 'exact', head: true })
       .eq('quiz_id', quizId);
 

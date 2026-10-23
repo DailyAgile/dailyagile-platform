@@ -5,6 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { authorize, canManage, requireStudentOrStaff } from '@/lib/server/route-guards';
+import { requireInstructor } from '@/lib/server/auth-middleware';
 import { getSupabaseClient } from '@/lib/server/supabase-client';
 import { createLogger } from '@/lib/logger';
 
@@ -29,6 +31,9 @@ interface QuizQuestion {
 
 export async function GET(req: NextRequest) {
   try {
+    const caller = await authorize(req, requireInstructor);
+    if (caller instanceof NextResponse) return caller;
+
     const searchParams = req.nextUrl.searchParams;
     const quizId = searchParams.get('quiz_id');
 
@@ -45,6 +50,10 @@ export async function GET(req: NextRequest) {
       .select('*')
       .eq('id', quizId)
       .single();
+
+    if (!quiz || !canManage(caller, quiz.instructor_id)) {
+      return NextResponse.json({ error: { message: 'Forbidden' } }, { status: 403 });
+    }
 
     if (quizError) {
       log.error('Error fetching quiz:', quizError);

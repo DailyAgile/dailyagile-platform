@@ -12,6 +12,11 @@ function getIconForStudent(studentId: string): string {
   return STUDENT_ICONS[hash % STUDENT_ICONS.length];
 }
 
+interface ParticipantRow {
+  student_id: string;
+  student_name: string | null;
+}
+
 interface StudentStatus {
   student_id: string;
   student_name: string;
@@ -64,11 +69,11 @@ export async function GET(
       .eq('session_id', session.id)
       .eq('question_id', `q${session.current_question_index}`);
 
-    const answeredIds = new Set(responses?.map((r) => r.student_id) || []);
+    const answeredIds = new Set(responses?.map((r: { student_id: string }) => r.student_id) || []);
 
     const answered: StudentStatus[] = participants
-      .filter((p) => answeredIds.has(p.student_id))
-      .map((p) => ({
+      .filter((p: ParticipantRow) => answeredIds.has(p.student_id))
+      .map((p: ParticipantRow) => ({
         student_id: p.student_id,
         student_name: p.student_name || 'Anonymous',
         icon: getIconForStudent(p.student_id),
@@ -76,8 +81,8 @@ export async function GET(
       }));
 
     const waiting: StudentStatus[] = participants
-      .filter((p) => !answeredIds.has(p.student_id))
-      .map((p) => ({
+      .filter((p: ParticipantRow) => !answeredIds.has(p.student_id))
+      .map((p: ParticipantRow) => ({
         student_id: p.student_id,
         student_name: p.student_name || 'Anonymous',
         icon: getIconForStudent(p.student_id),

@@ -534,8 +534,8 @@ export default function InstructorDashboard() {
       {/* HEADER */}
       <div style={{ backgroundColor: BRAND_COLORS.navy }} className="text-white py-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2">Quiz Management</h1>
-          <p style={{ color: BRAND_COLORS.gray }}>Create and manage quizzes for your courses</p>
+          <h1 className="text-4xl font-bold mb-2 text-white">Quiz Management</h1>
+          <p className="text-white/80">Create and manage quizzes for your courses</p>
         </div>
       </div>
 
